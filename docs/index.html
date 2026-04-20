@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>oCamlCase | Learn OCaml by Example</title>
+<meta name="description" content="A practical guide to OCaml with functional patterns, type system features, and coding exercises. Written for programmers who want to understand the language.">
+<meta property="og:title" content="oCamlCase | Learn OCaml by Example">
+<meta property="og:description" content="A practical guide to OCaml with functional patterns, type system features, and coding exercises.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <a class="site-name" href="index.html">
+    <span style="display:inline-block;width:30px;height:26px;overflow:hidden;vertical-align:middle;margin-right:6px;position:relative;top:-1px;flex-shrink:0;"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg" alt="" style="height:26px;width:auto;display:block;"></span>
+    o<span>Caml</span>Case
+  </a>
+  <nav class="topbar-nav">
+    <a href="index.html" class="active">Home</a>
+    <a href="cheatsheet.html">Cheat Sheet</a>
+    <a href="concepts/currying.html">Concepts</a>
+    <a href="exercises/bank.html">Exercises</a>
+  </nav>
+  <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav>
+      <div class="nav-group">
+        <span class="nav-label">Start here</span>
+        <a href="index.html" class="nav-link active"><span class="nav-num">·</span>Home</a>
+        <a href="cheatsheet.html" class="nav-link"><span class="nav-num">·</span>Cheat Sheet</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Concepts</span>
+        <a href="concepts/currying.html" class="nav-link"><span class="nav-num">1.</span>Currying</a>
+        <a href="concepts/abstractions.html" class="nav-link"><span class="nav-num">2.</span>Abstractions</a>
+        <a href="concepts/pattern-matching.html" class="nav-link"><span class="nav-num">3.</span>Pattern Matching</a>
+        <a href="concepts/higher-order.html" class="nav-link"><span class="nav-num">4.</span>Higher-Order Functions</a>
+        <a href="concepts/tail-recursion.html" class="nav-link"><span class="nav-num">5.</span>Tail Recursion</a>
+        <a href="concepts/iteration.html" class="nav-link"><span class="nav-num">6.</span>Iteration</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Exercises</span>
+        <a href="exercises/bank.html" class="nav-link"><span class="nav-num">E1.</span>Bank Account</a>
+        <a href="exercises/playlist.html" class="nav-link"><span class="nav-num">E2.</span>Playlist</a>
+        <a href="exercises/search.html" class="nav-link"><span class="nav-num">E3.</span>Search</a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="home-hero">
+      <!-- Official OCaml logo -->
+      <a href="https://ocaml.org" target="_blank" rel="noopener" style="display:inline-block; margin-bottom:24px;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg"
+             alt="OCaml logo" style="height:52px; width:auto; display:block;">
+      </a>
+      <h1>Learn OCaml<br>by example.</h1>
+      <p>A practical guide to OCaml covering functional patterns, type system features, and coding exercises. Written for programmers who want to understand the language, not just copy it.</p>
+    </div>
+
+    <div class="home-toc">
+      <div class="toc-section">
+        <div class="toc-section-head">
+          <span class="toc-section-title">Reference</span>
+        </div>
+        <div class="toc-items">
+          <a href="cheatsheet.html" class="toc-item">
+            <span class="toc-num">·</span>
+            Cheat Sheet
+            <span class="toc-desc">Syntax quick-reference: bindings, types, functions, modules</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="toc-section">
+        <div class="toc-section-head">
+          <span class="toc-section-title">Concepts</span>
+          <span class="toc-section-count">6 topics</span>
+        </div>
+        <div class="toc-items">
+          <a href="concepts/currying.html" class="toc-item">
+            <span class="toc-num">1.</span>
+            Currying
+            <span class="toc-desc">Partial application and multi-arg functions</span>
+          </a>
+          <a href="concepts/abstractions.html" class="toc-item">
+            <span class="toc-num">2.</span>
+            Abstractions
+            <span class="toc-desc">Hiding complexity behind clean interfaces</span>
+          </a>
+          <a href="concepts/pattern-matching.html" class="toc-item">
+            <span class="toc-num">3.</span>
+            Pattern Matching
+            <span class="toc-desc">Destructuring values with match expressions</span>
+          </a>
+          <a href="concepts/higher-order.html" class="toc-item">
+            <span class="toc-num">4.</span>
+            Higher-Order Functions
+            <span class="toc-desc">map, filter, fold and functions as values</span>
+          </a>
+          <a href="concepts/tail-recursion.html" class="toc-item">
+            <span class="toc-num">5.</span>
+            Tail Recursion
+            <span class="toc-desc">Writing stack-safe recursive functions</span>
+          </a>
+          <a href="concepts/iteration.html" class="toc-item">
+            <span class="toc-num">6.</span>
+            Iteration
+            <span class="toc-desc">Loops, folds, and iterative patterns</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="toc-section">
+        <div class="toc-section-head">
+          <span class="toc-section-title">Exercises</span>
+          <span class="toc-section-count">3 challenges</span>
+        </div>
+        <div class="toc-items">
+          <a href="exercises/bank.html" class="toc-item">
+            <span class="toc-num">E1.</span>
+            Bank Account
+            <span class="toc-diff">medium</span>
+            <span class="toc-desc">Variant types, records, fold</span>
+          </a>
+          <a href="exercises/playlist.html" class="toc-item">
+            <span class="toc-num">E2.</span>
+            Playlist
+            <span class="toc-diff">easy</span>
+            <span class="toc-desc">List operations, pattern matching</span>
+          </a>
+          <a href="exercises/search.html" class="toc-item">
+            <span class="toc-num">E3.</span>
+            Search
+            <span class="toc-diff">hard</span>
+            <span class="toc-desc">Definite and indefinite iteration, searching with predicates</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playlist | oCamlCase</title>
+<meta name="description" content="Practice OCaml list operations, higher-order functions, and tuple destructuring by building a music playlist with filtering, formatting, and duration calculation.">
+<meta property="og:title" content="Playlist Exercise | oCamlCase">
+<meta property="og:description" content="Build a music playlist model in OCaml using variant types, list operations, and higher-order functions.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <a class="site-name" href="../index.html">
+    <span style="display:inline-block;width:30px;height:26px;overflow:hidden;vertical-align:middle;margin-right:6px;position:relative;top:-1px;flex-shrink:0;"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg" alt="" style="height:26px;width:auto;display:block;"></span>
+    o<span>Caml</span>Case
+  </a>
+  <nav class="topbar-nav">
+    <a href="../index.html">Home</a>
+    <a href="../cheatsheet.html">Cheat Sheet</a>
+    <a href="../concepts/currying.html">Concepts</a>
+    <a href="bank.html" class="active">Exercises</a>
+  </nav>
+  <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav>
+      <div class="nav-group">
+        <span class="nav-label">Start here</span>
+        <a href="../index.html" class="nav-link"><span class="nav-num">·</span>Home</a>
+        <a href="../cheatsheet.html" class="nav-link"><span class="nav-num">·</span>Cheat Sheet</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Concepts</span>
+        <a href="../concepts/currying.html" class="nav-link"><span class="nav-num">1.</span>Currying</a>
+        <a href="../concepts/abstractions.html" class="nav-link"><span class="nav-num">2.</span>Abstractions</a>
+        <a href="../concepts/pattern-matching.html" class="nav-link"><span class="nav-num">3.</span>Pattern Matching</a>
+        <a href="../concepts/higher-order.html" class="nav-link"><span class="nav-num">4.</span>Higher-Order Functions</a>
+        <a href="../concepts/tail-recursion.html" class="nav-link"><span class="nav-num">5.</span>Tail Recursion</a>
+        <a href="../concepts/iteration.html" class="nav-link"><span class="nav-num">6.</span>Iteration</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Exercises</span>
+        <a href="bank.html" class="nav-link"><span class="nav-num">E1.</span>Bank Account</a>
+        <a href="playlist.html" class="nav-link active"><span class="nav-num">E2.</span>Playlist</a>
+        <a href="search.html" class="nav-link"><span class="nav-num">E3.</span>Search</a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="article">
+      <div class="page-header">
+        <div class="page-label">Exercise E2 · Easy</div>
+        <h1 class="page-title">Playlist</h1>
+        <p class="page-intro">Model a music playlist using tuples and a variant type for genre. You will practice tuple destructuring, list operations, and higher-order functions to filter, format, and summarize a collection of tracks.</p>
+      </div>
+
+      <!-- Prompt -->
+      <div class="exercise-box">
+        <div class="exercise-head">
+          <div class="exercise-meta">
+            <div class="exercise-label">The challenge</div>
+            <div class="exercise-title">Build a playlist with filters and formatters</div>
+          </div>
+          <span class="diff diff-easy">Easy</span>
+        </div>
+        <div class="exercise-body">
+          <p class="exercise-desc">A track is a tuple of title, artist, duration in seconds, and genre. Build a library of functions that work with a list of such tracks: compute total duration, filter by genre or artist, extract titles, and format tracks for display.</p>
+          <ul class="req-list">
+            <li><span class="req-n">01</span>Define a <code>genre</code> variant type with <code>Rock</code>, <code>Jazz</code>, <code>Classical</code>, and <code>Pop</code> constructors.</li>
+            <li><span class="req-n">02</span>Create at least 5 track tuples of type <code>string * string * int * genre</code> and collect them in a list.</li>
+            <li><span class="req-n">03</span>Write <code>duration</code> that takes a track and returns its duration in seconds.</li>
+            <li><span class="req-n">04</span>Write <code>total_duration</code> that takes a track list and returns the sum of all durations using recursion.</li>
+            <li><span class="req-n">05</span>Write <code>filter_by_genre</code> and <code>filter_by_artist</code> using <code>List.filter</code>.</li>
+            <li><span class="req-n">06</span>Write <code>track_titles</code> using <code>List.map</code> to extract just the title from each track.</li>
+            <li><span class="req-n">07</span>Write <code>long_tracks</code> that returns only tracks longer than a given threshold in seconds.</li>
+            <li><span class="req-n">08</span>Write <code>format_track</code> that returns a formatted string, for example <code>"Bohemian Rhapsody by Queen (5:54)"</code>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Starter + hints -->
+      <div class="two-col lean">
+        <div>
+          <h2>Starter code</h2>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">playlist.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">type</span> <span class="ty">genre</span> = <span class="ty">Rock</span> | <span class="ty">Jazz</span> | <span class="ty">Classical</span> | <span class="ty">Pop</span>
+
+<span class="cmt">(* A track: (title, artist, duration_sec, genre) *)</span>
+<span class="kw">let</span> track1 = (<span class="str">"Bohemian Rhapsody"</span>, <span class="str">"Queen"</span>, <span class="num">354</span>, <span class="ty">Rock</span>)
+<span class="kw">let</span> track2 = (<span class="str">"So What"</span>, <span class="str">"Miles Davis"</span>, <span class="num">562</span>, <span class="ty">Jazz</span>)
+<span class="cmt">(* add more tracks... *)</span>
+
+<span class="kw">let</span> playlist = [track1; track2 <span class="cmt">(* ... *)</span>]
+
+<span class="kw">let</span> <span class="fn">duration</span> track =
+  <span class="cmt">(* TODO: extract the third element *)</span>
+  <span class="num">0</span>
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">total_duration</span> = <span class="kw">function</span>
+  | [] -> <span class="num">0</span>
+  | track :: rest -> <span class="cmt">(* TODO *)</span> <span class="num">0</span>
+
+<span class="kw">let</span> <span class="fn">filter_by_genre</span> g tracks =
+  <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> _ -> <span class="cmt">(* TODO *)</span> <span class="kw">false</span>) tracks
+
+<span class="kw">let</span> <span class="fn">track_titles</span> tracks =
+  <span class="ty">List</span>.<span class="fn">map</span> (<span class="kw">fun</span> _ -> <span class="cmt">(* TODO *)</span> <span class="str">""</span>) tracks
+
+<span class="kw">let</span> <span class="fn">format_track</span> (title, artist, d, _) =
+  <span class="cmt">(* TODO: use Printf.sprintf
+     minutes = d / 60, seconds = d mod 60 *)</span>
+  <span class="str">""</span></pre>
+          </div>
+        </div>
+        <div>
+          <h2>Hints</h2>
+          <p>For <code>duration</code>, use a wildcard pattern to destructure the tuple: <code>let duration (_, _, d, _) = d</code>. The same approach works in any function that only needs certain fields.</p>
+          <p>For <code>filter_by_genre</code>, the lambda needs to extract the fourth element and compare it to <code>g</code>. Notice that <code>filter_by_artist</code> follows the exact same pattern, just extracting the second element instead. This repetition hints that partial application is at work: both functions are specializations of a more general filtering idea.</p>
+          <p>For <code>format_track</code>, use <code>Printf.sprintf "%s by %s (%d:%02d)"</code>. The <code>%02d</code> format pads the seconds with a leading zero when needed.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Notice the pattern</div>
+            <p><code>filter_by_genre</code> and <code>filter_by_artist</code> are structurally identical. The only thing that changes is which field is compared and to what. This is the same idea as partial application: parameterize the behavior instead of duplicating it.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solution -->
+      <div class="sol-toggle" id="sol-toggle" onclick="toggleSolution()">
+        <span class="sol-icon" id="sol-icon">+</span>
+        Show solution
+        <span class="sol-hint">try it yourself first</span>
+      </div>
+
+      <div class="sol-body" id="sol-body">
+        <div class="two-col lean">
+          <div>
+            <div class="code-block">
+              <div class="code-top">
+                <span class="code-fname">playlist_solution.ml</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+<pre><span class="kw">type</span> <span class="ty">genre</span> = <span class="ty">Rock</span> | <span class="ty">Jazz</span> | <span class="ty">Classical</span> | <span class="ty">Pop</span>
+
+<span class="kw">let</span> track1 = (<span class="str">"Bohemian Rhapsody"</span>, <span class="str">"Queen"</span>,           <span class="num">354</span>, <span class="ty">Rock</span>)
+<span class="kw">let</span> track2 = (<span class="str">"So What"</span>,           <span class="str">"Miles Davis"</span>,     <span class="num">562</span>, <span class="ty">Jazz</span>)
+<span class="kw">let</span> track3 = (<span class="str">"Moonlight Sonata"</span>,  <span class="str">"Beethoven"</span>,       <span class="num">375</span>, <span class="ty">Classical</span>)
+<span class="kw">let</span> track4 = (<span class="str">"Billie Jean"</span>,       <span class="str">"Michael Jackson"</span>, <span class="num">294</span>, <span class="ty">Pop</span>)
+<span class="kw">let</span> track5 = (<span class="str">"Comfortably Numb"</span>,  <span class="str">"Pink Floyd"</span>,      <span class="num">382</span>, <span class="ty">Rock</span>)
+
+<span class="kw">let</span> playlist = [track1; track2; track3; track4; track5]
+
+<span class="kw">let</span> <span class="fn">duration</span> (_, _, d, _) = d
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">total_duration</span> = <span class="kw">function</span>
+  | [] -> <span class="num">0</span>
+  | track :: rest -> <span class="fn">duration</span> track + <span class="fn">total_duration</span> rest
+
+<span class="kw">let</span> <span class="fn">filter_by_genre</span> g tracks =
+  <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> (_, _, _, tg) -> tg = g) tracks
+
+<span class="kw">let</span> <span class="fn">filter_by_artist</span> artist tracks =
+  <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> (_, a, _, _) -> a = artist) tracks
+
+<span class="kw">let</span> <span class="fn">track_titles</span> tracks =
+  <span class="ty">List</span>.<span class="fn">map</span> (<span class="kw">fun</span> (title, _, _, _) -> title) tracks
+
+<span class="kw">let</span> <span class="fn">long_tracks</span> min_sec tracks =
+  <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> track -> <span class="fn">duration</span> track > min_sec) tracks
+
+<span class="kw">let</span> <span class="fn">format_track</span> (title, artist, d, _) =
+  <span class="ty">Printf</span>.<span class="fn">sprintf</span> <span class="str">"%s by %s (%d:%02d)"</span>
+    title artist (d / <span class="num">60</span>) (d <span class="kw">mod</span> <span class="num">60</span>)
+
+<span class="kw">let</span> <span class="fn">print_playlist</span> tracks =
+  <span class="ty">List</span>.<span class="fn">iter</span> (<span class="kw">fun</span> t -> <span class="fn">print_endline</span> (<span class="fn">format_track</span> t)) tracks
+
+<span class="kw">let</span> () =
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"Total: %d:%02d\n"</span>
+    (<span class="fn">total_duration</span> playlist / <span class="num">60</span>)
+    (<span class="fn">total_duration</span> playlist <span class="kw">mod</span> <span class="num">60</span>);
+  <span class="fn">print_endline</span> <span class="str">"Rock tracks:"</span>;
+  <span class="fn">print_playlist</span> (<span class="fn">filter_by_genre</span> <span class="ty">Rock</span> playlist);
+  <span class="fn">print_endline</span> <span class="str">"Long tracks (5+ min):"</span>;
+  <span class="fn">print_playlist</span> (<span class="fn">long_tracks</span> <span class="num">300</span> playlist)</pre>
+            </div>
+          </div>
+          <div>
+            <h2>Walkthrough</h2>
+            <p><strong>Tuple destructuring.</strong> The wildcard pattern <code>(_, _, d, _)</code> unpacks only what is needed and discards the rest. This is the idiomatic way to access fields in a tuple: no index syntax and no boilerplate.</p>
+            <p><strong>filter_by_genre vs filter_by_artist.</strong> Both are one-liners that differ only in which field they compare. This similarity is intentional. In a real codebase you might abstract them into a single <code>filter_by_field</code> function that accepts a field extractor, but naming them explicitly is clearer here.</p>
+            <p><strong>format_track.</strong> The <code>%02d</code> format specifier pads the value with a leading zero so that 5 minutes and 4 seconds prints as <code>5:04</code> instead of <code>5:4</code>. This is the same as the C printf format, which OCaml inherits.</p>
+            <p><strong>print_playlist.</strong> <code>List.iter</code> applies a function to every element for its side effects. Unlike <code>List.map</code>, it returns <code>unit</code>. Using it here keeps the printing logic separate from the formatting logic.</p>
+
+            <h2>Going further</h2>
+            <p>Once the basic version works, try these extensions:</p>
+            <ul>
+              <li>Write <code>sort_by_duration</code> using <code>List.sort</code> with a custom comparator.</li>
+              <li>Group tracks by genre into a list of <code>(genre * track list)</code> pairs.</li>
+              <li>Write <code>shuffle</code> using <code>List.sort</code> with <code>Random.int</code> as the comparator.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <a href="bank.html">← Bank Account</a>
+        <a href="search.html">Next: Search →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied';
+    setTimeout(() => btn.textContent = 'copy', 1600);
+  });
+}
+function toggleSolution() {
+  const open = document.getElementById('sol-body').classList.toggle('open');
+  const toggle = document.getElementById('sol-toggle');
+  document.getElementById('sol-icon').textContent = open ? '\u2212' : '+';
+  toggle.classList.toggle('open', open);
+  toggle.childNodes[2].textContent = open ? ' Hide solution' : ' Show solution';
+  localStorage.setItem('playlist-sol', open);
+}
+if (localStorage.getItem('playlist-sol') === 'true') toggleSolution();
+</script>
+</body>
+</html>

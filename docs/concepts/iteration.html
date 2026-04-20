@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iteration | oCamlCase</title>
+<meta name="description" content="Learn definite and indefinite iteration in OCaml: how to apply a function n times with iter, and how to search for the first value satisfying a predicate with first.">
+<meta property="og:title" content="Iteration | oCamlCase">
+<meta property="og:description" content="Two fundamental iteration patterns in OCaml: definite iteration with iter and indefinite iteration with first.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <a class="site-name" href="../index.html">
+    <span style="display:inline-block;width:30px;height:26px;overflow:hidden;vertical-align:middle;margin-right:6px;position:relative;top:-1px;flex-shrink:0;"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg" alt="" style="height:26px;width:auto;display:block;"></span>
+    o<span>Caml</span>Case
+  </a>
+  <nav class="topbar-nav">
+    <a href="../index.html">Home</a>
+    <a href="../cheatsheet.html">Cheat Sheet</a>
+    <a href="currying.html" class="active">Concepts</a>
+    <a href="../exercises/bank.html">Exercises</a>
+  </nav>
+  <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav>
+      <div class="nav-group">
+        <span class="nav-label">Start here</span>
+        <a href="../index.html" class="nav-link"><span class="nav-num">·</span>Home</a>
+        <a href="../cheatsheet.html" class="nav-link"><span class="nav-num">·</span>Cheat Sheet</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Concepts</span>
+        <a href="currying.html" class="nav-link"><span class="nav-num">1.</span>Currying</a>
+        <a href="abstractions.html" class="nav-link"><span class="nav-num">2.</span>Abstractions</a>
+        <a href="pattern-matching.html" class="nav-link"><span class="nav-num">3.</span>Pattern Matching</a>
+        <a href="higher-order.html" class="nav-link"><span class="nav-num">4.</span>Higher-Order Functions</a>
+        <a href="tail-recursion.html" class="nav-link"><span class="nav-num">5.</span>Tail Recursion</a>
+        <a href="iteration.html" class="nav-link active"><span class="nav-num">6.</span>Iteration</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Exercises</span>
+        <a href="../exercises/bank.html" class="nav-link"><span class="nav-num">E1.</span>Bank Account</a>
+        <a href="../exercises/playlist.html" class="nav-link"><span class="nav-num">E2.</span>Playlist</a>
+        <a href="../exercises/search.html" class="nav-link"><span class="nav-num">E3.</span>Search</a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 6 of 6</div>
+        <h1 class="page-title">Iteration</h1>
+        <p class="page-intro">OCaml has no built-in loop construct. Instead, repetition is modeled with two recursive patterns: one for when you know how many steps to take, and one for when you need to keep going until a condition is met.</p>
+      </div>
+
+      <h2>Two kinds of repetition</h2>
+      <p>In languages with loops, you typically choose between <code>for</code> (known count) and <code>while</code> (condition-based). In OCaml, the same distinction exists but is expressed through two higher-order functions: <code>iter</code> for a fixed number of applications, and <code>first</code> for searching until a predicate holds.</p>
+      <p>Both are tail recursive, so neither will overflow the stack. The key difference is that <code>iter</code> always terminates, because the count decrements to zero, while <code>first</code> may diverge if the predicate never becomes true.</p>
+
+      <h2>Definite iteration: iter</h2>
+      <p><code>iter f n start</code> applies <code>f</code> exactly <code>n</code> times to <code>start</code>, chaining the output of each call as the input to the next. When <code>n</code> reaches zero, the accumulated value is returned. The number of steps is decided before the computation begins.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>Because each call passes the result of <code>f start</code> forward, <code>iter</code> is tail recursive. The stack frame is reused on every step, so it can safely run for any number of iterations.</p>
+          <p>Partial application makes <code>iter</code> very flexible. You can fix <code>f</code> in advance to create a specialized repeater, leaving <code>n</code> and <code>start</code> open for the caller to supply.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">iter.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="kw">rec</span> <span class="fn">iter</span> (f : <span class="ty">int</span> -> <span class="ty">int</span>) (n : <span class="ty">int</span>) (start : <span class="ty">int</span>) =
+  <span class="kw">if</span> n < <span class="num">1</span> <span class="kw">then</span> start
+  <span class="kw">else</span> <span class="fn">iter</span> f (n - <span class="num">1</span>) (f start)
+
+<span class="cmt">(* iter (fun a -> a * 2) 3 1
+   step 1: 1  -> 2
+   step 2: 2  -> 4
+   step 3: 4  -> 8
+   result: 8 *)</span>
+
+<span class="cmt">(* Raise x to the power n *)</span>
+<span class="kw">let</span> <span class="fn">power</span> x n = <span class="fn">iter</span> (<span class="kw">fun</span> a -> a * x) n <span class="num">1</span>
+
+<span class="fn">power</span> <span class="num">2</span> <span class="num">10</span>  <span class="cmt">(* 1024 *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Indefinite iteration: first</h2>
+      <p><code>first pred start</code> increments <code>start</code> by one on each step until <code>pred start</code> returns <code>true</code>, then returns that value. The number of steps is not known in advance; it depends entirely on when the predicate first holds.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>Like <code>iter</code>, <code>first</code> is tail recursive. But unlike <code>iter</code>, it can diverge: if <code>pred</code> is never true, the function runs forever. This is the OCaml equivalent of a <code>while</code> loop that never exits.</p>
+          <div class="callout callout-warn">
+            <div class="callout-title">Watch out</div>
+            <p>Always verify that the predicate will eventually be satisfied for any valid input. A predicate that can never become true turns <code>first</code> into an infinite loop.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">first.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="kw">rec</span> <span class="fn">first</span> (pred : <span class="ty">int</span> -> <span class="ty">bool</span>) (start : <span class="ty">int</span>) =
+  <span class="kw">if</span> pred start <span class="kw">then</span> start
+  <span class="kw">else</span> <span class="fn">first</span> pred (start + <span class="num">1</span>)
+
+<span class="cmt">(* first (fun k -> k * k > 15) 1
+   k=1: 1  > 15? no
+   k=2: 4  > 15? no
+   k=3: 9  > 15? no
+   k=4: 16 > 15? yes -> return 4 *)</span>
+
+<span class="cmt">(* Natural square root: first k where k^2 exceeds n,
+   then step back by one *)</span>
+<span class="kw">let</span> <span class="fn">sqrt</span> x = (<span class="fn">first</span> (<span class="kw">fun</span> k -> k * k > x) <span class="num">1</span>) - <span class="num">1</span>
+
+<span class="fn">sqrt</span> <span class="num">8</span>   <span class="cmt">(* 2, since floor(sqrt(8)) = 2 *)</span>
+<span class="fn">sqrt</span> <span class="num">25</span>  <span class="cmt">(* 5 *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Building from iter and first</h2>
+      <p>Because both functions take a step function or predicate as an argument, they combine well with partial application. You can define domain-specific iteration patterns by fixing the function argument and leaving the count or starting point open.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">derived.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* Double a number n times *)</span>
+<span class="kw">let</span> <span class="fn">double_n_times</span> = <span class="fn">iter</span> (<span class="kw">fun</span> x -> x * <span class="num">2</span>)
+<span class="fn">double_n_times</span> <span class="num">4</span> <span class="num">1</span>   <span class="cmt">(* 16 *)</span>
+
+<span class="cmt">(* Increment by a fixed step n times *)</span>
+<span class="kw">let</span> <span class="fn">count_by</span> step = <span class="fn">iter</span> (<span class="kw">fun</span> x -> x + step)
+<span class="kw">let</span> <span class="fn">count_by_3</span> = <span class="fn">count_by</span> <span class="num">3</span>
+<span class="fn">count_by_3</span> <span class="num">5</span> <span class="num">0</span>   <span class="cmt">(* 15 *)</span>
+
+<span class="cmt">(* Find the first multiple of n at or above start *)</span>
+<span class="kw">let</span> <span class="fn">first_multiple_of</span> n =
+  <span class="fn">first</span> (<span class="kw">fun</span> x -> x <span class="kw">mod</span> n = <span class="num">0</span>)
+<span class="fn">first_multiple_of</span> <span class="num">7</span> <span class="num">50</span>  <span class="cmt">(* 56 *)</span></pre>
+      </div>
+
+      <div class="callout callout-key">
+        <div class="callout-title">Key insight</div>
+        <p><code>iter</code> and <code>first</code> are not built into OCaml. They are ordinary functions you define. The same is true of the looping patterns in the standard library. Once you understand how to build them, you can design your own iteration abstractions for any domain.</p>
+      </div>
+
+      <div class="page-footer">
+        <a href="tail-recursion.html">← Tail Recursion</a>
+        <a href="../exercises/bank.html">Next: Bank Account →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied';
+    setTimeout(() => btn.textContent = 'copy', 1600);
+  });
+}
+</script>
+</body>
+</html>

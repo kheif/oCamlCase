@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abstractions | oCamlCase</title>
+<meta name="description" content="Learn how OCaml uses anonymous functions (abstractions) as first-class values, and how let bindings are just syntactic sugar for naming them.">
+<meta property="og:title" content="Abstractions | oCamlCase">
+<meta property="og:description" content="Understand anonymous functions in OCaml: the fun keyword, immediate application, and the relationship between let bindings and abstractions.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <a class="site-name" href="../index.html">
+    <span style="display:inline-block;width:30px;height:26px;overflow:hidden;vertical-align:middle;margin-right:6px;position:relative;top:-1px;flex-shrink:0;"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg" alt="" style="height:26px;width:auto;display:block;"></span>
+    o<span>Caml</span>Case
+  </a>
+  <nav class="topbar-nav">
+    <a href="../index.html">Home</a>
+    <a href="../cheatsheet.html">Cheat Sheet</a>
+    <a href="currying.html" class="active">Concepts</a>
+    <a href="../exercises/bank.html">Exercises</a>
+  </nav>
+  <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav>
+      <div class="nav-group">
+        <span class="nav-label">Start here</span>
+        <a href="../index.html" class="nav-link"><span class="nav-num">·</span>Home</a>
+        <a href="../cheatsheet.html" class="nav-link"><span class="nav-num">·</span>Cheat Sheet</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Concepts</span>
+        <a href="currying.html" class="nav-link"><span class="nav-num">1.</span>Currying</a>
+        <a href="abstractions.html" class="nav-link active"><span class="nav-num">2.</span>Abstractions</a>
+        <a href="pattern-matching.html" class="nav-link"><span class="nav-num">3.</span>Pattern Matching</a>
+        <a href="higher-order.html" class="nav-link"><span class="nav-num">4.</span>Higher-Order Functions</a>
+        <a href="tail-recursion.html" class="nav-link"><span class="nav-num">5.</span>Tail Recursion</a>
+        <a href="iteration.html" class="nav-link"><span class="nav-num">6.</span>Iteration</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Exercises</span>
+        <a href="../exercises/bank.html" class="nav-link"><span class="nav-num">E1.</span>Bank Account</a>
+        <a href="../exercises/playlist.html" class="nav-link"><span class="nav-num">E2.</span>Playlist</a>
+        <a href="../exercises/search.html" class="nav-link"><span class="nav-num">E3.</span>Search</a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 2 of 6</div>
+        <h1 class="page-title">Abstractions</h1>
+        <p class="page-intro">An abstraction is a function without a name. OCaml uses the <code>fun</code> keyword to create them, and they are ordinary values just like integers or strings.</p>
+      </div>
+
+      <h2>Anonymous functions</h2>
+      <p>In most languages, creating a function requires giving it a name. OCaml lets you write a function as an expression anywhere a value is expected. The syntax is <code>fun &lt;arg&gt; -&gt; &lt;expr&gt;</code>, and the result has a function type.</p>
+      <p>Other languages call these lambdas or anonymous functions. In OCaml, the formal term is <em>abstraction</em>, because the expression abstracts over the argument: the argument is left open, and the body is the computation to run once it is supplied.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The type of <code>fun x -&gt; x * x</code> is <code>int -&gt; int</code>. It takes an integer and returns an integer. No name is needed, and the function can be used immediately. You can also apply it on the spot by wrapping it in parentheses and passing an argument.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p>An abstraction produces a value of a function type. It is not a statement or a declaration. It is an expression that evaluates to a function.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">anon.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* A function with no name *)</span>
+<span class="kw">let</span> _ = <span class="kw">fun</span> x -> x * x
+<span class="cmt">(* type: int -> int *)</span>
+
+<span class="cmt">(* Define it and apply it immediately *)</span>
+<span class="kw">let</span> _ = (<span class="kw">fun</span> x -> x * x) <span class="num">7</span>
+<span class="cmt">(* = 49 *)</span>
+
+<span class="cmt">(* Bind it to a name if you want to reuse it *)</span>
+<span class="kw">let</span> <span class="fn">square</span> = <span class="kw">fun</span> x -> x * x</pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Tuple arguments</h2>
+      <p>An abstraction takes exactly one argument, but that argument can be a tuple. Tuple destructuring happens right in the argument position, so the function body can use the components directly by name.</p>
+      <p>This looks like multiple arguments, but it is not. The function takes one pair and unpacks it. The distinction matters for currying: a function taking a tuple cannot be partially applied in the same way as a curried function.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>Contrast <code>fun x y -&gt; x * y</code> (two curried arguments, type <code>int -&gt; int -&gt; int</code>) with <code>fun (x, y) -&gt; x * y</code> (one tuple argument, type <code>int * int -&gt; int</code>). The difference is visible in the types.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">tuple_arg.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* Tuple argument *)</span>
+<span class="kw">let</span> _ = <span class="kw">fun</span> (x, y) -> x * y
+<span class="cmt">(* type: int * int -> int *)</span>
+
+<span class="cmt">(* Apply with a tuple *)</span>
+<span class="kw">let</span> _ = (<span class="kw">fun</span> (x, y) -> x * y) (<span class="num">6</span>, <span class="num">7</span>)
+<span class="cmt">(* = 42 *)</span>
+
+<span class="cmt">(* Curried version, two separate args *)</span>
+<span class="kw">let</span> _ = <span class="kw">fun</span> x y -> x * y
+<span class="cmt">(* type: int -> int -> int *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>The connection to let bindings</h2>
+      <p>When you write <code>let square x = x * x</code>, OCaml treats it as exactly the same thing as <code>let square = fun x -&gt; x * x</code>. The multi-argument <code>let</code> form is syntactic sugar. Under the hood, a named function is just an abstraction bound to a name.</p>
+      <p>This means there is nothing special about named functions. They are ordinary values of function types, stored in the environment like any other binding. The <code>fun</code> form makes this explicit.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">let_vs_fun.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* These two definitions are completely equivalent *)</span>
+<span class="kw">let</span> <span class="fn">square</span> x = x * x
+<span class="kw">let</span> <span class="fn">square'</span> = <span class="kw">fun</span> x -> x * x
+
+<span class="cmt">(* The let form is sugar. The fun form is the underlying representation.
+   OCaml sees both as binding a function value to a name. *)</span>
+
+<span class="cmt">(* Same for multiple arguments *)</span>
+<span class="kw">let</span> <span class="fn">add</span> x y = x + y
+<span class="kw">let</span> <span class="fn">add'</span> = <span class="kw">fun</span> x -> <span class="kw">fun</span> y -> x + y</pre>
+      </div>
+
+      <h2>Why first-class functions matter</h2>
+      <p>Because abstractions are ordinary values, you can pass a function as an argument to another function, return a function from a function, and store functions in data structures. This is what it means for functions to be <em>first-class</em>.</p>
+      <p>Abstractions are the building block that makes all of this natural. You can produce a function on the fly, right at the call site, without first giving it a name and a top-level binding. Higher-order functions like <code>List.map</code> and <code>List.filter</code> rely entirely on this ability.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">first_class.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* Pass a function as an argument, defined inline *)</span>
+<span class="ty">List</span>.<span class="fn">map</span> (<span class="kw">fun</span> x -> x * <span class="num">2</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* [2; 4; 6] *)</span>
+
+<span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> x -> x > <span class="num">2</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>]
+<span class="cmt">(* [3; 4] *)</span>
+
+<span class="cmt">(* Return a function from a function *)</span>
+<span class="kw">let</span> <span class="fn">multiplier</span> factor = <span class="kw">fun</span> x -> x * factor
+<span class="kw">let</span> <span class="fn">double</span> = <span class="fn">multiplier</span> <span class="num">2</span>
+<span class="cmt">(* double : int -> int *)</span></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Good practice</div>
+        <p>Use inline abstractions for short, single-use transformations. Give a function a name with <code>let</code> only when you need to reuse it or when the logic is complex enough that a name improves readability.</p>
+      </div>
+
+      <div class="page-footer">
+        <a href="currying.html">← Currying</a>
+        <a href="pattern-matching.html">Next: Pattern Matching →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied';
+    setTimeout(() => btn.textContent = 'copy', 1600);
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search | oCamlCase</title>
+<meta name="description" content="Practice OCaml iteration patterns: implement iter for definite repetition and first for indefinite search, then use them to solve concrete problems with partial application.">
+<meta property="og:title" content="Search Exercise | oCamlCase">
+<meta property="og:description" content="Implement iter and first from scratch, then use partial application to build specialized search and iteration utilities.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <a class="site-name" href="../index.html">
+    <span style="display:inline-block;width:30px;height:26px;overflow:hidden;vertical-align:middle;margin-right:6px;position:relative;top:-1px;flex-shrink:0;"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg" alt="" style="height:26px;width:auto;display:block;"></span>
+    o<span>Caml</span>Case
+  </a>
+  <nav class="topbar-nav">
+    <a href="../index.html">Home</a>
+    <a href="../cheatsheet.html">Cheat Sheet</a>
+    <a href="../concepts/currying.html">Concepts</a>
+    <a href="bank.html" class="active">Exercises</a>
+  </nav>
+  <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav>
+      <div class="nav-group">
+        <span class="nav-label">Start here</span>
+        <a href="../index.html" class="nav-link"><span class="nav-num">·</span>Home</a>
+        <a href="../cheatsheet.html" class="nav-link"><span class="nav-num">·</span>Cheat Sheet</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Concepts</span>
+        <a href="../concepts/currying.html" class="nav-link"><span class="nav-num">1.</span>Currying</a>
+        <a href="../concepts/abstractions.html" class="nav-link"><span class="nav-num">2.</span>Abstractions</a>
+        <a href="../concepts/pattern-matching.html" class="nav-link"><span class="nav-num">3.</span>Pattern Matching</a>
+        <a href="../concepts/higher-order.html" class="nav-link"><span class="nav-num">4.</span>Higher-Order Functions</a>
+        <a href="../concepts/tail-recursion.html" class="nav-link"><span class="nav-num">5.</span>Tail Recursion</a>
+        <a href="../concepts/iteration.html" class="nav-link"><span class="nav-num">6.</span>Iteration</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Exercises</span>
+        <a href="bank.html" class="nav-link"><span class="nav-num">E1.</span>Bank Account</a>
+        <a href="playlist.html" class="nav-link"><span class="nav-num">E2.</span>Playlist</a>
+        <a href="search.html" class="nav-link active"><span class="nav-num">E3.</span>Search</a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="article">
+      <div class="page-header">
+        <div class="page-label">Exercise E3 · Hard</div>
+        <h1 class="page-title">Iteration and Search</h1>
+        <p class="page-intro">Implement the two fundamental iteration patterns from scratch, then use partial application to build a family of specialized utilities on top of them. This exercise ties together currying, higher-order functions, and tail recursion.</p>
+      </div>
+
+      <!-- Prompt -->
+      <div class="exercise-box">
+        <div class="exercise-head">
+          <div class="exercise-meta">
+            <div class="exercise-label">The challenge</div>
+            <div class="exercise-title">Build iter and first, then derive everything else</div>
+          </div>
+          <span class="diff diff-hard">Hard</span>
+        </div>
+        <div class="exercise-body">
+          <p class="exercise-desc">Start by implementing the two core iteration functions. Then use them as building blocks to solve concrete problems. The goal is to get comfortable using partial application to specialize a general function into a specific one.</p>
+          <ul class="req-list">
+            <li><span class="req-n">01</span>Implement <code>iter f n start</code>: applies <code>f</code> exactly <code>n</code> times to <code>start</code>. Must be tail recursive.</li>
+            <li><span class="req-n">02</span>Use <code>iter</code> to define <code>double_n_times</code>: doubles a number exactly <code>n</code> times. Use partial application.</li>
+            <li><span class="req-n">03</span>Use <code>iter</code> to define <code>add_step</code> and <code>count_by_3</code>: add a fixed amount <code>n</code> times.</li>
+            <li><span class="req-n">04</span>Implement <code>first pred start</code>: returns the smallest integer at or above <code>start</code> for which <code>pred</code> holds.</li>
+            <li><span class="req-n">05</span>Use <code>first</code> to define <code>first_divisible_by n start</code>.</li>
+            <li><span class="req-n">06</span>Use <code>first</code> to define <code>first_perfect_square start</code>. A number <code>x</code> is a perfect square if <code>floor(sqrt(x))^2 = x</code>.</li>
+            <li><span class="req-n">07</span>Use <code>first</code> to define <code>natural_sqrt n</code>: compute <code>floor(sqrt(n))</code> without using any floating-point square root.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Starter + hints -->
+      <div class="two-col lean">
+        <div>
+          <h2>Starter code</h2>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">search.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* Definite iteration *)</span>
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">iter</span> (f : <span class="ty">int</span> -> <span class="ty">int</span>) (n : <span class="ty">int</span>) (start : <span class="ty">int</span>) =
+  <span class="cmt">(* TODO *)</span>
+  start
+
+<span class="kw">let</span> <span class="fn">double_n_times</span> n =
+  <span class="cmt">(* TODO: partial application of iter *)</span>
+  <span class="fn">iter</span> (<span class="kw">fun</span> x -> x) n
+
+<span class="kw">let</span> <span class="fn">add_step</span> step =
+  <span class="cmt">(* TODO: partial application of iter *)</span>
+  <span class="fn">iter</span> (<span class="kw">fun</span> x -> x) step
+
+<span class="kw">let</span> <span class="fn">count_by_3</span> =
+  <span class="cmt">(* TODO: partial application of add_step *)</span>
+  <span class="fn">add_step</span> <span class="num">0</span>
+
+<span class="cmt">(* Indefinite iteration *)</span>
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">first</span> (pred : <span class="ty">int</span> -> <span class="ty">bool</span>) (start : <span class="ty">int</span>) =
+  <span class="cmt">(* TODO *)</span>
+  start
+
+<span class="kw">let</span> <span class="fn">first_divisible_by</span> n start =
+  <span class="cmt">(* TODO *)</span>
+  <span class="num">0</span>
+
+<span class="kw">let</span> <span class="fn">first_perfect_square</span> start =
+  <span class="cmt">(* TODO: use int_of_float (sqrt (float_of_int x)) *)</span>
+  <span class="num">0</span>
+
+<span class="kw">let</span> <span class="fn">natural_sqrt</span> n =
+  <span class="cmt">(* TODO: use first to find the first k where k*k > n *)</span>
+  <span class="num">0</span></pre>
+          </div>
+        </div>
+        <div>
+          <h2>Hints</h2>
+          <p>For <code>iter</code>, the base case is when <code>n &lt; 1</code>: return <code>start</code> as is. For the recursive case, call <code>iter</code> again with <code>n - 1</code> and <code>f start</code> as the new starting value. This keeps the recursion in tail position.</p>
+          <p>For <code>double_n_times</code>, notice that <code>iter (fun x -&gt; x * 2)</code> is a function of type <code>int -&gt; int -&gt; int</code>. Supplying just <code>iter (fun x -&gt; x * 2)</code> gives you a function that still expects <code>n</code> and <code>start</code>. That is exactly <code>double_n_times</code>.</p>
+          <p>For <code>natural_sqrt</code>, use <code>first</code> to find the first <code>k</code> where <code>k * k &gt; n</code>, starting from <code>1</code>. Then subtract 1 from the result.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key insight</div>
+            <p>Every derived function is just <code>iter</code> or <code>first</code> with one or more arguments already fixed. Recognize this pattern and the implementations become one-liners.</p>
+          </div>
+          <div class="callout callout-warn">
+            <div class="callout-title">Watch out</div>
+            <p><code>first_perfect_square</code> uses OCaml's built-in <code>sqrt</code> to check whether a number is a perfect square, but <code>natural_sqrt</code> must not. The whole point of <code>natural_sqrt</code> is to compute the integer square root using only integer arithmetic through <code>first</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solution -->
+      <div class="sol-toggle" id="sol-toggle" onclick="toggleSolution()">
+        <span class="sol-icon" id="sol-icon">+</span>
+        Show solution
+        <span class="sol-hint">try it yourself first</span>
+      </div>
+
+      <div class="sol-body" id="sol-body">
+        <div class="two-col lean">
+          <div>
+            <div class="code-block">
+              <div class="code-top">
+                <span class="code-fname">search_solution.ml</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+<pre><span class="cmt">(* Definite iteration *)</span>
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">iter</span> (f : <span class="ty">int</span> -> <span class="ty">int</span>) (n : <span class="ty">int</span>) (start : <span class="ty">int</span>) =
+  <span class="kw">if</span> n < <span class="num">1</span> <span class="kw">then</span> start
+  <span class="kw">else</span> <span class="fn">iter</span> f (n - <span class="num">1</span>) (f start)
+
+<span class="kw">let</span> <span class="fn">double_n_times</span> = <span class="fn">iter</span> (<span class="kw">fun</span> x -> x * <span class="num">2</span>)
+<span class="cmt">(* double_n_times : int -> int -> int *)</span>
+
+<span class="kw">let</span> <span class="fn">add_step</span> step = <span class="fn">iter</span> (<span class="kw">fun</span> x -> x + step)
+<span class="kw">let</span> <span class="fn">count_by_3</span> = <span class="fn">add_step</span> <span class="num">3</span>
+
+<span class="cmt">(* Indefinite iteration *)</span>
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">first</span> (pred : <span class="ty">int</span> -> <span class="ty">bool</span>) (start : <span class="ty">int</span>) =
+  <span class="kw">if</span> pred start <span class="kw">then</span> start
+  <span class="kw">else</span> <span class="fn">first</span> pred (start + <span class="num">1</span>)
+
+<span class="kw">let</span> <span class="fn">first_divisible_by</span> n =
+  <span class="fn">first</span> (<span class="kw">fun</span> x -> x <span class="kw">mod</span> n = <span class="num">0</span>)
+
+<span class="kw">let</span> <span class="fn">first_perfect_square</span> start =
+  <span class="kw">let</span> <span class="fn">is_square</span> x =
+    <span class="kw">let</span> s = <span class="fn">int_of_float</span> (<span class="fn">sqrt</span> (<span class="fn">float_of_int</span> x)) <span class="kw">in</span>
+    s * s = x
+  <span class="kw">in</span>
+  <span class="fn">first</span> <span class="fn">is_square</span> start
+
+<span class="kw">let</span> <span class="fn">natural_sqrt</span> n =
+  (<span class="fn">first</span> (<span class="kw">fun</span> k -> k * k > n) <span class="num">1</span>) - <span class="num">1</span>
+
+<span class="kw">let</span> () =
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"1 doubled 4 times: %d\n"</span>
+    (<span class="fn">double_n_times</span> <span class="num">4</span> <span class="num">1</span>);
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"count_by_3, 5 steps from 0: %d\n"</span>
+    (<span class="fn">count_by_3</span> <span class="num">5</span> <span class="num">0</span>);
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"First multiple of 7 from 50: %d\n"</span>
+    (<span class="fn">first_divisible_by</span> <span class="num">7</span> <span class="num">50</span>);
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"First perfect square from 20: %d\n"</span>
+    (<span class="fn">first_perfect_square</span> <span class="num">20</span>);
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"floor(sqrt(50)): %d\n"</span>
+    (<span class="fn">natural_sqrt</span> <span class="num">50</span>)</pre>
+            </div>
+          </div>
+          <div>
+            <h2>Walkthrough</h2>
+            <p><strong>iter.</strong> The function simply decrements <code>n</code> and applies <code>f</code> to <code>start</code> on each recursive call. Both updated values are passed forward as arguments, so there is nothing pending after the recursive call. This makes it tail recursive.</p>
+            <p><strong>double_n_times.</strong> Supplying <code>iter (fun x -&gt; x * 2)</code> produces a function waiting for <code>n</code> and <code>start</code>. That is exactly the type of <code>double_n_times</code>. No wrapper function is needed.</p>
+            <p><strong>add_step and count_by_3.</strong> <code>add_step</code> takes <code>step</code> and returns a partially applied <code>iter</code>. Then <code>count_by_3</code> partially applies <code>add_step</code> with <code>3</code>, giving a function of type <code>int -&gt; int -&gt; int</code>. Two levels of partial application, both one-liners.</p>
+            <p><strong>natural_sqrt.</strong> The key insight is that the first <code>k</code> where <code>k * k &gt; n</code> overshoots by exactly one step. Subtracting 1 gives the floor of the square root. No floating-point arithmetic involved.</p>
+
+            <h2>Going further</h2>
+            <p>Once everything works, try these extensions:</p>
+            <ul>
+              <li>Generalize <code>iter</code> to work with any type, not just <code>int</code>. What does the signature look like?</li>
+              <li>Write <code>iterate_until f pred start</code> that applies <code>f</code> repeatedly until <code>pred</code> holds, similar to <code>first</code> but with a custom step function.</li>
+              <li>Use <code>iter</code> to implement the Fibonacci sequence: <code>fib n</code> via a pair accumulator <code>(a, b)</code> where each step becomes <code>(b, a + b)</code>.</li>
+            </ul>
+            <div class="code-block" style="margin-top:16px;">
+              <div class="code-top">
+                <span class="code-fname">extension.ml</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+<pre><span class="cmt">(* Fibonacci using iter with a pair accumulator *)</span>
+<span class="kw">let</span> <span class="fn">fib</span> n =
+  <span class="kw">let</span> <span class="fn">step</span> (a, b) = (b, a + b) <span class="kw">in</span>
+  <span class="kw">let</span> <span class="kw">rec</span> <span class="fn">loop</span> acc k =
+    <span class="kw">if</span> k < <span class="num">1</span> <span class="kw">then</span> <span class="fn">fst</span> acc
+    <span class="kw">else</span> <span class="fn">loop</span> (<span class="fn">step</span> acc) (k - <span class="num">1</span>)
+  <span class="kw">in</span>
+  <span class="fn">loop</span> (<span class="num">0</span>, <span class="num">1</span>) n
+
+<span class="fn">fib</span> <span class="num">10</span>  <span class="cmt">(* 55 *)</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <a href="playlist.html">← Playlist</a>
+        <a href="../index.html">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied';
+    setTimeout(() => btn.textContent = 'copy', 1600);
+  });
+}
+function toggleSolution() {
+  const open = document.getElementById('sol-body').classList.toggle('open');
+  const toggle = document.getElementById('sol-toggle');
+  document.getElementById('sol-icon').textContent = open ? '\u2212' : '+';
+  toggle.classList.toggle('open', open);
+  toggle.childNodes[2].textContent = open ? ' Hide solution' : ' Show solution';
+  localStorage.setItem('search-sol', open);
+}
+if (localStorage.getItem('search-sol') === 'true') toggleSolution();
+</script>
+</body>
+</html>

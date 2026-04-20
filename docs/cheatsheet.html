@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet | oCamlCase</title>
+<meta name="description" content="Quick reference for OCaml syntax: bindings, types, functions, pattern matching, lists, modules, and I/O.">
+<meta property="og:title" content="OCaml Cheat Sheet | oCamlCase">
+<meta property="og:description" content="Quick reference for OCaml syntax: bindings, types, functions, pattern matching, lists, modules, and I/O.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <a class="site-name" href="index.html">
+    <span style="display:inline-block;width:30px;height:26px;overflow:hidden;vertical-align:middle;margin-right:6px;position:relative;top:-1px;flex-shrink:0;"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg" alt="" style="height:26px;width:auto;display:block;"></span>
+    o<span>Caml</span>Case
+  </a>
+  <nav class="topbar-nav">
+    <a href="index.html">Home</a>
+    <a href="cheatsheet.html" class="active">Cheat Sheet</a>
+    <a href="concepts/currying.html">Concepts</a>
+    <a href="exercises/bank.html">Exercises</a>
+  </nav>
+  <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav>
+      <div class="nav-group">
+        <span class="nav-label">Start here</span>
+        <a href="index.html" class="nav-link"><span class="nav-num">·</span>Home</a>
+        <a href="cheatsheet.html" class="nav-link active"><span class="nav-num">·</span>Cheat Sheet</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Concepts</span>
+        <a href="concepts/currying.html" class="nav-link"><span class="nav-num">1.</span>Currying</a>
+        <a href="concepts/abstractions.html" class="nav-link"><span class="nav-num">2.</span>Abstractions</a>
+        <a href="concepts/pattern-matching.html" class="nav-link"><span class="nav-num">3.</span>Pattern Matching</a>
+        <a href="concepts/higher-order.html" class="nav-link"><span class="nav-num">4.</span>Higher-Order Functions</a>
+        <a href="concepts/tail-recursion.html" class="nav-link"><span class="nav-num">5.</span>Tail Recursion</a>
+        <a href="concepts/iteration.html" class="nav-link"><span class="nav-num">6.</span>Iteration</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Exercises</span>
+        <a href="exercises/bank.html" class="nav-link"><span class="nav-num">E1.</span>Bank Account</a>
+        <a href="exercises/playlist.html" class="nav-link"><span class="nav-num">E2.</span>Playlist</a>
+        <a href="exercises/search.html" class="nav-link"><span class="nav-num">E3.</span>Search</a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="article" style="max-width:1060px;">
+      <div class="page-header">
+        <div class="page-label">Reference</div>
+        <h1 class="page-title">OCaml Cheat Sheet</h1>
+        <p class="page-intro">Common syntax for OCaml 5.x. Not exhaustive. Each card shows the most useful forms.</p>
+      </div>
+
+      <!-- Bindings -->
+      <div class="cheat-section">
+        <h2>Bindings</h2>
+        <div class="cheat-grid">
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">let binding</div>
+<pre><span class="kw">let</span> x = <span class="num">42</span>
+<span class="kw">let</span> name = <span class="str">"Alice"</span>
+<span class="kw">let</span> pi : <span class="ty">float</span> = <span class="num">3.14159</span>
+<span class="cmt">(* immutable by default *)</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">let … in (local scope)</div>
+<pre><span class="kw">let</span> result =
+  <span class="kw">let</span> a = <span class="num">10</span> <span class="kw">in</span>
+  <span class="kw">let</span> b = <span class="num">20</span> <span class="kw">in</span>
+  a + b    <span class="cmt">(* 30 *)</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">mutable ref</div>
+<pre><span class="kw">let</span> n = <span class="fn">ref</span> <span class="num">0</span>
+n := !n + <span class="num">1</span>
+<span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"%d\n"</span> !n  <span class="cmt">(* 1 *)</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">destructuring</div>
+<pre><span class="kw">let</span> (a, b)       = (<span class="num">1</span>, <span class="num">2</span>)
+<span class="kw">let</span> { name; age } = person
+<span class="kw">let</span> x :: rest    = [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Types -->
+      <div class="cheat-section">
+        <h2>Types</h2>
+        <div class="cheat-grid">
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">type alias</div>
+<pre><span class="kw">type</span> <span class="ty">name</span>     = <span class="ty">string</span>
+<span class="kw">type</span> <span class="ty">point</span>    = <span class="ty">float</span> * <span class="ty">float</span>
+<span class="kw">type</span> <span class="ty">'a pair</span> = <span class="ty">'a</span> * <span class="ty">'a</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">record type</div>
+<pre><span class="kw">type</span> <span class="ty">person</span> = {
+  name  : <span class="ty">string</span>;
+  age   : <span class="ty">int</span>;
+  mutable score : <span class="ty">int</span>;
+}
+<span class="kw">let</span> p2 = { p <span class="kw">with</span> age = <span class="num">31</span> }</pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">variant (ADT)</div>
+<pre><span class="kw">type</span> <span class="ty">shape</span> =
+  | <span class="ty">Circle</span>    <span class="kw">of</span> <span class="ty">float</span>
+  | <span class="ty">Rect</span>      <span class="kw">of</span> <span class="ty">float</span> * <span class="ty">float</span>
+  | <span class="ty">Point</span>
+<span class="kw">let</span> s = <span class="ty">Circle</span> <span class="num">5.0</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">option</div>
+<pre><span class="kw">let</span> <span class="fn">safe_div</span> a b =
+  <span class="kw">if</span> b = <span class="num">0</span> <span class="kw">then</span> <span class="ty">None</span>
+  <span class="kw">else</span> <span class="ty">Some</span> (a / b)
+<span class="cmt">(* int -> int -> int option *)</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">result</div>
+<pre><span class="kw">let</span> <span class="fn">parse</span> s =
+  <span class="kw">match</span> <span class="fn">int_of_string_opt</span> s <span class="kw">with</span>
+  | <span class="ty">Some</span> n -> <span class="ty">Ok</span> n
+  | <span class="ty">None</span>   -> <span class="ty">Error</span> <span class="str">"not a number"</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">recursive type</div>
+<pre><span class="kw">type</span> <span class="ty">'a tree</span> =
+  | <span class="ty">Leaf</span>
+  | <span class="ty">Node</span> <span class="kw">of</span> <span class="ty">'a</span> * <span class="ty">'a tree</span> * <span class="ty">'a tree</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Functions -->
+      <div class="cheat-section">
+        <h2>Functions</h2>
+        <div class="cheat-grid">
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">defining functions</div>
+<pre><span class="kw">let</span> <span class="fn">square</span> x  = x * x
+<span class="kw">let</span> <span class="fn">add</span> x y   = x + y
+<span class="kw">let</span> <span class="fn">sq</span>        = <span class="kw">fun</span> x -> x * x</pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">recursive</div>
+<pre><span class="kw">let</span> <span class="kw">rec</span> <span class="fn">fact</span> n =
+  <span class="kw">if</span> n <= <span class="num">1</span> <span class="kw">then</span> <span class="num">1</span>
+  <span class="kw">else</span> n * <span class="fn">fact</span> (n - <span class="num">1</span>)
+<span class="fn">fact</span> <span class="num">5</span>  <span class="cmt">(* 120 *)</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">labeled &amp; optional args</div>
+<pre><span class="kw">let</span> <span class="fn">greet</span> ?(title=<span class="str">""</span>) ~name =
+  <span class="kw">if</span> title = <span class="str">""</span> <span class="kw">then</span> name
+  <span class="kw">else</span> title ^ <span class="str">" "</span> ^ name
+<span class="fn">greet</span> ~title:<span class="str">"Dr."</span> ~name:<span class="str">"Lee"</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">pipe operator |&gt;</div>
+<pre>[<span class="num">1</span>;<span class="num">2</span>;<span class="num">3</span>;<span class="num">4</span>;<span class="num">5</span>]
+|> <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> x -> x <span class="kw">mod</span> <span class="num">2</span> = <span class="num">0</span>)
+|> <span class="ty">List</span>.<span class="fn">map</span>    (<span class="kw">fun</span> x -> x * x)
+|> <span class="ty">List</span>.<span class="fn">fold_left</span> (+) <span class="num">0</span>  <span class="cmt">(* 20 *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pattern matching -->
+      <div class="cheat-section">
+        <h2>Pattern Matching</h2>
+        <div class="cheat-grid">
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">match expression</div>
+<pre><span class="kw">match</span> x <span class="kw">with</span>
+| <span class="num">0</span>           -> <span class="str">"zero"</span>
+| n <span class="kw">when</span> n < <span class="num">0</span> -> <span class="str">"negative"</span>
+| _           -> <span class="str">"positive"</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">matching variants</div>
+<pre><span class="kw">let</span> <span class="fn">area</span> = <span class="kw">function</span>
+  | <span class="ty">Circle</span> r     -> <span class="ty">Float</span>.<span class="fn">pi</span> *. r *. r
+  | <span class="ty">Rect</span> (w, h)  -> w *. h
+  | <span class="ty">Point</span>        -> <span class="num">0.0</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">matching lists</div>
+<pre><span class="kw">let</span> <span class="kw">rec</span> <span class="fn">sum</span> = <span class="kw">function</span>
+  | []      -> <span class="num">0</span>
+  | x :: xs -> x + <span class="fn">sum</span> xs
+<span class="fn">sum</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]  <span class="cmt">(* 6 *)</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">nested patterns</div>
+<pre><span class="kw">match</span> pair <span class="kw">with</span>
+| (<span class="ty">Some</span> x, <span class="ty">Some</span> y) -> x + y
+| (<span class="ty">Some</span> x, <span class="ty">None</span>)   -> x
+| (<span class="ty">None</span>,   _)      -> <span class="num">0</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lists -->
+      <div class="cheat-section">
+        <h2>Lists &amp; Collections</h2>
+        <div class="cheat-grid">
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">list basics</div>
+<pre><span class="kw">let</span> xs = [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="num">0</span> :: xs           <span class="cmt">(* [0;1;2;3] *)</span>
+xs @ [<span class="num">4</span>; <span class="num">5</span>]      <span class="cmt">(* [1;2;3;4;5] *)</span>
+<span class="ty">List</span>.<span class="fn">length</span> xs    <span class="cmt">(* 3 *)</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">map / filter / fold</div>
+<pre><span class="ty">List</span>.<span class="fn">map</span>    (<span class="kw">fun</span> x -> x*<span class="num">2</span>) xs
+<span class="cmt">(* [2; 4; 6] *)</span>
+<span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> x -> x > <span class="num">1</span>) xs
+<span class="cmt">(* [2; 3] *)</span>
+<span class="ty">List</span>.<span class="fn">fold_left</span> (+) <span class="num">0</span> xs  <span class="cmt">(* 6 *)</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">arrays</div>
+<pre><span class="kw">let</span> a = [| <span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span> |]
+a.(<span class="num">0</span>)           <span class="cmt">(* 1, read *)</span>
+a.(<span class="num">0</span>) <- <span class="num">99</span>     <span class="cmt">(* mutate *)</span>
+<span class="ty">Array</span>.<span class="fn">map</span> (<span class="kw">fun</span> x -> x+<span class="num">1</span>) a</pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">Hashtbl</div>
+<pre><span class="kw">let</span> t = <span class="ty">Hashtbl</span>.<span class="fn">create</span> <span class="num">16</span>
+<span class="ty">Hashtbl</span>.<span class="fn">add</span>    t <span class="str">"k"</span> <span class="num">42</span>
+<span class="ty">Hashtbl</span>.<span class="fn">find</span>   t <span class="str">"k"</span>   <span class="cmt">(* 42 *)</span>
+<span class="ty">Hashtbl</span>.<span class="fn">remove</span> t <span class="str">"k"</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modules -->
+      <div class="cheat-section">
+        <h2>Modules</h2>
+        <div class="cheat-grid">
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">defining a module</div>
+<pre><span class="kw">module</span> <span class="ty">Stack</span> = <span class="kw">struct</span>
+  <span class="kw">type</span> <span class="ty">'a t</span> = <span class="ty">'a list</span>
+  <span class="kw">let</span> <span class="fn">empty</span>    = []
+  <span class="kw">let</span> <span class="fn">push</span> x s = x :: s
+<span class="kw">end</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">signature</div>
+<pre><span class="kw">module type</span> <span class="ty">S</span> = <span class="kw">sig</span>
+  <span class="kw">type</span> <span class="ty">'a t</span>
+  <span class="kw">val</span> <span class="fn">empty</span> : <span class="ty">'a t</span>
+  <span class="kw">val</span> <span class="fn">push</span>  : <span class="ty">'a -> 'a t -> 'a t</span>
+<span class="kw">end</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">local open (preferred)</div>
+<pre><span class="kw">let</span> result =
+  <span class="ty">List</span>.(<span class="fn">map</span> (<span class="kw">fun</span> x -> x+<span class="num">1</span>)
+         [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>])
+<span class="cmt">(* avoids polluting scope *)</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">functor</div>
+<pre><span class="kw">module</span> <span class="ty">StringMap</span> =
+  <span class="ty">Map</span>.<span class="fn">Make</span>(<span class="ty">String</span>)
+
+<span class="kw">let</span> m =
+  <span class="ty">StringMap</span>.<span class="fn">add</span> <span class="str">"k"</span> <span class="num">1</span>
+    <span class="ty">StringMap</span>.<span class="fn">empty</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- I/O -->
+      <div class="cheat-section">
+        <h2>I/O &amp; Misc</h2>
+        <div class="cheat-grid">
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">printing</div>
+<pre><span class="fn">print_endline</span> <span class="str">"hello"</span>
+<span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"%s = %d\n"</span> <span class="str">"x"</span> <span class="num">42</span>
+<span class="kw">let</span> s = <span class="ty">Printf</span>.<span class="fn">sprintf</span> <span class="str">"n=%d"</span> <span class="num">5</span></pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">exceptions</div>
+<pre><span class="kw">exception</span> <span class="ty">Bad</span> <span class="kw">of</span> <span class="ty">string</span>
+<span class="kw">raise</span> (<span class="ty">Bad</span> <span class="str">"oops"</span>)
+
+<span class="kw">try</span> <span class="fn">risky</span> () <span class="kw">with</span>
+| <span class="ty">Bad</span> msg -> <span class="fn">print_endline</span> msg</pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">strings</div>
+<pre><span class="str">"hello"</span> ^ <span class="str">" world"</span>
+<span class="ty">String</span>.<span class="fn">length</span> <span class="str">"hi"</span>       <span class="cmt">(* 2 *)</span>
+<span class="ty">String</span>.<span class="fn">sub</span> s <span class="num">0</span> <span class="num">5</span>
+<span class="ty">String</span>.<span class="fn">split_on_char</span> <span class="str">' '</span> s</pre>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-head">control flow</div>
+<pre><span class="kw">if</span> x > <span class="num">0</span> <span class="kw">then</span> <span class="str">"pos"</span> <span class="kw">else</span> <span class="str">"other"</span>
+
+<span class="kw">for</span> i = <span class="num">0</span> <span class="kw">to</span> <span class="num">9</span> <span class="kw">do</span>
+  <span class="fn">print_int</span> i <span class="kw">done</span>
+
+<span class="kw">while</span> !n > <span class="num">0</span> <span class="kw">do</span>
+  n := !n - <span class="num">1</span> <span class="kw">done</span></pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+</script>
+</body>
+</html>

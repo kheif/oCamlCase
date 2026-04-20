@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Higher-Order Functions | oCamlCase</title>
+<meta name="description" content="Learn higher-order functions in OCaml: map, filter, fold, the pipe operator, and how passing functions as arguments compares to dependency injection in OOP.">
+<meta property="og:title" content="Higher-Order Functions | oCamlCase">
+<meta property="og:description" content="How OCaml treats functions as first-class values, and what map, filter, and fold look like in practice.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="topbar">
+  <a class="site-name" href="../index.html">
+    <span style="display:inline-block;width:30px;height:26px;overflow:hidden;vertical-align:middle;margin-right:6px;position:relative;top:-1px;flex-shrink:0;"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg" alt="" style="height:26px;width:auto;display:block;"></span>
+    o<span>Caml</span>Case
+  </a>
+  <nav class="topbar-nav">
+    <a href="../index.html">Home</a>
+    <a href="../cheatsheet.html">Cheat Sheet</a>
+    <a href="currying.html" class="active">Concepts</a>
+    <a href="../exercises/bank.html">Exercises</a>
+  </nav>
+  <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav>
+      <div class="nav-group">
+        <span class="nav-label">Start here</span>
+        <a href="../index.html" class="nav-link"><span class="nav-num">·</span>Home</a>
+        <a href="../cheatsheet.html" class="nav-link"><span class="nav-num">·</span>Cheat Sheet</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Concepts</span>
+        <a href="currying.html" class="nav-link"><span class="nav-num">1.</span>Currying</a>
+        <a href="abstractions.html" class="nav-link"><span class="nav-num">2.</span>Abstractions</a>
+        <a href="pattern-matching.html" class="nav-link"><span class="nav-num">3.</span>Pattern Matching</a>
+        <a href="higher-order.html" class="nav-link active"><span class="nav-num">4.</span>Higher-Order Functions</a>
+        <a href="tail-recursion.html" class="nav-link"><span class="nav-num">5.</span>Tail Recursion</a>
+        <a href="iteration.html" class="nav-link"><span class="nav-num">6.</span>Iteration</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Exercises</span>
+        <a href="../exercises/bank.html" class="nav-link"><span class="nav-num">E1.</span>Bank Account</a>
+        <a href="../exercises/playlist.html" class="nav-link"><span class="nav-num">E2.</span>Playlist</a>
+        <a href="../exercises/search.html" class="nav-link"><span class="nav-num">E3.</span>Search</a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 4 of 6</div>
+        <h1 class="page-title">Higher-Order Functions</h1>
+        <p class="page-intro">A higher-order function is one that takes another function as an argument or returns one as a result. In OCaml this is entirely natural, because functions are ordinary values with types just like integers or strings.</p>
+      </div>
+
+      <h2>Functions as values</h2>
+      <p>Every function in OCaml has a type. The type of a function that takes an <code>int</code> and returns an <code>int</code> is <code>int -&gt; int</code>. A function that takes such a function and applies it is a higher-order function, with type <code>(int -&gt; int) -&gt; int -&gt; int</code>.</p>
+      <p>This is not a special mechanism. It follows directly from functions being values. You can store a function in a variable, pass it as an argument, and return it just like any other value.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The function <code>apply</code> takes any function <code>f</code> and a value <code>x</code>, and returns <code>f x</code>. Its type is <code>('a -&gt; 'b) -&gt; 'a -&gt; 'b</code>. The type variables <code>'a</code> and <code>'b</code> mean it works for any types, so the same <code>apply</code> works whether <code>f</code> is a string function or an integer function.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">apply.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="fn">apply</span> f x = f x
+<span class="cmt">(* val apply : ('a -> 'b) -> 'a -> 'b *)</span>
+
+<span class="kw">let</span> <span class="fn">square</span> x = x * x
+
+<span class="fn">apply</span> <span class="fn">square</span> <span class="num">5</span>              <span class="cmt">(* 25 *)</span>
+<span class="fn">apply</span> (<span class="kw">fun</span> x -> x * <span class="num">3</span>) <span class="num">5</span>   <span class="cmt">(* 15 *)</span>
+<span class="fn">apply</span> <span class="ty">String</span>.<span class="fn">length</span> <span class="str">"hello"</span> <span class="cmt">(* 5 *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>map: transforming every element</h2>
+      <p><code>List.map</code> takes a function and a list, and returns a new list where every element has been transformed by that function. The input list and output list always have the same length. The original list is not modified.</p>
+      <p>The type is <code>('a -&gt; 'b) -&gt; 'a list -&gt; 'b list</code>. The function can change the type of each element, for example turning a list of integers into a list of strings.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">map.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let</span> nums = [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>]
+
+<span class="ty">List</span>.<span class="fn">map</span> (<span class="kw">fun</span> x -> x * <span class="num">2</span>) nums
+<span class="cmt">(* [2; 4; 6; 8; 10] *)</span>
+
+<span class="ty">List</span>.<span class="fn">map</span> (<span class="kw">fun</span> x -> x * x) nums
+<span class="cmt">(* [1; 4; 9; 16; 25] *)</span>
+
+<span class="ty">List</span>.<span class="fn">map</span> <span class="ty">string_of_int</span> nums
+<span class="cmt">(* ["1"; "2"; "3"; "4"; "5"] *)</span></pre>
+      </div>
+
+      <h2>filter: selecting elements</h2>
+      <p><code>List.filter</code> takes a predicate function and a list, and returns a new list containing only the elements for which the predicate returns <code>true</code>. The output list can be shorter than the input, but each element in the output appears in the same order as in the input.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">filter.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let</span> nums = [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>; <span class="num">6</span>]
+
+<span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> x -> x <span class="kw">mod</span> <span class="num">2</span> = <span class="num">0</span>) nums
+<span class="cmt">(* [2; 4; 6] *)</span>
+
+<span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> x -> x > <span class="num">3</span>) nums
+<span class="cmt">(* [4; 5; 6] *)</span>
+
+<span class="cmt">(* Partial application makes filters reusable *)</span>
+<span class="kw">let</span> <span class="fn">positives</span> = <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> x -> x > <span class="num">0</span>)
+<span class="fn">positives</span> [-<span class="num">1</span>; <span class="num">2</span>; -<span class="num">3</span>; <span class="num">4</span>]  <span class="cmt">(* [2; 4] *)</span></pre>
+      </div>
+
+      <h2>fold_left: reducing a list to a value</h2>
+      <p><code>List.fold_left</code> walks a list from left to right, carrying an accumulator through each step. You provide the starting value for the accumulator and the function to combine the accumulator with each element. At the end, you get the final accumulated result.</p>
+      <p>The type is <code>('a -&gt; 'b -&gt; 'a) -&gt; 'a -&gt; 'b list -&gt; 'a</code>. The accumulator starts as <code>'a</code>, each element is <code>'b</code>, and the combination function produces the next <code>'a</code>. Summing a list of integers is the simplest example, but fold can compute anything that can be expressed as a running accumulation.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>Both <code>map</code> and <code>filter</code> can be expressed in terms of <code>fold_left</code>. Fold is the most fundamental of the three. Map and filter are specialized folds that happen to be common enough to deserve their own names.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key insight</div>
+            <p>When you find yourself writing a recursive function that carries an accumulator and walks a list, it is almost certainly a fold in disguise.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">fold.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> nums = [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>]
+
+<span class="cmt">(* Sum *)</span>
+<span class="ty">List</span>.<span class="fn">fold_left</span> (+) <span class="num">0</span> nums  <span class="cmt">(* 15 *)</span>
+
+<span class="cmt">(* Product *)</span>
+<span class="ty">List</span>.<span class="fn">fold_left</span> ( *) <span class="num">1</span> nums  <span class="cmt">(* 120 *)</span>
+
+<span class="cmt">(* Maximum *)</span>
+<span class="ty">List</span>.<span class="fn">fold_left</span> <span class="fn">max</span> <span class="ty">Int</span>.<span class="fn">min_int</span> nums  <span class="cmt">(* 5 *)</span>
+
+<span class="cmt">(* Build a new list, equivalent to map *)</span>
+<span class="ty">List</span>.<span class="fn">fold_left</span>
+  (<span class="kw">fun</span> acc x -> acc @ [x * <span class="num">2</span>]) [] nums
+<span class="cmt">(* [2; 4; 6; 8; 10] *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Chaining with the pipe operator</h2>
+      <p>The <code>|&gt;</code> operator passes a value from left to right through a sequence of functions. It reads naturally as a pipeline: start with data, then transform it step by step. Each step is often a partially applied higher-order function.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">pipe.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* Without pipe, read inside-out *)</span>
+<span class="ty">List</span>.<span class="fn">fold_left</span> (+) <span class="num">0</span>
+  (<span class="ty">List</span>.<span class="fn">map</span> (<span class="kw">fun</span> x -> x * x)
+    (<span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> x -> x <span class="kw">mod</span> <span class="num">2</span> = <span class="num">0</span>) [<span class="num">1</span>;<span class="num">2</span>;<span class="num">3</span>;<span class="num">4</span>;<span class="num">5</span>]))
+
+<span class="cmt">(* With pipe, read top to bottom *)</span>
+[<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>]
+|> <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> x -> x <span class="kw">mod</span> <span class="num">2</span> = <span class="num">0</span>)  <span class="cmt">(* [2; 4] *)</span>
+|> <span class="ty">List</span>.<span class="fn">map</span>    (<span class="kw">fun</span> x -> x * x)          <span class="cmt">(* [4; 16] *)</span>
+|> <span class="ty">List</span>.<span class="fn">fold_left</span> (+) <span class="num">0</span>                  <span class="cmt">(* 20 *)</span></pre>
+      </div>
+
+      <h2>The dependency injection parallel</h2>
+      <p>In object-oriented programming, dependency injection is the practice of passing a dependency (an object, a service, a strategy) into a class rather than hardcoding it. The class does not decide what behavior to use. It receives that behavior from outside, which makes it testable and composable.</p>
+      <p>Higher-order functions are the same idea applied to functions. Instead of hardcoding a behavior inside a function, you accept that behavior as an argument. The caller decides what to do; the function decides how to iterate, fold, or transform. The principle is identical. Only the medium is different: objects in OOP, functions in OCaml.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">di_parallel.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* The behavior is injected as a function argument *)</span>
+<span class="kw">let</span> <span class="fn">transform_all</span> f items =
+  <span class="ty">List</span>.<span class="fn">map</span> f items
+
+<span class="cmt">(* The caller decides what transformation to apply *)</span>
+<span class="fn">transform_all</span> (<span class="kw">fun</span> x -> x * <span class="num">2</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="fn">transform_all</span> <span class="ty">String</span>.<span class="fn">uppercase_ascii</span> [<span class="str">"a"</span>; <span class="str">"b"</span>]
+
+<span class="cmt">(* transform_all does not care what f does.
+   It only knows how to apply f to each element.
+   The behavior (what to do) comes from outside. *)</span></pre>
+      </div>
+
+      <div class="page-footer">
+        <a href="pattern-matching.html">← Pattern Matching</a>
+        <a href="tail-recursion.html">Next: Tail Recursion →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied';
+    setTimeout(() => btn.textContent = 'copy', 1600);
+  });
+}
+</script>
+</body>
+</html>

@@ -590,6 +590,256 @@ pre {
 .toc-desc { font-size: 13px; color: var(--dim); margin-left: auto; font-family: var(--sans); }
 .toc-diff { font-family: var(--sans); font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--dim); margin-left: 6px; }
 
+/* ════════════════════════════════════════
+   Playground layout
+   ════════════════════════════════════════ */
+
+/* ── Control bar ── */
+.pg-bar {
+  height: 42px;
+  background: var(--bg-warm);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ── Body: fills remaining viewport ── */
+.pg-body {
+  display: flex;
+  height: calc(100vh - 44px - 42px);
+  overflow: hidden;
+}
+
+/* ── Left wrapper (editor + type panel, 60%) ── */
+.pg-left-panel {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* ── Tab bar ── */
+.pg-tab-bar {
+  display: flex;
+  align-items: center;
+  background: var(--bg-warm);
+  border-bottom: 1px solid var(--border);
+  padding: 0 8px;
+  gap: 2px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.pg-tab-bar::-webkit-scrollbar { display: none; }
+.pg-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 6px 12px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+  user-select: none;
+}
+.pg-tab:hover { color: var(--text); }
+.pg-tab.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 500; }
+.pg-tab-close {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 1px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+}
+.pg-tab-close:hover { color: #d73a49; }
+.pg-tab-add {
+  margin-left: 4px;
+  padding: 4px 8px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 3px;
+}
+.pg-tab-add:hover { color: var(--text); background: rgba(0,0,0,0.05); }
+
+/* ── Editor panel (left, fills pg-left-panel) ── */
+.pg-editor-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Type-info panel (bottom of left column) ── */
+.pg-info-panel {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+  max-height: 140px;
+  transition: max-height 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+.pg-info-panel.collapsed { max-height: 24px; }
+.pg-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--bg-warm);
+  border-bottom: 1px solid var(--border);
+}
+.pg-info-arrow { transition: transform 0.2s ease; font-size: 11px; }
+.pg-info-panel.collapsed .pg-info-arrow { transform: rotate(-90deg); }
+.pg-info-content {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.7;
+  padding: 6px 14px;
+  overflow-y: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.pg-info-empty { color: var(--dim); font-style: italic; }
+
+/* ── Right panel (flex column, tasks + output) ── */
+.pg-right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Tasks panel (right-top, exercise mode only) */
+.pg-tasks-panel {
+  flex: 0 0 auto;
+  max-height: 46%;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--border);
+}
+.pg-tasks-header {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pg-task {
+  padding: 9px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.pg-task-head { display: flex; align-items: center; gap: 10px; }
+.pg-task-icon {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--dim);
+  width: 14px;
+  flex-shrink: 0;
+}
+.pg-task.pass .pg-task-icon { color: #3fb950; }
+.pg-task.fail .pg-task-icon { color: #f85149; }
+.pg-task-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}
+.pg-task.pass .pg-task-name { color: var(--dim); }
+.pg-task-detail {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #f85149;
+  margin-top: 4px;
+  padding-left: 24px;
+}
+
+/* Log panel (right-bottom, always visible) */
+.pg-log-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pg-log-header {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pg-log {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  padding: 14px 18px;
+  overflow-y: auto;
+  margin: 0;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.pg-log-empty { color: var(--dim); }
+
+/* Free mode: tasks hidden, log fills full right panel */
+.pg-body.no-exercise .pg-tasks-panel { display: none; }
+.pg-body.no-exercise .pg-log-panel { flex: 1; }
+
+/* ── Run button ── */
+.run-btn {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 4px;
+  padding: 5px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s;
+}
+.run-btn:hover { background: #b8521a; }
+.run-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* ── Error line highlight ── */
+.pg-error-line { background: rgba(248, 81, 73, 0.18) !important; }
+
 /* ── Mobile ── */
 @media (max-width: 860px) {
   .sidebar {

@@ -66,6 +66,8 @@
 .pg-icon-btn:hover { color: var(--text); border-color: var(--border-dk); background: rgba(0,0,0,0.04); }
 [data-pg-theme="dark"] .pg-icon-btn { color: #6a737d; border-color: #3a3d40; }
 [data-pg-theme="dark"] .pg-icon-btn:hover { color: #e1e4e8; border-color: #555; background: rgba(255,255,255,0.05); }
+.pg-icon-btn.pg-share-copied { color: #1a7f37; border-color: #1a7f37; background: rgba(26,127,55,0.1); }
+[data-pg-theme="dark"] .pg-icon-btn.pg-share-copied { color: #3fb950; border-color: #3fb950; background: rgba(63,185,80,0.15); }
 
 /* ── Settings modal ── */
 .pg-settings-overlay {

@@ -730,6 +730,49 @@ function downloadCode() {
   URL.revokeObjectURL(a.href);
 }
 
+// ── Share ────────────────────────────────────────────
+function _encodeShareCode(code) {
+  const bytes = new TextEncoder().encode(code);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function _decodeShareCode(s) {
+  try {
+    let b64 = s.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  } catch { return null; }
+}
+async function shareCode() {
+  const code = getEditorValue();
+  const url = new URL(window.location.href);
+  url.searchParams.delete('exercise');
+  url.searchParams.set('code', _encodeShareCode(code));
+  const link = url.toString();
+  let copied = false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(link);
+      copied = true;
+    }
+  } catch {}
+  const btn = document.getElementById('pg-share-btn');
+  if (copied) {
+    if (btn) {
+      const oldTitle = btn.title;
+      btn.title = 'Link copied!';
+      btn.classList.add('pg-share-copied');
+      setTimeout(() => { btn.title = oldTitle; btn.classList.remove('pg-share-copied'); }, 1500);
+    }
+  } else {
+    window.prompt('Copy this share link:', link);
+  }
+}
+
 // ── Theme ────────────────────────────────────────────
 function toggleTheme() {
   const html   = document.documentElement;
@@ -1370,7 +1413,10 @@ document.getElementById('ml-upload').addEventListener('change', e => {
 // ── Init ─────────────────────────────────────────────
 initEditor();
 applyZoom();
-const _initEx = new URLSearchParams(window.location.search).get('exercise');
+const _initParams = new URLSearchParams(window.location.search);
+const _initEx = _initParams.get('exercise');
+const _initSharedRaw = _initParams.get('code');
+const _initShared = _initSharedRaw ? _decodeShareCode(_initSharedRaw) : null;
 if (_initEx && EXERCISES[_initEx]) {
   if (!restoreTabs()) {
     _tabs = [{ id: Date.now(), name: 'scratch.ml', content: '' }];
@@ -1378,6 +1424,29 @@ if (_initEx && EXERCISES[_initEx]) {
   }
   renderTabBar();
   loadExercise(_initEx);
+} else if (_initShared !== null) {
+  // Shared link: load shared code into a new tab, preserving any prior tabs
+  if (!restoreTabs()) {
+    const did = Date.now();
+    _tabs = [{ id: did, name: 'scratch.ml', content: '' }];
+    _activeTab = 0;
+    localStorage.setItem(tabKey(did), '');
+  }
+  const sid = Date.now() + 1;
+  _tabs.push({ id: sid, name: 'shared.ml', content: _initShared });
+  _activeTab = _tabs.length - 1;
+  localStorage.setItem(tabKey(sid), _initShared);
+  saveTabs();
+  setEditorValue(_initShared);
+  document.getElementById('editor-label').textContent = 'shared.ml';
+  document.getElementById('pg-body').classList.add('no-exercise');
+  renderTabBar();
+  rebuildLocalVars();
+  try {
+    const cleanUrl = new URL(window.location.href);
+    cleanUrl.searchParams.delete('code');
+    window.history.replaceState({}, '', cleanUrl.toString());
+  } catch {}
 } else {
   // Free mode: restore tabs or create a default one
   if (!restoreTabs()) {

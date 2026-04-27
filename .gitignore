@@ -1,0 +1,7 @@
+docs/dist/
+docs/node_modules/
+docs/.vite/
+docs/*.tsbuildinfo
+docs/vite.config.d.ts
+docs/vite.config.js
+.DS_Store

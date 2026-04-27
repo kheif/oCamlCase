@@ -1,0 +1,164 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 13 of 13</div>
+        <h1 class="page-title">Derived Forms</h1>
+        <p class="page-intro">Some pieces of OCaml syntax look special but are really shorthand for something simpler. The compiler rewrites them into a small core of forms before doing anything else. Knowing the rewrites makes the language feel smaller and explains a few quirks.</p>
+      </div>
+
+      <h2>Boolean operators are <code>if</code> in disguise</h2>
+      <p>The short-circuit operators <code>&amp;&amp;</code> and <code>||</code> are not built-in functions. They are syntactic sugar for conditional expressions:</p>
+      <p style="text-align:center; font-family: var(--mono); line-height: 2;">
+        e<sub>1</sub> &amp;&amp; e<sub>2</sub>&nbsp;&nbsp;&rarr;&nbsp;&nbsp;<span class="kw" style="color:var(--accent)">if</span> e<sub>1</sub> <span class="kw" style="color:var(--accent)">then</span> e<sub>2</sub> <span class="kw" style="color:var(--accent)">else</span> false<br>
+        e<sub>1</sub> || e<sub>2</sub>&nbsp;&nbsp;&rarr;&nbsp;&nbsp;<span class="kw" style="color:var(--accent)">if</span> e<sub>1</sub> <span class="kw" style="color:var(--accent)">then</span> true <span class="kw" style="color:var(--accent)">else</span> e<sub>2</sub>
+      </p>
+      <p>This is why both operators short-circuit: the right-hand side is the body of an <code>if</code> branch, and an <code>if</code> only evaluates the branch it actually takes. There is no special evaluation rule to learn, since the rule for <code>if</code> already covers it.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The rewrite also explains the type. Both branches of an <code>if</code> must agree, so the right operand of <code>&amp;&amp;</code> has to be a <code>bool</code> just like the literal <code>false</code> on the other branch. The same goes for <code>||</code>.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p>Short-circuiting is not a separate language feature in OCaml. It is a free consequence of expressing <code>&amp;&amp;</code> and <code>||</code> as conditionals.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">short_circuit.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* Test if a predicate p returns true
+   for every value in m..n *)</span>
+<span class="kw">let rec</span> <span class="fn">for_all</span> p m n =
+  m &gt; n || (p m &amp;&amp; <span class="fn">for_all</span> p (m + <span class="num">1</span>) n)
+
+<span class="cmt">(* The recursive call only fires when
+   m &lt;= n AND (p m) holds, because
+   || and && short-circuit. *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Watch the desugaring</h2>
+      <p>Click through to see <code>e<sub>1</sub> &amp;&amp; e<sub>2</sub></code> rewritten step by step into its core form.</p>
+
+      <div class="closure-demo">
+        <input type="radio" name="ds-step" id="ds-1" checked>
+        <input type="radio" name="ds-step" id="ds-2">
+        <input type="radio" name="ds-step" id="ds-3">
+
+        <div class="demo-controls">
+          <label for="ds-1">1</label>
+          <label for="ds-2">2</label>
+          <label for="ds-3">3</label>
+        </div>
+
+        <div class="demo-stage single">
+          <div class="demo-program tall">
+            <div class="ds-line ds-l1">x &gt; <span class="num">0</span> <span class="kw">&amp;&amp;</span> y &gt; <span class="num">0</span></div>
+            <div class="ds-line ds-l2"><span class="kw">if</span> x &gt; <span class="num">0</span> <span class="kw">then</span> (y &gt; <span class="num">0</span>) <span class="kw">else</span> <span class="num">false</span></div>
+            <div class="ds-line ds-l3">x = <span class="num">3</span>, y = <span class="num">5</span> &nbsp;⇒&nbsp; <span class="kw">if</span> <span class="num">true</span> <span class="kw">then</span> <span class="num">true</span> <span class="kw">else</span> <span class="num">false</span> &nbsp;⇒&nbsp; <span class="num">true</span></div>
+          </div>
+        </div>
+
+        <div class="demo-caption">
+          <div class="cap cap-1"><strong>Step 1.</strong> The source program. <code>&amp;&amp;</code> looks atomic but is shorthand.</div>
+          <div class="cap cap-2"><strong>Step 2.</strong> The compiler rewrites it. The right operand becomes the <code>then</code> branch; <code>false</code> becomes the <code>else</code> branch.</div>
+          <div class="cap cap-3"><strong>Step 3.</strong> Substitute concrete values and the <code>if</code> reduces normally. No special rule for <code>&amp;&amp;</code> was ever needed.</div>
+        </div>
+      </div>
+
+      <h2>Operators as functions</h2>
+      <p>Wrap any operator in parentheses and it becomes a regular two-argument function. <code>(+)</code> is the same as <code>fun x y -&gt; x + y</code>. This works for arithmetic, comparison, and even <code>mod</code>.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The wrapped form is useful when an operator needs to be passed as a value: to <code>List.fold_left</code>, partially applied, or stored in a data structure. Without the parentheses, OCaml's parser would try to treat <code>+</code> as a binary operator and fail.</p>
+          <p>The unary minus has its own form, <code>(~-)</code>, to distinguish it from binary subtraction.</p>
+          <div class="callout callout-tip">
+            <div class="callout-title">Pattern</div>
+            <p>This is one of the reasons <code>fun</code> exists in the language at all: it is the underlying form that operators desugar to. Anywhere a function is expected, <code>(+)</code> works exactly like any other function value.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">operators.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* Each line is a derived form:
+   the right side is what it stands for *)</span>
+(-)    <span class="cmt">(* fun x y -&gt; x - y   *)</span>
+(~-)   <span class="cmt">(* fun x   -&gt; - x     *)</span>
+( * )  <span class="cmt">(* fun x y -&gt; x * y   *)</span>
+(&lt;)    <span class="cmt">(* fun x y -&gt; x &lt; y   *)</span>
+(=)    <span class="cmt">(* fun x y -&gt; x = y   *)</span>
+(mod)  <span class="cmt">(* fun x y -&gt; x mod y *)</span>
+
+<span class="cmt">(* Use them like any other function *)</span>
+<span class="ty">List</span>.<span class="fn">fold_left</span> (+) <span class="num">0</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* = 6 *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Why it matters</div>
+        <p>Once you know which forms are derived, the language has a much smaller core to remember. Conditional shorthand, operator wrapping, and even <code>let f x = ...</code> for <code>let f = fun x -&gt; ...</code> are all rewrites on top of a tiny set of primitives. The cheat sheet shrinks; the consistency grows.</p>
+      </div>
+
+      <div class="page-footer">
+        <a href="/concepts/iteration">← Iteration</a>
+        <a href="/exercises/bank">Next: Bank Account →</a>
+      </div>
+
+      <style>
+        .closure-demo {
+          margin: 24px 0 32px;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          background: var(--bg-warm);
+          padding: 18px 20px 20px;
+        }
+        .closure-demo > input[type="radio"] { display: none; }
+        .demo-controls {
+          display: flex; gap: 8px; margin-bottom: 14px; align-items: center;
+        }
+        .demo-controls::before {
+          content: 'Step:'; color: var(--muted); font-size: 13px; margin-right: 4px;
+        }
+        .demo-controls label {
+          width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+          border: 1px solid var(--border-dk); border-radius: 50%; cursor: pointer;
+          font-family: var(--mono); font-size: 13px; color: var(--muted);
+          background: var(--bg); user-select: none;
+          transition: background .2s, color .2s, border-color .2s;
+        }
+        .demo-controls label:hover { border-color: var(--accent); color: var(--accent); }
+        #ds-1:checked ~ .demo-controls label[for="ds-1"],
+        #ds-2:checked ~ .demo-controls label[for="ds-2"],
+        #ds-3:checked ~ .demo-controls label[for="ds-3"] {
+          background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+        .demo-stage.single { display: block; }
+        .demo-program.tall {
+          background: var(--bg-code); color: #e6e6e6;
+          padding: 16px 18px; border-radius: 6px;
+          font-family: var(--mono); font-size: 14px; line-height: 1.7;
+          min-height: 78px; position: relative;
+        }
+        .ds-line {
+          opacity: 0; transform: translateY(6px);
+          transition: opacity .35s ease, transform .35s ease;
+          position: absolute; left: 18px; right: 18px; top: 16px;
+        }
+        #ds-1:checked ~ .demo-stage .ds-l1,
+        #ds-2:checked ~ .demo-stage .ds-l2,
+        #ds-3:checked ~ .demo-stage .ds-l3 { opacity: 1; transform: translateY(0); position: static; }
+        .demo-caption { margin-top: 14px; min-height: 44px; }
+        .cap { display: none; color: var(--text); font-size: 14px; line-height: 1.55; }
+        #ds-1:checked ~ .demo-caption .cap-1,
+        #ds-2:checked ~ .demo-caption .cap-2,
+        #ds-3:checked ~ .demo-caption .cap-3 { display: block; }
+      </style>
+    </div>

@@ -26,6 +26,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://ocamlcase.dev/concepts/lexical-scope</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/concepts/closures</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://ocamlcase.dev/concepts/type-inference</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -57,6 +67,11 @@
   </url>
   <url>
     <loc>https://ocamlcase.dev/concepts/iteration</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/concepts/derived-forms</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

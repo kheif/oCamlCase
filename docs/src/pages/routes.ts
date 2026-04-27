@@ -4,6 +4,7 @@ import bindings from '../pages-content/concepts/bindings.html?raw';
 import currying from '../pages-content/concepts/currying.html?raw';
 import abstractions from '../pages-content/concepts/abstractions.html?raw';
 import lexicalScope from '../pages-content/concepts/lexical-scope.html?raw';
+import closures from '../pages-content/concepts/closures.html?raw';
 import typeInference from '../pages-content/concepts/type-inference.html?raw';
 import polymorphism from '../pages-content/concepts/polymorphism.html?raw';
 import patternMatching from '../pages-content/concepts/pattern-matching.html?raw';
@@ -11,6 +12,7 @@ import lists from '../pages-content/concepts/lists.html?raw';
 import higherOrder from '../pages-content/concepts/higher-order.html?raw';
 import tailRecursion from '../pages-content/concepts/tail-recursion.html?raw';
 import iteration from '../pages-content/concepts/iteration.html?raw';
+import derivedForms from '../pages-content/concepts/derived-forms.html?raw';
 import bank from '../pages-content/exercises/bank.html?raw';
 import playlist from '../pages-content/exercises/playlist.html?raw';
 import search from '../pages-content/exercises/search.html?raw';
@@ -66,6 +68,13 @@ export const contentRoutes: ContentRoute[] = [
       'Reason about names in OCaml: defining vs. using occurrences, bound vs. free occurrences, lexical binding, and the sanitization conditions that make substitution safe.',
   },
   {
+    path: '/concepts/closures',
+    html: closures,
+    title: 'Closures | oCamlCase',
+    description:
+      'Learn how OCaml represents function values as closures: a tuple of argument, body, and captured environment. See why recursive functions also store their own name.',
+  },
+  {
     path: '/concepts/type-inference',
     html: typeInference,
     title: 'Type Inference | oCamlCase',
@@ -113,6 +122,13 @@ export const contentRoutes: ContentRoute[] = [
     title: 'Iteration | oCamlCase',
     description:
       'Learn definite and indefinite iteration in OCaml: how to apply a function n times with iter, and how to search for the first value satisfying a predicate with first.',
+  },
+  {
+    path: '/concepts/derived-forms',
+    html: derivedForms,
+    title: 'Derived Forms | oCamlCase',
+    description:
+      'See how OCaml syntax desugars to a small core: && and || are if-expressions, operators in parentheses are functions, and let f x = ... is sugar for fun.',
   },
   {
     path: '/exercises/bank',

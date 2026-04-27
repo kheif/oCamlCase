@@ -1,0 +1,237 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 5 of 13</div>
+        <h1 class="page-title">Closures</h1>
+        <p class="page-intro">A function value is more than its code. To run later, it also needs to remember the meaning of every name it uses freely. The pair of code and remembered environment is called a closure, and OCaml builds one every time you write <code>fun</code> or <code>let f x = ...</code>.</p>
+      </div>
+
+      <h2>Environments</h2>
+      <p>An <strong>environment</strong> is a collection of identifier bindings. The notation <code>[x := 5, y := 7]</code> means the name <code>x</code> stands for the value <code>5</code> and <code>y</code> stands for <code>7</code>. Given an environment, every closed expression has a value. <code>x + y</code> in this environment evaluates to <code>12</code>.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>An identifier that has no binding in the surrounding environment is called <strong>free</strong>. A declaration with free identifiers cannot be executed on its own, because the runtime would not know what those names stand for. <code>let q x = 3 + p x</code> only makes sense if <code>p</code> is already bound somewhere outside.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p>The same expression can have different values in different environments. The environment is part of the meaning of a phrase, not just a runtime detail.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">env.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* Environment [x := 5, y := 7] *)</span>
+<span class="kw">let</span> x = <span class="num">5</span>
+<span class="kw">let</span> y = <span class="num">7</span>
+
+<span class="cmt">(* In this environment, x + y = 12 *)</span>
+<span class="kw">let</span> _ = x + y
+
+<span class="cmt">(* p occurs freely here.
+   This declaration cannot run unless
+   p is bound in the outer environment. *)</span>
+<span class="kw">let</span> q (x : <span class="ty">int</span>) = <span class="num">3</span> + p x</pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Functions are tuples</h2>
+      <p>To capture this in one piece of data, OCaml represents every function value as a triple:</p>
+      <p style="text-align:center; font-family: var(--mono);">function = (argument, body, environment)</p>
+      <p>The <strong>argument</strong> is the parameter name, the <strong>body</strong> is the code to run, and the <strong>environment</strong> records the meaning of every identifier the body uses freely. This triple is the <em>closure</em>. Whenever you call the function later, the body is evaluated in the saved environment extended with the parameter binding.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>In the example, <code>let a = 2 * 7</code> binds <code>a</code> to <code>14</code>. Then <code>let p x = x + a</code> creates a function whose body refers freely to <code>a</code>. The closure stored under <code>p</code> is the triple <code>(x, x + a, [a := 14])</code>. Even if <code>a</code> goes out of scope later, <code>p</code> still carries its own copy of the binding.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">closure.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> a = <span class="num">2</span> * <span class="num">7</span>
+<span class="kw">let</span> <span class="fn">p</span> (x : <span class="ty">int</span>) = x + a
+
+<span class="cmt">(* p is bound to the closure
+     ( x ,           argument
+       x + a ,       body
+       [a := 14] )   environment   *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Watch a closure form</h2>
+      <p>Step through this small program to see how each <code>let</code> grows the environment and how each function value carries its own snapshot of it.</p>
+
+      <div class="closure-demo">
+        <input type="radio" name="closure-step" id="cs-1" checked>
+        <input type="radio" name="closure-step" id="cs-2">
+        <input type="radio" name="closure-step" id="cs-3">
+        <input type="radio" name="closure-step" id="cs-4">
+
+        <div class="demo-controls">
+          <label for="cs-1">1</label>
+          <label for="cs-2">2</label>
+          <label for="cs-3">3</label>
+          <label for="cs-4">4</label>
+        </div>
+
+        <div class="demo-stage">
+          <div class="demo-program">
+<pre><span class="kw">let</span> a = <span class="num">2</span> * <span class="num">7</span>
+<span class="kw">let</span> <span class="fn">p</span> (x : <span class="ty">int</span>) = x + a
+<span class="kw">let</span> <span class="fn">q</span> (x : <span class="ty">int</span>) = x + <span class="fn">p</span> x</pre>
+            <div class="demo-cursor demo-cursor-1"></div>
+            <div class="demo-cursor demo-cursor-2"></div>
+            <div class="demo-cursor demo-cursor-3"></div>
+            <div class="demo-cursor demo-cursor-4"></div>
+          </div>
+
+          <div class="demo-env">
+            <div class="demo-env-title">Environment</div>
+            <div class="demo-binding b-a">a := <span class="num">14</span></div>
+            <div class="demo-binding b-p">p := (x, x + a, [a := 14])</div>
+            <div class="demo-binding b-q">q := (x, x + p x, [a := 14, p := (x, x + a, [a := 14])])</div>
+          </div>
+        </div>
+
+        <div class="demo-caption">
+          <div class="cap cap-1"><strong>Step 1.</strong> Evaluate <code>2 * 7</code> in the empty environment. Bind <code>a</code> to <code>14</code>.</div>
+          <div class="cap cap-2"><strong>Step 2.</strong> Build a closure for <code>p</code>. Its body uses <code>a</code> freely, so <code>[a := 14]</code> is captured.</div>
+          <div class="cap cap-3"><strong>Step 3.</strong> Build a closure for <code>q</code>. Its body uses both <code>a</code> and <code>p</code> freely, so <em>both</em> bindings are captured.</div>
+          <div class="cap cap-4"><strong>Step 4.</strong> The full environment now binds three names. Each function value carries the snapshot it needs.</div>
+        </div>
+      </div>
+
+      <h2>Recursive functions</h2>
+      <p>For a recursive function, the body refers freely to the function's own name. So the closure has to include that name too. OCaml stores recursive functions as a <strong>quadruple</strong>:</p>
+      <p style="text-align:center; font-family: var(--mono);">recursive function = (function identifier, argument, body, environment)</p>
+      <p>The function identifier is what makes the body able to call itself later. Without it, the recursive call would resolve as a free name with no binding.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>For <code>let rec f (i : int) : int = if i &lt; 0 then f (i + 1) else i</code>, the closure is <code>(f, i, if i &lt; 0 then f (i + 1) else i, [])</code>. The environment is empty because the body has no other free names. The only one, <code>f</code>, is already provided by the function-identifier slot.</p>
+          <div class="callout callout-tip">
+            <div class="callout-title">Why the slot</div>
+            <p>If you tried to store a recursive function the same way as a non-recursive one, you would have to put the closure inside its own environment, which is a chicken-and-egg problem. The dedicated identifier slot avoids the cycle.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">recursive.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let rec</span> <span class="fn">f</span> (i : <span class="ty">int</span>) : <span class="ty">int</span> =
+  <span class="kw">if</span> i &lt; <span class="num">0</span> <span class="kw">then</span> <span class="fn">f</span> (i + <span class="num">1</span>) <span class="kw">else</span> i
+
+<span class="cmt">(* f is bound to the closure
+     ( f ,                    fn identifier
+       i ,                    argument
+       if i &lt; 0 then ... ,    body
+       [] )                   environment   *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Why it matters</div>
+        <p>Closures are why returning a function from a function works in OCaml. The returned function carries the bindings it needs, even after the surrounding scope is gone. This is the mechanism behind partial application, callbacks, and most higher-order patterns.</p>
+      </div>
+
+      <div class="page-footer">
+        <a href="/concepts/lexical-scope">← Lexical Scope</a>
+        <a href="/concepts/type-inference">Next: Type Inference →</a>
+      </div>
+
+      <style>
+        .closure-demo {
+          margin: 24px 0 32px;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          background: var(--bg-warm);
+          padding: 18px 20px 20px;
+        }
+        .closure-demo > input[type="radio"] { display: none; }
+        .demo-controls {
+          display: flex; gap: 8px; margin-bottom: 14px; align-items: center;
+        }
+        .demo-controls::before {
+          content: 'Step:'; color: var(--muted); font-size: 13px; margin-right: 4px;
+        }
+        .demo-controls label {
+          width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+          border: 1px solid var(--border-dk); border-radius: 50%; cursor: pointer;
+          font-family: var(--mono); font-size: 13px; color: var(--muted);
+          background: var(--bg); user-select: none;
+          transition: background .2s, color .2s, border-color .2s;
+        }
+        .demo-controls label:hover { border-color: var(--accent); color: var(--accent); }
+        #cs-1:checked ~ .demo-controls label[for="cs-1"],
+        #cs-2:checked ~ .demo-controls label[for="cs-2"],
+        #cs-3:checked ~ .demo-controls label[for="cs-3"],
+        #cs-4:checked ~ .demo-controls label[for="cs-4"] {
+          background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+        .demo-stage {
+          display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+        }
+        .demo-program {
+          position: relative;
+          background: var(--bg-code); color: #e6e6e6;
+          padding: 14px 16px; border-radius: 6px;
+          font-family: var(--mono); font-size: 13px; line-height: 1.7;
+        }
+        .demo-program pre { margin: 0; background: transparent; padding: 0; color: inherit; }
+        .demo-cursor {
+          position: absolute; left: 8px; width: 4px; height: 22px;
+          background: var(--accent); border-radius: 2px;
+          opacity: 0; transition: top .35s ease, opacity .25s ease;
+        }
+        .demo-cursor-1 { top: 12px; }
+        .demo-cursor-2 { top: 36px; }
+        .demo-cursor-3 { top: 60px; }
+        .demo-cursor-4 { top: 60px; }
+        #cs-1:checked ~ .demo-stage .demo-cursor-1,
+        #cs-2:checked ~ .demo-stage .demo-cursor-2,
+        #cs-3:checked ~ .demo-stage .demo-cursor-3,
+        #cs-4:checked ~ .demo-stage .demo-cursor-4 { opacity: 1; }
+        .demo-env {
+          background: var(--bg); border: 1px solid var(--border);
+          border-radius: 6px; padding: 12px 14px;
+          font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+        }
+        .demo-env-title {
+          font-family: var(--sans); font-size: 12px; color: var(--muted);
+          text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px;
+        }
+        .demo-binding {
+          opacity: 0; max-height: 0; overflow: hidden;
+          transition: opacity .35s ease, max-height .35s ease, padding .35s ease;
+          padding: 0;
+        }
+        #cs-1:checked ~ .demo-stage .b-a,
+        #cs-2:checked ~ .demo-stage .b-a,
+        #cs-3:checked ~ .demo-stage .b-a,
+        #cs-4:checked ~ .demo-stage .b-a,
+        #cs-2:checked ~ .demo-stage .b-p,
+        #cs-3:checked ~ .demo-stage .b-p,
+        #cs-4:checked ~ .demo-stage .b-p,
+        #cs-3:checked ~ .demo-stage .b-q,
+        #cs-4:checked ~ .demo-stage .b-q {
+          opacity: 1; max-height: 80px; padding: 4px 0;
+        }
+        .demo-caption { margin-top: 14px; min-height: 44px; }
+        .cap { display: none; color: var(--text); font-size: 14px; line-height: 1.55; }
+        #cs-1:checked ~ .demo-caption .cap-1,
+        #cs-2:checked ~ .demo-caption .cap-2,
+        #cs-3:checked ~ .demo-caption .cap-3,
+        #cs-4:checked ~ .demo-caption .cap-4 { display: block; }
+        @media (max-width: 720px) {
+          .demo-stage { grid-template-columns: 1fr; }
+        }
+      </style>
+    </div>

@@ -110,6 +110,60 @@
         </div>
       </div>
 
+      <h2>fold_left vs fold_right</h2>
+      <p><code>List.fold_right</code> walks the list from right to left, building the result on the way back up. Its type is <code>('a -&gt; 'b -&gt; 'b) -&gt; 'a list -&gt; 'b -&gt; 'b</code>: the element comes first, the accumulator second, and the initial value is the last argument. Unlike <code>fold_left</code>, it is <em>not</em> tail recursive: every element waits on the recursive call to finish before combining its own result.</p>
+      <p>The two folds also differ in how they parenthesize the computation. For <code>[1; 2; 3; 4]</code> with <code>(+)</code> and starting value <code>0</code>, <code>fold_left</code> evaluates as <code>(((0+1)+2)+3)+4</code>, while <code>fold_right</code> evaluates as <code>1+(2+(3+(4+0)))</code>. Addition is associative so both yield <code>10</code>, but the <em>shape</em> of the computation is different.</p>
+      <p>In practice, prefer <code>fold_left</code>: it is stack-safe and works on lists of any size. Reach for <code>fold_right</code> when the operation is naturally right-associative; list construction with <code>::</code> is the canonical example, since <code>fold_right</code> preserves the original element order without reversing.</p>
+
+      <div class="fold-demo">
+        <input type="radio" name="fold-step" id="fs-1" checked>
+        <input type="radio" name="fold-step" id="fs-2">
+        <input type="radio" name="fold-step" id="fs-3">
+        <input type="radio" name="fold-step" id="fs-4">
+        <input type="radio" name="fold-step" id="fs-5">
+
+        <div class="demo-controls">
+          <label for="fs-1">1</label>
+          <label for="fs-2">2</label>
+          <label for="fs-3">3</label>
+          <label for="fs-4">4</label>
+          <label for="fs-5">5</label>
+        </div>
+
+        <div class="fold-stage">
+          <div class="fold-col">
+            <div class="fold-col-title">fold_left (+) 0 [1;2;3;4]</div>
+            <div class="fold-expr">
+              <span class="fl fl-1">(0 + 1)</span>
+              <span class="fl fl-2">((0 + 1) + 2)</span>
+              <span class="fl fl-3">(((0 + 1) + 2) + 3)</span>
+              <span class="fl fl-4">((((0 + 1) + 2) + 3) + 4)</span>
+              <span class="fl fl-5">10</span>
+            </div>
+            <div class="fold-foot">peak frames: <strong>1</strong> (tail recursive)</div>
+          </div>
+          <div class="fold-col">
+            <div class="fold-col-title">fold_right (+) [1;2;3;4] 0</div>
+            <div class="fold-expr">
+              <span class="fr fr-1">(4 + 0)</span>
+              <span class="fr fr-2">(3 + (4 + 0))</span>
+              <span class="fr fr-3">(2 + (3 + (4 + 0)))</span>
+              <span class="fr fr-4">(1 + (2 + (3 + (4 + 0))))</span>
+              <span class="fr fr-5">10</span>
+            </div>
+            <div class="fold-foot">peak frames: <strong>4</strong> (one per element)</div>
+          </div>
+        </div>
+
+        <div class="demo-caption">
+          <div class="cap cap-1"><strong>Step 1.</strong> First combination. <code>fold_left</code> consumes the head <code>1</code>, producing <code>0+1</code>. <code>fold_right</code> reaches the deepest call first and combines the tail <code>4</code> with the initial value.</div>
+          <div class="cap cap-2"><strong>Step 2.</strong> Both add a layer. <code>fold_left</code> grows on the outside (next element wraps the previous result). <code>fold_right</code> grows on the inside (each return wraps an outer element around the previous result).</div>
+          <div class="cap cap-3"><strong>Step 3.</strong> Notice the order of elements: <code>fold_left</code> sees them as <code>1, 2, 3, ...</code> while <code>fold_right</code>'s combinations appear in reverse, though the source list is the same.</div>
+          <div class="cap cap-4"><strong>Step 4.</strong> Full parenthesization. Same elements, opposite associativity. <code>fold_right</code> required four nested calls before any combination ran.</div>
+          <div class="cap cap-5"><strong>Step 5.</strong> Both reduce to <code>10</code>. With <code>(+)</code>, the result coincides; with a non-associative operation like list cons or string concatenation, the shape determines the answer.</div>
+        </div>
+      </div>
+
       <h2>Chaining with the pipe operator</h2>
       <p>The <code>|&gt;</code> operator passes a value from left to right through a sequence of functions. It reads naturally as a pipeline: start with data, then transform it step by step. Each step is often a partially applied higher-order function.</p>
 
@@ -156,4 +210,91 @@
         <a href="/concepts/lists">← Lists</a>
         <a href="/concepts/tail-recursion">Next: Tail Recursion →</a>
       </div>
+
+      <style>
+        .fold-demo {
+          margin: 24px 0 32px;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          background: var(--bg-warm);
+          padding: 18px 20px 20px;
+        }
+        .fold-demo > input[type="radio"] { display: none; }
+        .demo-controls {
+          display: flex; gap: 8px; margin-bottom: 14px; align-items: center;
+        }
+        .demo-controls::before {
+          content: 'Step:'; color: var(--muted); font-size: 13px; margin-right: 4px;
+        }
+        .demo-controls label {
+          width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+          border: 1px solid var(--border-dk); border-radius: 50%; cursor: pointer;
+          font-family: var(--mono); font-size: 13px; color: var(--muted);
+          background: var(--bg); user-select: none;
+          transition: background .2s, color .2s, border-color .2s;
+        }
+        .demo-controls label:hover { border-color: var(--accent); color: var(--accent); }
+        #fs-1:checked ~ .demo-controls label[for="fs-1"],
+        #fs-2:checked ~ .demo-controls label[for="fs-2"],
+        #fs-3:checked ~ .demo-controls label[for="fs-3"],
+        #fs-4:checked ~ .demo-controls label[for="fs-4"],
+        #fs-5:checked ~ .demo-controls label[for="fs-5"] {
+          background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+
+        .fold-stage { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .fold-col {
+          background: var(--bg); border: 1px solid var(--border);
+          border-radius: 6px; padding: 12px 14px;
+          display: flex; flex-direction: column;
+        }
+        .fold-col-title {
+          font-family: var(--mono); font-size: 12px; color: var(--muted);
+          margin-bottom: 12px;
+        }
+        .fold-expr {
+          flex: 1; min-height: 100px;
+          background: var(--bg-code); color: #e6e6e6;
+          padding: 14px 16px; border-radius: 6px;
+          font-family: var(--mono); font-size: 14px;
+          display: flex; align-items: center; justify-content: center;
+          text-align: center;
+        }
+        .fl, .fr {
+          display: none;
+          transition: opacity .25s ease;
+        }
+        #fs-1:checked ~ .fold-stage .fl-1,
+        #fs-2:checked ~ .fold-stage .fl-2,
+        #fs-3:checked ~ .fold-stage .fl-3,
+        #fs-4:checked ~ .fold-stage .fl-4,
+        #fs-5:checked ~ .fold-stage .fl-5,
+        #fs-1:checked ~ .fold-stage .fr-1,
+        #fs-2:checked ~ .fold-stage .fr-2,
+        #fs-3:checked ~ .fold-stage .fr-3,
+        #fs-4:checked ~ .fold-stage .fr-4,
+        #fs-5:checked ~ .fold-stage .fr-5 {
+          display: inline;
+        }
+        #fs-5:checked ~ .fold-stage .fl-5,
+        #fs-5:checked ~ .fold-stage .fr-5 {
+          color: #c4a76a; font-size: 18px; font-weight: 600;
+        }
+        .fold-foot {
+          margin-top: 10px; font-family: var(--mono); font-size: 11px; color: var(--muted);
+        }
+
+        .demo-caption { margin-top: 14px; min-height: 56px; }
+        .cap { display: none; color: var(--text); font-size: 14px; line-height: 1.55; }
+        #fs-1:checked ~ .demo-caption .cap-1,
+        #fs-2:checked ~ .demo-caption .cap-2,
+        #fs-3:checked ~ .demo-caption .cap-3,
+        #fs-4:checked ~ .demo-caption .cap-4,
+        #fs-5:checked ~ .demo-caption .cap-5 { display: block; }
+
+        @media (max-width: 720px) {
+          .fold-stage { grid-template-columns: 1fr; }
+          .fold-expr { font-size: 12px; padding: 10px 8px; }
+        }
+      </style>
     </div>

@@ -68,6 +68,63 @@
         </div>
       </div>
 
+      <h2>Watch the stack grow</h2>
+      <p>Step through the same depth of recursion for both functions side by side. The left column tracks <code>factorial 4</code>; each call leaves a pending multiplication on the stack. The right column tracks <code>countdown 4</code>; the single frame is reused on every call.</p>
+
+      <div class="stack-demo">
+        <input type="radio" name="stack-step" id="ss-1" checked>
+        <input type="radio" name="stack-step" id="ss-2">
+        <input type="radio" name="stack-step" id="ss-3">
+        <input type="radio" name="stack-step" id="ss-4">
+        <input type="radio" name="stack-step" id="ss-5">
+        <input type="radio" name="stack-step" id="ss-6">
+        <input type="radio" name="stack-step" id="ss-7">
+        <input type="radio" name="stack-step" id="ss-8">
+
+        <div class="demo-controls">
+          <label for="ss-1">1</label>
+          <label for="ss-2">2</label>
+          <label for="ss-3">3</label>
+          <label for="ss-4">4</label>
+          <label for="ss-5">5</label>
+          <label for="ss-6">6</label>
+          <label for="ss-7">7</label>
+          <label for="ss-8">8</label>
+        </div>
+
+        <div class="stack-stage">
+          <div class="stack-col">
+            <div class="stack-col-title">factorial 4 <span class="stack-tag stack-tag-bad">grows</span></div>
+            <div class="stack-frames">
+              <div class="frame f-fact f-fact-1"><span class="frame-call">factorial 4</span><span class="frame-pending">4 * _</span></div>
+              <div class="frame f-fact f-fact-2"><span class="frame-call">factorial 3</span><span class="frame-pending">3 * _</span></div>
+              <div class="frame f-fact f-fact-3"><span class="frame-call">factorial 2</span><span class="frame-pending">2 * _</span></div>
+              <div class="frame f-fact f-fact-4"><span class="frame-call">factorial 1</span><span class="frame-pending">1 * _</span></div>
+              <div class="frame f-fact f-fact-base"><span class="frame-call">returns 1</span></div>
+            </div>
+            <div class="stack-depth">depth: <span class="depth-val depth-fact">0</span></div>
+          </div>
+          <div class="stack-col">
+            <div class="stack-col-title">countdown 4 <span class="stack-tag stack-tag-good">flat</span></div>
+            <div class="stack-frames">
+              <div class="frame f-cd"><span class="frame-call frame-call-cd"></span><span class="frame-pending">tail call: frame reused</span></div>
+            </div>
+            <div class="stack-depth">depth: <span class="depth-val depth-cd">0</span></div>
+          </div>
+        </div>
+
+        <div class="demo-caption">
+          <div class="cap cap-1"><strong>Step 1.</strong> Both functions are called with <code>4</code>. One frame on each side.</div>
+          <div class="cap cap-2"><strong>Step 2.</strong> <code>factorial</code> calls itself with <code>3</code>; the previous frame must wait, holding a pending <code>4 *</code>. <code>countdown</code> jumps to <code>countdown 3</code> reusing its frame.</div>
+          <div class="cap cap-3"><strong>Step 3.</strong> Three frames pile up on the left, each carrying its pending multiplication. The right side still uses one frame.</div>
+          <div class="cap cap-4"><strong>Step 4.</strong> Four frames alive on the left. Memory grows linearly with the recursion depth. The right side has not grown.</div>
+          <div class="cap cap-5"><strong>Step 5.</strong> Base case on the left returns <code>1</code>. Now the pending multiplications start resolving, top frame first.</div>
+          <div class="cap cap-6"><strong>Step 6.</strong> <code>1 * 1 = 1</code> pops; <code>2 * 1 = 2</code> pops next.</div>
+          <div class="cap cap-7"><strong>Step 7.</strong> <code>3 * 2 = 6</code> pops. The stack drains in reverse order.</div>
+          <div class="cap cap-8"><strong>Step 8.</strong> <code>4 * 6 = 24</code> returns. With a million-deep input, the right side would still use one frame; the left would crash long before getting there.</div>
+        </div>
+      </div>
+
       <h2>Tail call optimization</h2>
       <p>When a recursive call is in tail position, the OCaml compiler can optimize it into a jump rather than a new stack frame. Because there is nothing left to do in the current frame, it can be reused for the next call. This means a tail-recursive function runs in constant stack space regardless of how deep the recursion goes.</p>
       <p><code>countdown 1_000_000</code> will run fine if <code>countdown</code> is tail recursive. The same depth with a non-tail-recursive function would crash.</p>
@@ -109,6 +166,50 @@
         </div>
       </div>
 
+      <div class="acc-demo">
+        <input type="radio" name="acc-step" id="as-1" checked>
+        <input type="radio" name="acc-step" id="as-2">
+        <input type="radio" name="acc-step" id="as-3">
+        <input type="radio" name="acc-step" id="as-4">
+        <input type="radio" name="acc-step" id="as-5">
+        <input type="radio" name="acc-step" id="as-6">
+
+        <div class="demo-controls">
+          <label for="as-1">1</label>
+          <label for="as-2">2</label>
+          <label for="as-3">3</label>
+          <label for="as-4">4</label>
+          <label for="as-5">5</label>
+          <label for="as-6">6</label>
+        </div>
+
+        <div class="acc-stage">
+          <div class="acc-tape">
+            <div class="acc-cell ac-1"><span class="acc-call">loop 1 5</span><span class="acc-eval">1 * 5</span></div>
+            <div class="acc-arrow aa-1">→</div>
+            <div class="acc-cell ac-2"><span class="acc-call">loop 5 4</span><span class="acc-eval">5 * 4</span></div>
+            <div class="acc-arrow aa-2">→</div>
+            <div class="acc-cell ac-3"><span class="acc-call">loop 20 3</span><span class="acc-eval">20 * 3</span></div>
+            <div class="acc-arrow aa-3">→</div>
+            <div class="acc-cell ac-4"><span class="acc-call">loop 60 2</span><span class="acc-eval">60 * 2</span></div>
+            <div class="acc-arrow aa-4">→</div>
+            <div class="acc-cell ac-5"><span class="acc-call">loop 120 1</span><span class="acc-eval">120 * 1</span></div>
+            <div class="acc-arrow aa-5">→</div>
+            <div class="acc-cell ac-6"><span class="acc-call">loop 120 0</span><span class="acc-eval">return 120</span></div>
+          </div>
+          <div class="acc-badge">stack depth: <strong>1</strong> throughout</div>
+        </div>
+
+        <div class="demo-caption">
+          <div class="cap cap-1"><strong>Step 1.</strong> Start: <code>loop 1 5</code>. The accumulator is <code>1</code>; remaining factor is <code>5</code>.</div>
+          <div class="cap cap-2"><strong>Step 2.</strong> <code>1 * 5 = 5</code>. We do not push a frame; we replace the current call with <code>loop 5 4</code>.</div>
+          <div class="cap cap-3"><strong>Step 3.</strong> <code>5 * 4 = 20</code>. The work-in-progress lives in the argument, not on the stack.</div>
+          <div class="cap cap-4"><strong>Step 4.</strong> <code>20 * 3 = 60</code>. Frame reuse continues; depth stays at one.</div>
+          <div class="cap cap-5"><strong>Step 5.</strong> <code>60 * 2 = 120</code>. The full result is now sitting in the accumulator.</div>
+          <div class="cap cap-6"><strong>Step 6.</strong> Base case: <code>k = 0</code>, return <code>acc = 120</code>. No pending multiplications to unwind.</div>
+        </div>
+      </div>
+
       <h2>Divergence: hanging vs crashing</h2>
       <p>Tail recursion does not make a function correct. It only protects the stack. A tail-recursive function without a base case will still run forever, but it will hang instead of crashing. That distinction is worth understanding.</p>
       <p>A non-tail-recursive function without a base case grows the stack on every call and eventually crashes with a stack overflow. A tail-recursive one without a base case loops forever at a flat stack depth. Both diverge, but only one takes the program down with it.</p>
@@ -137,4 +238,210 @@
         <a href="/concepts/higher-order">← Higher-Order Functions</a>
         <a href="/concepts/iteration">Next: Iteration →</a>
       </div>
+
+      <style>
+        .stack-demo, .acc-demo {
+          margin: 24px 0 32px;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          background: var(--bg-warm);
+          padding: 18px 20px 20px;
+        }
+        .stack-demo > input[type="radio"], .acc-demo > input[type="radio"] { display: none; }
+        .demo-controls {
+          display: flex; gap: 8px; margin-bottom: 14px; align-items: center;
+        }
+        .demo-controls::before {
+          content: 'Step:'; color: var(--muted); font-size: 13px; margin-right: 4px;
+        }
+        .demo-controls label {
+          width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+          border: 1px solid var(--border-dk); border-radius: 50%; cursor: pointer;
+          font-family: var(--mono); font-size: 13px; color: var(--muted);
+          background: var(--bg); user-select: none;
+          transition: background .2s, color .2s, border-color .2s;
+        }
+        .demo-controls label:hover { border-color: var(--accent); color: var(--accent); }
+
+        #ss-1:checked ~ .demo-controls label[for="ss-1"],
+        #ss-2:checked ~ .demo-controls label[for="ss-2"],
+        #ss-3:checked ~ .demo-controls label[for="ss-3"],
+        #ss-4:checked ~ .demo-controls label[for="ss-4"],
+        #ss-5:checked ~ .demo-controls label[for="ss-5"],
+        #ss-6:checked ~ .demo-controls label[for="ss-6"],
+        #ss-7:checked ~ .demo-controls label[for="ss-7"],
+        #ss-8:checked ~ .demo-controls label[for="ss-8"],
+        #as-1:checked ~ .demo-controls label[for="as-1"],
+        #as-2:checked ~ .demo-controls label[for="as-2"],
+        #as-3:checked ~ .demo-controls label[for="as-3"],
+        #as-4:checked ~ .demo-controls label[for="as-4"],
+        #as-5:checked ~ .demo-controls label[for="as-5"],
+        #as-6:checked ~ .demo-controls label[for="as-6"] {
+          background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+
+        .demo-caption { margin-top: 14px; min-height: 48px; }
+        .cap { display: none; color: var(--text); font-size: 14px; line-height: 1.55; }
+        #ss-1:checked ~ .demo-caption .cap-1,
+        #ss-2:checked ~ .demo-caption .cap-2,
+        #ss-3:checked ~ .demo-caption .cap-3,
+        #ss-4:checked ~ .demo-caption .cap-4,
+        #ss-5:checked ~ .demo-caption .cap-5,
+        #ss-6:checked ~ .demo-caption .cap-6,
+        #ss-7:checked ~ .demo-caption .cap-7,
+        #ss-8:checked ~ .demo-caption .cap-8,
+        #as-1:checked ~ .demo-caption .cap-1,
+        #as-2:checked ~ .demo-caption .cap-2,
+        #as-3:checked ~ .demo-caption .cap-3,
+        #as-4:checked ~ .demo-caption .cap-4,
+        #as-5:checked ~ .demo-caption .cap-5,
+        #as-6:checked ~ .demo-caption .cap-6 { display: block; }
+
+        .stack-stage { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .stack-col {
+          background: var(--bg); border: 1px solid var(--border);
+          border-radius: 6px; padding: 12px 14px;
+          display: flex; flex-direction: column;
+        }
+        .stack-col-title {
+          font-family: var(--sans); font-size: 12px; color: var(--muted);
+          text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px;
+          display: flex; justify-content: space-between; align-items: center;
+        }
+        .stack-tag {
+          font-family: var(--mono); font-size: 10px; padding: 2px 6px;
+          border-radius: 3px; text-transform: none; letter-spacing: 0;
+        }
+        .stack-tag-bad { background: #f4d4d4; color: #8a3030; }
+        .stack-tag-good { background: #d4ecd4; color: #2f6a30; }
+
+        .stack-frames {
+          display: flex; flex-direction: column-reverse; gap: 4px;
+          min-height: 180px; justify-content: flex-start;
+        }
+        .frame {
+          background: var(--bg-code); color: #e6e6e6;
+          padding: 6px 10px; border-radius: 4px;
+          font-family: var(--mono); font-size: 12px;
+          display: flex; justify-content: space-between; align-items: center;
+          opacity: 0; max-height: 0; overflow: hidden;
+          transition: opacity .3s ease, max-height .3s ease, padding .3s ease;
+          padding-top: 0; padding-bottom: 0;
+        }
+        .frame-pending { color: #c4a76a; font-size: 11px; }
+
+        /* factorial frames: appear on push steps, disappear on pop steps */
+        #ss-1:checked ~ .stack-stage .f-fact-1,
+        #ss-2:checked ~ .stack-stage .f-fact-1,
+        #ss-3:checked ~ .stack-stage .f-fact-1,
+        #ss-4:checked ~ .stack-stage .f-fact-1,
+        #ss-5:checked ~ .stack-stage .f-fact-1,
+        #ss-6:checked ~ .stack-stage .f-fact-1,
+        #ss-7:checked ~ .stack-stage .f-fact-1,
+        #ss-2:checked ~ .stack-stage .f-fact-2,
+        #ss-3:checked ~ .stack-stage .f-fact-2,
+        #ss-4:checked ~ .stack-stage .f-fact-2,
+        #ss-5:checked ~ .stack-stage .f-fact-2,
+        #ss-6:checked ~ .stack-stage .f-fact-2,
+        #ss-3:checked ~ .stack-stage .f-fact-3,
+        #ss-4:checked ~ .stack-stage .f-fact-3,
+        #ss-5:checked ~ .stack-stage .f-fact-3,
+        #ss-4:checked ~ .stack-stage .f-fact-4,
+        #ss-5:checked ~ .stack-stage .f-fact-4 {
+          opacity: 1; max-height: 36px; padding-top: 6px; padding-bottom: 6px;
+        }
+        /* base-case "returns 1" frame visible at step 5 then resolved away */
+        #ss-5:checked ~ .stack-stage .f-fact-base {
+          opacity: 1; max-height: 36px; padding-top: 6px; padding-bottom: 6px;
+        }
+
+        /* countdown side: single frame always visible, label changes */
+        .f-cd { opacity: 1; max-height: 36px; padding-top: 6px; padding-bottom: 6px; }
+        .frame-call-cd::before { content: 'countdown 4'; }
+        #ss-2:checked ~ .stack-stage .frame-call-cd::before { content: 'countdown 3'; }
+        #ss-3:checked ~ .stack-stage .frame-call-cd::before { content: 'countdown 2'; }
+        #ss-4:checked ~ .stack-stage .frame-call-cd::before { content: 'countdown 1'; }
+        #ss-5:checked ~ .stack-stage .frame-call-cd::before,
+        #ss-6:checked ~ .stack-stage .frame-call-cd::before,
+        #ss-7:checked ~ .stack-stage .frame-call-cd::before,
+        #ss-8:checked ~ .stack-stage .frame-call-cd::before { content: 'returns ()'; }
+
+        .stack-depth {
+          margin-top: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted);
+        }
+        .depth-val { color: var(--text); font-weight: 600; }
+        #ss-1:checked ~ .stack-stage .depth-fact { content: '1'; }
+        #ss-1:checked ~ .stack-stage .depth-fact::after { content: '1'; }
+        #ss-2:checked ~ .stack-stage .depth-fact::after { content: '2'; }
+        #ss-3:checked ~ .stack-stage .depth-fact::after { content: '3'; }
+        #ss-4:checked ~ .stack-stage .depth-fact::after,
+        #ss-5:checked ~ .stack-stage .depth-fact::after { content: '4'; }
+        #ss-6:checked ~ .stack-stage .depth-fact::after { content: '2'; }
+        #ss-7:checked ~ .stack-stage .depth-fact::after { content: '1'; }
+        #ss-8:checked ~ .stack-stage .depth-fact::after { content: '0'; }
+        .depth-fact, .depth-cd { font-size: 0; }
+        .depth-fact::after, .depth-cd::after { font-size: 12px; }
+        .depth-cd::after { content: '1'; }
+        #ss-8:checked ~ .stack-stage .depth-cd::after { content: '0'; }
+
+        /* accumulator demo */
+        .acc-stage {
+          background: var(--bg); border: 1px solid var(--border);
+          border-radius: 6px; padding: 16px 14px;
+        }
+        .acc-tape {
+          display: flex; flex-wrap: wrap; align-items: center;
+          gap: 6px; justify-content: center;
+        }
+        .acc-cell {
+          display: inline-flex; flex-direction: column; align-items: center;
+          padding: 8px 12px; border-radius: 5px;
+          background: var(--bg-code); color: #e6e6e6;
+          font-family: var(--mono); font-size: 12px;
+          border: 2px solid transparent;
+          transition: border-color .25s ease, transform .25s ease, background .25s ease;
+          min-width: 100px;
+        }
+        .acc-cell .acc-eval { color: #c4a76a; font-size: 11px; margin-top: 2px; }
+        .acc-arrow {
+          color: var(--muted); font-family: var(--mono); font-size: 16px;
+          opacity: .35; transition: opacity .25s ease, color .25s ease;
+        }
+        #as-1:checked ~ .acc-stage .ac-1,
+        #as-2:checked ~ .acc-stage .ac-2,
+        #as-3:checked ~ .acc-stage .ac-3,
+        #as-4:checked ~ .acc-stage .ac-4,
+        #as-5:checked ~ .acc-stage .ac-5,
+        #as-6:checked ~ .acc-stage .ac-6 {
+          border-color: var(--accent); transform: translateY(-2px);
+        }
+        #as-2:checked ~ .acc-stage .aa-1,
+        #as-3:checked ~ .acc-stage .aa-1,
+        #as-3:checked ~ .acc-stage .aa-2,
+        #as-4:checked ~ .acc-stage .aa-1,
+        #as-4:checked ~ .acc-stage .aa-2,
+        #as-4:checked ~ .acc-stage .aa-3,
+        #as-5:checked ~ .acc-stage .aa-1,
+        #as-5:checked ~ .acc-stage .aa-2,
+        #as-5:checked ~ .acc-stage .aa-3,
+        #as-5:checked ~ .acc-stage .aa-4,
+        #as-6:checked ~ .acc-stage .aa-1,
+        #as-6:checked ~ .acc-stage .aa-2,
+        #as-6:checked ~ .acc-stage .aa-3,
+        #as-6:checked ~ .acc-stage .aa-4,
+        #as-6:checked ~ .acc-stage .aa-5 {
+          opacity: 1; color: var(--accent);
+        }
+        .acc-badge {
+          margin: 14px auto 0; display: block; width: fit-content;
+          font-family: var(--mono); font-size: 12px;
+          padding: 6px 10px; background: #d4ecd4; color: #2f6a30;
+          border-radius: 4px;
+        }
+
+        @media (max-width: 720px) {
+          .stack-stage { grid-template-columns: 1fr; }
+          .stack-frames { min-height: auto; }
+        }
+      </style>
     </div>

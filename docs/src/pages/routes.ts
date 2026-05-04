@@ -9,6 +9,7 @@ import typeInference from '../pages-content/concepts/type-inference.html?raw';
 import polymorphism from '../pages-content/concepts/polymorphism.html?raw';
 import patternMatching from '../pages-content/concepts/pattern-matching.html?raw';
 import lists from '../pages-content/concepts/lists.html?raw';
+import listOperations from '../pages-content/concepts/list-operations.html?raw';
 import higherOrder from '../pages-content/concepts/higher-order.html?raw';
 import tailRecursion from '../pages-content/concepts/tail-recursion.html?raw';
 import iteration from '../pages-content/concepts/iteration.html?raw';
@@ -100,7 +101,14 @@ export const contentRoutes: ContentRoute[] = [
     html: lists,
     title: 'Lists | oCamlCase',
     description:
-      'Work with OCaml lists: cons-based construction, pattern matching on empty and non-empty lists, and the standard List functions including map, filter, and fold_left.',
+      'Understand OCaml lists from the ground up: the two constructors, the recursive construction rule, tree representation, pattern matching, and recursive implementations of length, append, rev, and concat.',
+  },
+  {
+    path: '/concepts/list-operations',
+    html: listOperations,
+    title: 'List Operations | oCamlCase',
+    description:
+      'Build map, filter, and exists from scratch as recursive functions, see how they compare to imperative loops, and learn to pipe them together with the standard List module.',
   },
   {
     path: '/concepts/higher-order',

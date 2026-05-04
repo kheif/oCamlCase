@@ -1,137 +1,235 @@
 <div class="article">
       <div class="page-header">
-        <div class="page-label">Concept 9 of 13</div>
+        <div class="page-label">Concept 9 of 14</div>
         <h1 class="page-title">Lists</h1>
-        <p class="page-intro">A list in OCaml is an immutable, singly-linked sequence of values of the same type. Most everyday data processing in OCaml passes through lists and the small set of functions that operate on them.</p>
+        <p class="page-intro">A list in OCaml is either empty or a head element joined to a tail list. Every recursive function on lists follows directly from this two-case structure.</p>
       </div>
 
       <h2>Construction</h2>
-      <p>A list is either empty (<code>[]</code>) or a head element followed by a tail list (<code>head :: tail</code>). The <code>::</code> operator, called <em>cons</em>, prepends an element to an existing list. The literal syntax <code>[1; 2; 3]</code> is sugar for <code>1 :: 2 :: 3 :: []</code>.</p>
+      <p>Two constructors build every list. <code>[]</code> is the empty list. <code>::</code> (read "cons") prepends a single element to an existing list, producing a new, longer list. The literal syntax <code>[1; 2; 3]</code> is shorthand for <code>1 :: 2 :: 3 :: []</code>.</p>
 
       <div class="two-col lean">
         <div>
-          <p>All elements of a list have the same type. The type is written <code>'a list</code>, where <code>'a</code> is the element type. A list of integers is <code>int list</code>, a list of strings is <code>string list</code>, and an empty list is polymorphic until used.</p>
+          <p>Both constructors have precise types. The empty list is polymorphic: it can hold any type. Cons takes an element of type <code>'a</code> and a list of the same type, and returns a new list of that type.</p>
           <div class="callout callout-key">
             <div class="callout-title">Key point</div>
-            <p>Lists are immutable. Cons does not modify the tail; it produces a new list that shares the tail with the old one. This sharing is what makes immutable lists cheap to build.</p>
+            <p>Cons does not modify the tail. It returns a new list node that shares the tail with the original. This structural sharing is what makes immutable lists cheap to build.</p>
           </div>
         </div>
         <div class="sticky">
           <div class="code-block">
             <div class="code-top">
-              <span class="code-fname">build.ml</span>
+              <span class="code-fname">types.ml</span>
               <button class="copy-btn" onclick="copyCode(this)">copy</button>
             </div>
-<pre><span class="kw">let</span> empty = []
-<span class="cmt">(* empty : 'a list *)</span>
+<pre><span class="cmt">(* [] : 'a list *)</span>
+<span class="cmt">(* (::) : 'a -> 'a list -> 'a list *)</span>
 
-<span class="kw">let</span> nums = [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="kw">let</span> a = []
+<span class="cmt">(* 'a list, polymorphic *)</span>
+
+<span class="kw">let</span> b = [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
 <span class="cmt">(* int list *)</span>
 
-<span class="cmt">(* The same list with cons *)</span>
-<span class="kw">let</span> nums' = <span class="num">1</span> :: <span class="num">2</span> :: <span class="num">3</span> :: []
+<span class="kw">let</span> b' = <span class="num">1</span> :: <span class="num">2</span> :: <span class="num">3</span> :: []
+<span class="cmt">(* identical to b *)</span>
 
-<span class="cmt">(* Prepend; original list is unchanged *)</span>
-<span class="kw">let</span> more = <span class="num">0</span> :: nums
-<span class="cmt">(* more = [0; 1; 2; 3]
-   nums  = [1; 2; 3] still *)</span></pre>
+<span class="kw">let</span> c = <span class="num">0</span> :: b
+<span class="cmt">(* [0; 1; 2; 3], b is unchanged *)</span></pre>
           </div>
         </div>
       </div>
 
-      <h2>Pattern matching on lists</h2>
-      <p>Pattern matching is the natural way to take a list apart. The two cases mirror the two ways a list can be built: empty or cons. Most list-processing functions follow the same shape: handle the empty case, then handle the cons case recursively.</p>
+      <h2>Recursive construction rule</h2>
+      <p>Lists of type <code>t</code> are defined by exactly two rules:</p>
+      <ul>
+        <li>The empty list <code>[]</code> is a list over <code>t</code>.</li>
+        <li>If <code>x</code> is a value of type <code>t</code> and <code>xs</code> is a list over <code>t</code>, then <code>x :: xs</code> is a list over <code>t</code>.</li>
+      </ul>
+      <p>This is an inductive definition. Every non-empty list is built from a smaller list, and the recursion bottoms out at <code>[]</code>. Functions on lists mirror this shape exactly: one branch for the base case, one branch for the recursive case.</p>
 
-      <div class="two-col lean">
-        <div>
-          <p>The empty pattern <code>[]</code> matches the empty list. The cons pattern <code>x :: xs</code> matches any non-empty list, binding the first element to <code>x</code> and the rest to <code>xs</code>. Together they cover every possible list, and the compiler will warn if you miss either.</p>
-        </div>
-        <div class="sticky">
-          <div class="code-block">
-            <div class="code-top">
-              <span class="code-fname">recurse.ml</span>
-              <button class="copy-btn" onclick="copyCode(this)">copy</button>
-            </div>
-<pre><span class="kw">let rec</span> <span class="fn">length</span> = <span class="kw">function</span>
-  | [] -> <span class="num">0</span>
-  | _ :: xs -> <span class="num">1</span> + <span class="fn">length</span> xs
-
-<span class="kw">let rec</span> <span class="fn">sum</span> = <span class="kw">function</span>
-  | [] -> <span class="num">0</span>
-  | x :: xs -> x + <span class="fn">sum</span> xs
-
-<span class="fn">length</span> [<span class="num">10</span>; <span class="num">20</span>; <span class="num">30</span>]   <span class="cmt">(* 3 *)</span>
-<span class="fn">sum</span>    [<span class="num">10</span>; <span class="num">20</span>; <span class="num">30</span>]   <span class="cmt">(* 60 *)</span></pre>
-          </div>
-        </div>
-      </div>
-
-      <h2>Basic functions on lists</h2>
-      <p>The standard library's <code>List</code> module covers the operations you reach for most often. A handful of these handle the bulk of everyday work.</p>
+      <h2>Tree representation</h2>
+      <p>Each <code>::</code> node carries one element and one tail, so a list is really a right-leaning chain of cons nodes ending at <code>[]</code>. Writing <code>[1; 5; 7]</code> out as a tree makes the recursive structure visible.</p>
 
       <div class="code-block inline">
         <div class="code-top">
-          <span class="code-fname">list_basics.ml</span>
-          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          <span class="code-fname">[1; 5; 7] as a cons tree</span>
         </div>
-<pre><span class="ty">List</span>.<span class="fn">length</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
-<span class="cmt">(* 3 *)</span>
-
-<span class="ty">List</span>.<span class="fn">rev</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
-<span class="cmt">(* [3; 2; 1] *)</span>
-
-<span class="ty">List</span>.<span class="fn">append</span> [<span class="num">1</span>; <span class="num">2</span>] [<span class="num">3</span>; <span class="num">4</span>]
-<span class="cmt">(* [1; 2; 3; 4]. Also written [1; 2] @ [3; 4] *)</span>
-
-<span class="ty">List</span>.<span class="fn">hd</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
-<span class="cmt">(* 1, raises on empty lists *)</span>
-
-<span class="ty">List</span>.<span class="fn">tl</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
-<span class="cmt">(* [2; 3], raises on empty lists *)</span>
-
-<span class="ty">List</span>.<span class="fn">nth</span> [<span class="num">10</span>; <span class="num">20</span>; <span class="num">30</span>] <span class="num">1</span>
-<span class="cmt">(* 20, zero-indexed *)</span></pre>
+<pre>      ::
+     /  \
+    1    ::
+        /  \
+       5    ::
+           /  \
+          7    []</pre>
       </div>
 
-      <h2>Map, filter, and fold</h2>
-      <p>Three higher-order functions cover most list transformations. <code>List.map</code> applies a function to every element. <code>List.filter</code> keeps the elements that satisfy a predicate. <code>List.fold_left</code> reduces a list to a single value by accumulating from left to right.</p>
+      <p>Reading the tree bottom-up: <code>[]</code> is wrapped by cons with <code>7</code>, then with <code>5</code>, then with <code>1</code>. Pattern matching simply reverses this: it peels off the outermost cons node at each step.</p>
+
+      <h2>Pattern matching on lists</h2>
+      <p>A <code>match</code> expression on a list mirrors the two constructors. The <code>[]</code> branch handles the empty case; the <code>x :: xr</code> branch binds the head <code>x</code> and the tail <code>xr</code>. Together they are exhaustive: every list is either empty or not, and the compiler will warn if either case is missing.</p>
 
       <div class="two-col lean">
         <div>
-          <p>Together with the pipe operator, these compose into readable pipelines. Each step is one transformation, and the type of the value flowing through changes only when you map to a new element type.</p>
-          <div class="callout callout-warn">
-            <div class="callout-title">Watch out</div>
-            <p><code>List.hd</code>, <code>List.tl</code>, and <code>List.nth</code> raise exceptions on inputs that do not fit. For total alternatives, use the <code>_opt</code> variants where they exist, or pattern match yourself.</p>
+          <p>The name <code>xr</code> is a convention for "x rest". The recursive call is made on <code>xr</code>, which is one element shorter than the original list. Because the list shrinks at each step and <code>[]</code> is the base case, the recursion always terminates.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Recursive skeleton</div>
+            <p>Most list functions follow the same shape: return a base value for <code>[]</code>, compute something with the head and a recursive call on the tail for the cons case.</p>
           </div>
         </div>
         <div class="sticky">
           <div class="code-block">
             <div class="code-top">
-              <span class="code-fname">pipeline.ml</span>
+              <span class="code-fname">length.ml</span>
               <button class="copy-btn" onclick="copyCode(this)">copy</button>
             </div>
-<pre>[<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>]
-|> <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> x -> x <span class="kw">mod</span> <span class="num">2</span> = <span class="num">0</span>)
-|> <span class="ty">List</span>.<span class="fn">map</span> (<span class="kw">fun</span> x -> x * x)
-|> <span class="ty">List</span>.<span class="fn">fold_left</span> (+) <span class="num">0</span>
-<span class="cmt">(* 4 + 16 = 20 *)</span>
+<pre><span class="kw">let rec</span> <span class="fn">length</span> xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> <span class="num">0</span>
+  | _ :: xr -> <span class="num">1</span> + <span class="fn">length</span> xr
 
-<span class="ty">List</span>.<span class="fn">map</span> <span class="ty">String</span>.<span class="fn">length</span> [<span class="str">"hi"</span>; <span class="str">"there"</span>]
-<span class="cmt">(* [2; 5] *)</span>
+<span class="cmt">(* val length : 'a list -> int *)</span>
 
-<span class="ty">List</span>.<span class="fn">filter</span> ((&lt;) <span class="num">0</span>) [-<span class="num">1</span>; <span class="num">2</span>; -<span class="num">3</span>; <span class="num">4</span>]
-<span class="cmt">(* [2; 4] *)</span></pre>
+<span class="fn">length</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* 1 + (1 + (1 + 0)) = 3 *)</span></pre>
           </div>
         </div>
       </div>
 
+      <h2>Append</h2>
+      <p><code>append xs ys</code> concatenates two lists. The <code>@</code> operator in OCaml does exactly this. Its recursion follows <code>xs</code>: the empty case returns <code>ys</code> unchanged; the cons case rebuilds the head of <code>xs</code> onto the recursive result.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>This means <code>append</code> takes time proportional to the length of its <em>first</em> argument. The second list is never traversed; it simply becomes the bottom of the rebuilt chain.</p>
+          <div class="callout callout-warn">
+            <div class="callout-title">Watch out</div>
+            <p><code>xs @ ys</code> allocates a fresh copy of every cons cell in <code>xs</code>. Appending in a tight loop accumulates O(n²) work. Prefer prepending with <code>::</code> and reversing once at the end.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">append.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let rec</span> <span class="fn">append</span> xs ys =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> ys
+  | x :: xr -> x :: <span class="fn">append</span> xr ys
+
+<span class="cmt">(* val append : 'a list -> 'a list -> 'a list *)</span>
+
+<span class="fn">append</span> [<span class="num">2</span>; <span class="num">3</span>] [<span class="num">6</span>; <span class="num">7</span>; <span class="num">8</span>]
+<span class="cmt">(* [2; 3; 6; 7; 8] *)</span>
+
+[<span class="num">2</span>; <span class="num">3</span>] @ [<span class="num">6</span>; <span class="num">7</span>; <span class="num">8</span>]
+<span class="cmt">(* same thing, @ is List.append *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Rev</h2>
+      <p><code>rev</code> reverses a list. The cons case appends the singleton <code>[x]</code> after the reversed tail. This is correct but slow: each <code>@</code> traverses the growing reversed prefix, giving O(n²) cost overall.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">rev.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let rec</span> <span class="fn">rev</span> xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> []
+  | x :: xr -> <span class="fn">rev</span> xr @ [x]
+
+<span class="cmt">(* val rev : 'a list -> 'a list *)</span>
+
+<span class="fn">rev</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>]
+<span class="cmt">(* [4; 3; 2; 1] *)</span></pre>
+      </div>
+
       <div class="callout callout-tip">
-        <div class="callout-title">Good practice</div>
-        <p>Reach for <code>map</code>, <code>filter</code>, and <code>fold_left</code> before writing an explicit recursion. They express intent more directly and are tail-recursive where it matters.</p>
+        <div class="callout-title">The faster way</div>
+        <p>The standard <code>List.rev</code> uses an accumulator to avoid the repeated appends, reversing in a single pass. You will see this pattern in detail in the Tail Recursion concept.</p>
+      </div>
+
+      <h2>Concat</h2>
+      <p><code>concat</code> takes a list of lists and flattens it into one list. It uses <code>@</code> to stitch each inner list onto the recursive result.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">concat.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let rec</span> <span class="fn">concat</span> xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> []
+  | x :: xr -> x @ <span class="fn">concat</span> xr
+
+<span class="cmt">(* val concat : 'a list list -> 'a list *)</span>
+
+<span class="fn">concat</span> [[<span class="num">1</span>;<span class="num">2</span>]; []; [<span class="num">3</span>]; [<span class="num">4</span>;<span class="num">5</span>]]
+<span class="cmt">(* [1; 2; 3; 4; 5] *)</span></pre>
+      </div>
+
+      <h2>Hd and Tl</h2>
+      <p><code>hd</code> returns the first element of a list. <code>tl</code> returns everything after the first element. Both use pattern matching internally and raise an exception when called on the empty list, because there is no head or tail to return.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>Because these functions can fail, they are considered partial. The safer alternative for most code is to pattern match directly: you are forced to handle the empty case at the call site instead of discovering the failure at runtime.</p>
+          <div class="callout callout-warn">
+            <div class="callout-title">Watch out</div>
+            <p><code>hd</code> and <code>tl</code> raise <code>Failure</code> on an empty list. Prefer pattern matching when the input might be empty.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">hd_tl.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="fn">hd</span> xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> <span class="fn">failwith</span> <span class="str">"hd"</span>
+  | x :: _ -> x
+
+<span class="cmt">(* val hd : 'a list -> 'a *)</span>
+
+<span class="kw">let</span> <span class="fn">tl</span> xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> <span class="fn">failwith</span> <span class="str">"tl"</span>
+  | _ :: xr -> xr
+
+<span class="cmt">(* val tl : 'a list -> 'a list *)</span>
+
+<span class="fn">hd</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]  <span class="cmt">(* 1 *)</span>
+<span class="fn">tl</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]  <span class="cmt">(* [2; 3] *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Nth</h2>
+      <p><code>nth xs n</code> returns the element at position <code>n</code>, counting from zero. It works by stripping the head with <code>tl</code> until <code>n</code> reaches zero, at which point it returns the head. If <code>n</code> is negative or the list runs out first, it raises an exception.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">nth.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let rec</span> <span class="fn">nth</span> xs n =
+  <span class="kw">if</span> n < <span class="num">0</span> || xs = [] <span class="kw">then</span> <span class="fn">failwith</span> <span class="str">"nth"</span>
+  <span class="kw">else if</span> n = <span class="num">0</span> <span class="kw">then</span> <span class="fn">hd</span> xs
+  <span class="kw">else</span> <span class="fn">nth</span> (<span class="fn">tl</span> xs) (n - <span class="num">1</span>)
+
+<span class="cmt">(* val nth : 'a list -> int -> 'a *)</span>
+
+<span class="fn">nth</span> [<span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>] <span class="num">0</span>  <span class="cmt">(* 3 *)</span>
+<span class="fn">nth</span> [<span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>] <span class="num">2</span>  <span class="cmt">(* 5 *)</span></pre>
       </div>
 
       <div class="page-footer">
         <a href="/concepts/pattern-matching">← Pattern Matching</a>
-        <a href="/concepts/higher-order">Next: Higher-Order Functions →</a>
+        <a href="/concepts/list-operations">Next: List Operations →</a>
       </div>
     </div>

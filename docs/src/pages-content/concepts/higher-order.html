@@ -1,6 +1,6 @@
 <div class="article">
       <div class="page-header">
-        <div class="page-label">Concept 10 of 13</div>
+        <div class="page-label">Concept 11 of 14</div>
         <h1 class="page-title">Higher-Order Functions</h1>
         <p class="page-intro">A higher-order function is one that takes another function as an argument or returns one as a result. In OCaml this is entirely natural, because functions are ordinary values with types just like integers or strings.</p>
       </div>
@@ -110,6 +110,30 @@
         </div>
       </div>
 
+      <h2>Fold as a general list transformer</h2>
+      <p>Because <code>fold_left</code> passes each element to a combining function along with the running accumulator, you can use it to build any transformation that could be written as a recursive loop. Reversing a list is a clean example. The key is choosing the right combining function.</p>
+      <p>Define <code>snoc xs x = x :: xs</code>, which is cons with its arguments flipped. Where <code>cons</code> prepends <code>x</code> to <code>xs</code>, <code>snoc</code> prepends the new element to the accumulator. Folding with <code>snoc</code> and starting from <code>[]</code> reads each element left-to-right and prepends it, producing the list in reverse.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">snoc_rev.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let</span> <span class="fn">cons</span> x xs = x :: xs
+<span class="kw">let</span> <span class="fn">snoc</span> xs x = x :: xs
+
+<span class="cmt">(* val cons : 'a -> 'a list -> 'a list *)</span>
+<span class="cmt">(* val snoc : 'a list -> 'a -> 'a list *)</span>
+
+<span class="ty">List</span>.<span class="fn">fold_left</span> <span class="fn">snoc</span> [] [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* = snoc (snoc (snoc [] 1) 2) 3
+   = snoc (snoc [1] 2) 3
+   = snoc [2; 1] 3
+   = [3; 2; 1] *)</span>
+
+<span class="cmt">(* This is exactly what List.rev does internally *)</span></pre>
+      </div>
+
       <h2>fold_left vs fold_right</h2>
       <p><code>List.fold_right</code> walks the list from right to left, building the result on the way back up. Its type is <code>('a -&gt; 'b -&gt; 'b) -&gt; 'a list -&gt; 'b -&gt; 'b</code>: the element comes first, the accumulator second, and the initial value is the last argument. Unlike <code>fold_left</code>, it is <em>not</em> tail recursive: every element waits on the recursive call to finish before combining its own result.</p>
       <p>The two folds also differ in how they parenthesize the computation. For <code>[1; 2; 3; 4]</code> with <code>(+)</code> and starting value <code>0</code>, <code>fold_left</code> evaluates as <code>(((0+1)+2)+3)+4</code>, while <code>fold_right</code> evaluates as <code>1+(2+(3+(4+0)))</code>. Addition is associative so both yield <code>10</code>, but the <em>shape</em> of the computation is different.</p>
@@ -207,7 +231,7 @@
       </div>
 
       <div class="page-footer">
-        <a href="/concepts/lists">← Lists</a>
+        <a href="/concepts/list-operations">← List Operations</a>
         <a href="/concepts/tail-recursion">Next: Tail Recursion →</a>
       </div>
 

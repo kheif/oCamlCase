@@ -1,6 +1,6 @@
 <div class="article">
       <div class="page-header">
-        <div class="page-label">Concept 8 of 13</div>
+        <div class="page-label">Concept 8 of 14</div>
         <h1 class="page-title">Pattern Matching</h1>
         <p class="page-intro">Pattern matching is how OCaml inspects and destructures values. It is more than a switch statement: the compiler verifies that every possible case is handled, eliminating a whole class of bugs at compile time.</p>
       </div>
@@ -98,6 +98,70 @@
    get a compile-time warning until updated. *)</span></pre>
           </div>
         </div>
+      </div>
+
+      <h2>Overlapping patterns</h2>
+      <p>Two patterns <em>overlap</em> if a single value can match both of them. Because OCaml evaluates branches top to bottom and takes the first match, ordering matters. A more specific pattern must appear before a more general one, otherwise the general pattern will shadow it and the specific one can never fire.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>In the first version of <code>power</code>, the pattern <code>0</code> and the pattern <code>n</code> both match the value <code>0</code>. Writing <code>0</code> first is correct: the specific case is tried before the general one. Swapping them would mean the base case is never reached and the recursion never terminates.</p>
+          <div class="callout callout-warn">
+            <div class="callout-title">Watch out</div>
+            <p>Placing a catch-all pattern (<code>_</code> or a bare name) before a specific case silently swallows every value. The compiler will warn that the specific case is redundant, but only if you compile with warnings enabled.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">overlap.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* Correct: specific case first *)</span>
+<span class="kw">let rec</span> <span class="fn">power</span> x n =
+  <span class="kw">match</span> n <span class="kw">with</span>
+  | <span class="num">0</span> -> <span class="num">1</span>
+  | n -> x * <span class="fn">power</span> x (n - <span class="num">1</span>)
+
+<span class="cmt">(* Wrong: general case shadows 0 *)
+(* let rec power x n =        *)
+(*   match n with              *)
+(*   | n -> x * power x (n-1) *)  <span class="cmt">(* 0 never reached *)</span>
+(*   | 0 -> 1                  *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Exhaustive patterns</h2>
+      <p>A match expression is <em>exhaustive</em> if every possible value of the matched type is covered by at least one pattern. OCaml emits a compile-time warning for non-exhaustive matches and names an example value that falls through. The function still compiles, but calling it with an unmatched value raises a runtime exception.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">exhaustive.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* Non-exhaustive: misses lists of length >= 2 *)</span>
+<span class="kw">let</span> <span class="fn">test</span> xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | []  -> <span class="num">0</span>
+  | [_] -> <span class="num">1</span>
+
+<span class="cmt">(* Warning 8 [partial-match]:
+   this pattern-matching is not exhaustive.
+   Here is an example of a case that is not matched:
+   _::_::_ *)</span>
+
+<span class="cmt">(* Fix: add the missing case *)</span>
+<span class="kw">let</span> <span class="fn">test</span> xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | []     -> <span class="num">0</span>
+  | [_]    -> <span class="num">1</span>
+  | _ :: _ -> <span class="num">2</span></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Good practice</div>
+        <p>Treat Warning 8 as an error. A partial match is almost always a bug waiting to happen. Add the missing cases explicitly rather than silencing the warning.</p>
       </div>
 
       <h2>Guards</h2>

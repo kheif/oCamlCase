@@ -1,0 +1,200 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 10 of 14</div>
+        <h1 class="page-title">List Operations</h1>
+        <p class="page-intro">Map, filter, exists, and for_all are the workhorses of list processing. Each one is a recursive function that follows the same two-case structure as length or append, but captures a distinct idea about what to do with the elements.</p>
+      </div>
+
+      <h2>Functional vs imperative</h2>
+      <p>The difference between functional and imperative code is sharpest when transforming a list. Consider doubling every element of <code>[1; 2; 3]</code>. The functional version is a single expression. The imperative version allocates an array, loops over indices, writes to a second array, then formats the output manually.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The functional version says <em>what</em> to compute. The imperative version says <em>how</em> to compute it. The difference is not just brevity; the functional version is also easier to compose, test, and reason about because it has no side effects and produces no intermediate mutable state.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">compare.ml / Compare.java</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* OCaml: one expression *)</span>
+<span class="ty">List</span>.<span class="fn">map</span> (<span class="kw">fun</span> x -> x * <span class="num">2</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* [2; 4; 6] *)</span>
+
+<span class="cmt">// Java: 15 lines</span>
+<span class="cmt">// int[] arr = {1, 2, 3};</span>
+<span class="cmt">// int[] doubled = new int[arr.length];</span>
+<span class="cmt">// for (int i = 0; i &lt; arr.length; i++)</span>
+<span class="cmt">//     doubled[i] = arr[i] * 2;</span>
+<span class="cmt">// System.out.print("[");</span>
+<span class="cmt">// for (int i = 0; i &lt; doubled.length; i++) {</span>
+<span class="cmt">//     System.out.print(doubled[i]);</span>
+<span class="cmt">//     if (i &lt; doubled.length - 1)</span>
+<span class="cmt">//         System.out.print(";");</span>
+<span class="cmt">// }</span>
+<span class="cmt">// System.out.println("]");</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Map</h2>
+      <p><code>map f xs</code> applies <code>f</code> to every element of <code>xs</code> and returns the results in a new list of the same length. The empty case returns an empty list. The cons case applies <code>f</code> to the head and conses the result onto the mapped tail.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The type says it all: <code>map</code> takes a function from <code>'a</code> to <code>'b</code> and a list of <code>'a</code>, and returns a list of <code>'b</code>. The input and output element types can differ.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p><code>map</code> preserves structure. The output list has exactly the same length as the input; only the values change. This predictability is what makes it safe to reach for first.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">map.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let rec</span> <span class="fn">map</span> f xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> []
+  | x :: xr -> (f x) :: <span class="fn">map</span> f xr
+
+<span class="cmt">(* val map : ('a -> 'b) -> 'a list -> 'b list *)</span>
+
+<span class="fn">map</span> (<span class="kw">fun</span> x -> x * <span class="num">2</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* [2; 4; 6] *)</span>
+
+<span class="fn">map</span> <span class="ty">String</span>.<span class="fn">length</span> [<span class="str">"hi"</span>; <span class="str">"there"</span>]
+<span class="cmt">(* [2; 5] *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Filter</h2>
+      <p><code>filter f xs</code> returns the list of elements from <code>xs</code> for which the predicate <code>f</code> returns <code>true</code>. The empty case is an empty list. The cons case includes the head if <code>f x</code> is true, and skips it otherwise; the tail is filtered either way.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The output list is a subsequence of the input: same order, same element type, but potentially shorter. Elements that fail the predicate simply disappear.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p>The type of the elements does not change through <code>filter</code>. It takes a <code>'a list</code> and returns a <code>'a list</code>. Only the count changes.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">filter.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let rec</span> <span class="fn">filter</span> f xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> []
+  | x :: xr ->
+    <span class="kw">if</span> f x
+    <span class="kw">then</span> x :: <span class="fn">filter</span> f xr
+    <span class="kw">else</span> <span class="fn">filter</span> f xr
+
+<span class="cmt">(* val filter : ('a -> bool) -> 'a list -> 'a list *)</span>
+
+<span class="fn">filter</span> (<span class="kw">fun</span> x -> x >= <span class="num">0</span>) [<span class="num">0</span>; -<span class="num">1</span>; <span class="num">2</span>; -<span class="num">3</span>; -<span class="num">4</span>]
+<span class="cmt">(* [0; 2] *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Exists</h2>
+      <p><code>exists f xs</code> tests whether <code>f</code> returns <code>true</code> for at least one element of <code>xs</code>. The empty case is <code>false</code>: there is no element to satisfy anything. The cons case short-circuits: if <code>f x</code> is true, the answer is immediately true without examining the rest.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The <code>||</code> operator short-circuits left-to-right in OCaml, so the recursive call is only made when the head fails. On a list where a matching element appears early, almost nothing is traversed.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">exists.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let rec</span> <span class="fn">exists</span> f xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> <span class="kw">false</span>
+  | x :: xr -> f x || <span class="fn">exists</span> f xr
+
+<span class="cmt">(* val exists : ('a -> bool) -> 'a list -> bool *)</span>
+
+<span class="fn">exists</span> (<span class="kw">fun</span> x -> x < <span class="num">0</span>) [<span class="num">1</span>; -<span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* true, stops at -2 *)</span>
+
+<span class="fn">exists</span> (<span class="kw">fun</span> x -> x < <span class="num">0</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* false, all elements checked *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>For_all</h2>
+      <p><code>for_all f xs</code> tests whether <code>f</code> returns <code>true</code> for every element of <code>xs</code>. The empty case is <code>true</code>: a claim that holds for all elements of an empty list is vacuously true. The cons case short-circuits with <code>&amp;&amp;</code>: if the head fails the predicate, the answer is immediately false.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p><code>for_all</code> and <code>exists</code> are exact duals. Where <code>exists</code> returns <code>false</code> for <code>[]</code> and uses <code>||</code>, <code>for_all</code> returns <code>true</code> for <code>[]</code> and uses <code>&amp;&amp;</code>. The short-circuit direction also flips: <code>for_all</code> stops at the first element that fails.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p>Both functions traverse at most the whole list once. On a failing input, they stop as soon as the result is determined and never look at the remaining elements.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">for_all.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let rec</span> <span class="fn">for_all</span> f xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -> <span class="kw">true</span>
+  | x :: xr -> f x &amp;&amp; <span class="fn">for_all</span> f xr
+
+<span class="cmt">(* val for_all : ('a -> bool) -> 'a list -> bool *)</span>
+
+<span class="fn">for_all</span> (<span class="kw">fun</span> x -> x < <span class="num">0</span>) [<span class="num">1</span>; -<span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* false, stops at 1 *)</span>
+
+<span class="fn">for_all</span> (<span class="kw">fun</span> x -> x > <span class="num">0</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* true, all elements checked *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Using the standard library</h2>
+      <p>You now know how all four functions work internally. In practice, the <code>List</code> module provides them ready to use. The stdlib versions are also tail-recursive where it matters, so they handle large lists without stack overflow.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">stdlib.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="ty">List</span>.<span class="fn">map</span>     (<span class="kw">fun</span> x -> x * x) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>]
+<span class="cmt">(* [1; 4; 9; 16] *)</span>
+
+<span class="ty">List</span>.<span class="fn">filter</span>  (<span class="kw">fun</span> x -> x <span class="kw">mod</span> <span class="num">2</span> = <span class="num">0</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>]
+<span class="cmt">(* [2; 4] *)</span>
+
+<span class="ty">List</span>.<span class="fn">exists</span>  (<span class="kw">fun</span> x -> x > <span class="num">10</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* false *)</span>
+
+<span class="ty">List</span>.<span class="fn">for_all</span> (<span class="kw">fun</span> x -> x > <span class="num">0</span>) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+<span class="cmt">(* true *)</span>
+
+<span class="cmt">(* Pipe them together *)</span>
+[<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>]
+|> <span class="ty">List</span>.<span class="fn">filter</span>  (<span class="kw">fun</span> x -> x <span class="kw">mod</span> <span class="num">2</span> = <span class="num">0</span>)
+|> <span class="ty">List</span>.<span class="fn">map</span>     (<span class="kw">fun</span> x -> x * x)
+<span class="cmt">(* [4; 16] *)</span></pre>
+      </div>
+
+      <div class="page-footer">
+        <a href="/concepts/lists">← Lists</a>
+        <a href="/concepts/higher-order">Next: Higher-Order Functions →</a>
+      </div>
+    </div>

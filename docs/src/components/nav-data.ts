@@ -34,6 +34,9 @@ export const navGroups: NavGroup[] = [
       { num: '12.', label: 'Tail Recursion', path: '/concepts/tail-recursion' },
       { num: '13.', label: 'Iteration', path: '/concepts/iteration' },
       { num: '14.', label: 'Derived Forms', path: '/concepts/derived-forms' },
+      { num: '15.', label: 'Sorting', path: '/concepts/sorting' },
+      { num: '16.', label: 'Constructors and Exceptions', path: '/concepts/constructors-exceptions' },
+      { num: '17.', label: 'Trees', path: '/concepts/trees' },
     ],
   },
   {

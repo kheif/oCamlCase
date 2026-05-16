@@ -14,6 +14,9 @@ import higherOrder from '../pages-content/concepts/higher-order.html?raw';
 import tailRecursion from '../pages-content/concepts/tail-recursion.html?raw';
 import iteration from '../pages-content/concepts/iteration.html?raw';
 import derivedForms from '../pages-content/concepts/derived-forms.html?raw';
+import sorting from '../pages-content/concepts/sorting.html?raw';
+import constructorsExceptions from '../pages-content/concepts/constructors-exceptions.html?raw';
+import trees from '../pages-content/concepts/trees.html?raw';
 import bank from '../pages-content/exercises/bank.html?raw';
 import playlist from '../pages-content/exercises/playlist.html?raw';
 import search from '../pages-content/exercises/search.html?raw';
@@ -137,6 +140,27 @@ export const contentRoutes: ContentRoute[] = [
     title: 'Derived Forms | oCamlCase',
     description:
       'See how OCaml syntax desugars to a small core: && and || are if-expressions, operators in parentheses are functions, and let f x = ... is sugar for fun.',
+  },
+  {
+    path: '/concepts/sorting',
+    html: sorting,
+    title: 'Sorting | oCamlCase',
+    description:
+      'Learn about sorting algorithms in OCaml, including insertion sort, polymorphic sorting, and merge sort, and understand recursion trees.',
+  },
+  {
+    path: '/concepts/constructors-exceptions',
+    html: constructorsExceptions,
+    title: 'Constructors and Exceptions | oCamlCase',
+    description:
+      'Understand variant types, structural recursion, exceptions, and option types for handling alternative data shapes and control flow.',
+  },
+  {
+    path: '/concepts/trees',
+    html: trees,
+    title: 'Trees | oCamlCase',
+    description:
+      'Explore rose trees, structural terminology, and computing properties of tree data structures recursively.',
   },
   {
     path: '/exercises/bank',

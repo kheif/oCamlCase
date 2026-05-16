@@ -1,0 +1,474 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 17 of 17</div>
+        <h1 class="page-title">Trees</h1>
+        <p class="page-intro">Trees are recursive data structures that naturally model hierarchical information. Rose trees in particular offer flexibility by allowing nodes to have any number of branches.</p>
+      </div>
+
+      <h2>Rose Trees</h2>
+      <p>Rose trees have a variable and unbounded number of branches per node.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>Each node <code>T</code> holds a list of its children. This makes it incredibly expressive, allowing for structures where some nodes have no children while others have many.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">tree.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">type</span> tree = T <span class="kw">of</span> tree <span class="ty">list</span>
+
+<span class="kw">let</span> t1 = T []
+<span class="cmt">(* A single leaf / atomic tree *)</span>
+
+<span class="kw">let</span> t2 = T [t1; t1; t1]
+<span class="cmt">(* A node with three leaf children *)</span>
+
+<span class="kw">let</span> t3 = T [T [t2]; t1; t2]
+<span class="cmt">(* A deeper nested tree *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-box build-demo">
+        <input type="radio" name="build-step" id="bs-1" checked>
+        <input type="radio" name="build-step" id="bs-2">
+        <input type="radio" name="build-step" id="bs-3">
+
+        <div class="demo-timeline">
+          <label for="bs-1">1. Atomic Tree (t1)</label>
+          <label for="bs-2">2. Compound Tree (t2)</label>
+          <label for="bs-3">3. Deep Tree (t3)</label>
+        </div>
+
+        <div class="demo-stage build-stage">
+          <div class="tree-canvas">
+            <div class="t-node t-1 t-lbl lbl-bot val-t1"></div>
+            
+            <div class="t-node t-2 t-lbl lbl-top val-t2"></div>
+            <div class="t-edge t-e-2-1"></div>
+            <div class="t-edge t-e-2-2"></div>
+            <div class="t-edge t-e-2-3"></div>
+            <div class="t-node t-2-1 t-lbl lbl-bot val-t1"></div>
+            <div class="t-node t-2-2 t-lbl lbl-bot val-t1"></div>
+            <div class="t-node t-2-3 t-lbl lbl-bot val-t1"></div>
+            
+            <div class="t-node t-3 t-lbl lbl-top val-t3"></div>
+            <div class="t-edge t-e-3-1"></div>
+            <div class="t-edge t-e-3-2"></div>
+            <div class="t-edge t-e-3-3"></div>
+            <div class="t-node t-3-1 t-lbl lbl-l val-T"></div>
+            <div class="t-edge t-e-3-1-1"></div>
+            <div class="t-node t-3-1-1 t-lbl lbl-l val-t2"></div>
+            <div class="t-edge t-e-t2-1"></div><div class="t-edge t-e-t2-2"></div><div class="t-edge t-e-t2-3"></div>
+            <div class="t-node t-t2-1 t-lbl lbl-bot val-t1"></div><div class="t-node t-t2-2 t-lbl lbl-bot val-t1"></div><div class="t-node t-t2-3 t-lbl lbl-bot val-t1"></div>
+            
+            <div class="t-node t-3-2 t-lbl lbl-r val-t1"></div>
+            <div class="t-node t-3-3 t-lbl lbl-r val-t2"></div>
+            <div class="t-edge t-e-3-3-1"></div><div class="t-edge t-e-3-3-2"></div><div class="t-edge t-e-3-3-3"></div>
+            <div class="t-node t-3-3-1 t-lbl lbl-bot val-t1"></div><div class="t-node t-3-3-2 t-lbl lbl-bot val-t1"></div><div class="t-node t-3-3-3 t-lbl lbl-bot val-t1"></div>
+          </div>
+        </div>
+
+        <div class="demo-caption">
+          <div class="cap cap-1"><strong>Step 1.</strong> <code>let t1 = T []</code> creates a single atomic tree (a leaf with no children).</div>
+          <div class="cap cap-2"><strong>Step 2.</strong> <code>let t2 = T [t1; t1; t1]</code> creates a new root node containing a list of three <code>t1</code> children.</div>
+          <div class="cap cap-3"><strong>Step 3.</strong> <code>let t3 = T [T [t2]; t1; t2]</code> embeds the previous trees into an even deeper structure, demonstrating unbounded arity.</div>
+        </div>
+      </div>
+
+      <h2>Terminology</h2>
+      <p>Understanding tree terminology is essential for navigating and manipulating these structures:</p>
+      <ul>
+        <li><strong>Atomic tree:</strong> <code>T []</code> (no children)</li>
+        <li><strong>Compound tree:</strong> any tree with at least one child</li>
+        <li><strong>Root:</strong> the top node</li>
+        <li><strong>Inner nodes:</strong> non leaf nodes</li>
+        <li><strong>Arity</strong> of a tree <code>t = T [t0; ...; t_{n-1}]</code>: the number <code>n</code> of its children</li>
+        <li><strong>Successor trees:</strong> the children <code>t0, ..., t_{n-1}</code></li>
+      </ul>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">properties.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let</span> <span class="fn">arity</span> (T ts) = <span class="ty">List</span>.<span class="fn">length</span> ts
+
+<span class="kw">let</span> <span class="fn">succtree</span> (T ts) k = <span class="ty">List</span>.<span class="fn">nth</span> ts k</pre>
+      </div>
+
+      <h2>Computing the Number of Nodes</h2>
+      <p>The node count is computed recursively from successor trees. Each leaf contributes 1. Each inner node contributes 1 plus the sum of its children's node counts.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The approach combines three ideas:</p>
+          <ol>
+            <li>Recurse on successor trees.</li>
+            <li>Use <code>map</code> to apply the function to each child.</li>
+            <li>Use <code>fold_left</code> to aggregate the results.</li>
+          </ol>
+          <div class="callout callout-key">
+            <div class="callout-title">Pattern</div>
+            <p>This function maps <code>size</code> over all children to get a list of counts, then folds with addition starting from 1 for the current node itself.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">size.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let rec</span> <span class="fn">size</span> (T ts) =
+  <span class="ty">List</span>.<span class="fn">fold_left</span> (+) <span class="num">1</span> (<span class="ty">List</span>.<span class="fn">map</span> <span class="fn">size</span> ts)</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-box size-demo">
+        <input type="radio" name="sz-tab" id="sz-tab-simple" checked>
+        <input type="radio" name="sz-tab" id="sz-tab-deep">
+
+        <div class="demo-tabs">
+          <label for="sz-tab-simple" class="tab-label">1. Simple Tree</label>
+          <label for="sz-tab-deep" class="tab-label">2. Deep Tree</label>
+        </div>
+
+        <div class="demo-content sz-simple-content">
+          <input type="radio" name="sz-step-s" id="sz-s-1" checked>
+          <input type="radio" name="sz-step-s" id="sz-s-2">
+          <input type="radio" name="sz-step-s" id="sz-s-3">
+          <input type="radio" name="sz-step-s" id="sz-s-4">
+
+          <div class="demo-timeline">
+            <label for="sz-s-1">1. Start</label>
+            <label for="sz-s-2">2. Map Down</label>
+            <label for="sz-s-3">3. Leaves Return</label>
+            <label for="sz-s-4">4. Fold Up</label>
+          </div>
+
+          <div class="demo-stage size-stage">
+            <div class="sz-prog">
+              <div class="sz-code"><span class="fn">size</span> (T [T []; T []])</div>
+              <div class="sz-eval se-1"><span class="fn">fold_left</span> (+) <span class="num">1</span> (<span class="ty">List</span>.<span class="fn">map</span> <span class="fn">size</span> [T []; T []])</div>
+              <div class="sz-eval se-2"><span class="fn">fold_left</span> (+) <span class="num">1</span> [<span class="fn">size</span> (T []); <span class="fn">size</span> (T [])]</div>
+              <div class="sz-eval se-3"><span class="fn">fold_left</span> (+) <span class="num">1</span> [<span class="num">1</span>; <span class="num">1</span>]</div>
+              <div class="sz-eval se-4"><span class="num">1</span> + <span class="num">1</span> + <span class="num">1</span> = <span class="num">3</span></div>
+            </div>
+            <div class="sz-visual">
+              <div class="sz-root"></div>
+              <div class="sz-branch sb-l"></div>
+              <div class="sz-branch sb-r"></div>
+              <div class="sz-leaf sl-l"></div>
+              <div class="sz-leaf sl-r"></div>
+              
+              <div class="sz-flow sf-down-l"></div>
+              <div class="sz-flow sf-down-r"></div>
+              <div class="sz-flow sf-up-l">1</div>
+              <div class="sz-flow sf-up-r">1</div>
+              <div class="sz-res">3</div>
+            </div>
+          </div>
+
+          <div class="demo-caption">
+            <div class="cap cap-s-1"><strong>Step 1.</strong> We want to compute the size of a tree with one root and two atomic children.</div>
+            <div class="cap cap-s-2"><strong>Step 2.</strong> The root calls <code>List.map size</code> on its children, propagating downwards.</div>
+            <div class="cap cap-s-3"><strong>Step 3.</strong> The leaves evaluate their base case (<code>1</code>) and return these values to the <code>map</code> function, yielding <code>[1; 1]</code>.</div>
+            <div class="cap cap-s-4"><strong>Step 4.</strong> The root node receives <code>[1; 1]</code> and uses <code>fold_left (+) 1</code> to sum the list plus its own <code>1</code>, returning <code>3</code>.</div>
+          </div>
+        </div>
+
+        <div class="demo-content sz-deep-content">
+          <input type="radio" name="sz-step-d" id="sz-d-1" checked>
+          <input type="radio" name="sz-step-d" id="sz-d-2">
+          <input type="radio" name="sz-step-d" id="sz-d-3">
+          <input type="radio" name="sz-step-d" id="sz-d-4">
+          <input type="radio" name="sz-step-d" id="sz-d-5">
+          <input type="radio" name="sz-step-d" id="sz-d-6">
+
+          <div class="demo-timeline">
+            <label for="sz-d-1">1. Start</label>
+            <label for="sz-d-2">2. Map L1</label>
+            <label for="sz-d-3">3. Map L2</label>
+            <label for="sz-d-4">4. Leaves Ret</label>
+            <label for="sz-d-5">5. Inner Fold</label>
+            <label for="sz-d-6">6. Final Fold</label>
+          </div>
+
+          <div class="demo-stage size-stage">
+            <div class="sz-prog">
+              <div class="sz-code"><span class="fn">size</span> (T [T [T []; T []]; T []])</div>
+              <div class="sz-eval sd-2"><span class="fn">fold_left</span> (+) <span class="num">1</span> [<span class="fn">size</span> (T [T []; T []]); <span class="fn">size</span> (T [])]</div>
+              <div class="sz-eval sd-3"><span class="fn">fold_left</span> (+) <span class="num">1</span> [<span class="fn">fold_left</span> (+) <span class="num">1</span> [<span class="fn">size</span> (T []); <span class="fn">size</span> (T [])]; <span class="fn">size</span> (T [])]</div>
+              <div class="sz-eval sd-4"><span class="fn">fold_left</span> (+) <span class="num">1</span> [<span class="fn">fold_left</span> (+) <span class="num">1</span> [<span class="num">1</span>; <span class="num">1</span>]; <span class="num">1</span>]</div>
+              <div class="sz-eval sd-5"><span class="fn">fold_left</span> (+) <span class="num">1</span> [<span class="num">3</span>; <span class="num">1</span>]</div>
+              <div class="sz-eval sd-6"><span class="num">1</span> + <span class="num">3</span> + <span class="num">1</span> = <span class="num">5</span></div>
+            </div>
+            <div class="sz-visual">
+              <div class="sz-root sz-d-root"></div>
+              <div class="sz-branch sbd-l"></div>
+              <div class="sz-branch sbd-r"></div>
+              <div class="sz-node sz-d-l"></div>
+              <div class="sz-leaf sz-d-r"></div>
+              
+              <div class="sz-branch sbd-ll"></div>
+              <div class="sz-branch sbd-lr"></div>
+              <div class="sz-leaf sz-d-ll"></div>
+              <div class="sz-leaf sz-d-lr"></div>
+              
+              <div class="sz-flow sfd-down-l"></div>
+              <div class="sz-flow sfd-down-r"></div>
+              <div class="sz-flow sfd-down-ll"></div>
+              <div class="sz-flow sfd-down-lr"></div>
+              
+              <div class="sz-flow sfd-up-ll">1</div>
+              <div class="sz-flow sfd-up-lr">1</div>
+              <div class="sz-flow sfd-up-r">1</div>
+              
+              <div class="sz-res sfd-res-l">3</div>
+              <div class="sz-res sfd-res-root">5</div>
+            </div>
+          </div>
+
+          <div class="demo-caption">
+            <div class="cap cap-d-1"><strong>Step 1.</strong> We compute the size of a more detailed tree: <code>T [T [T []; T []]; T []]</code>.</div>
+            <div class="cap cap-d-2"><strong>Step 2.</strong> The root maps over its two children.</div>
+            <div class="cap cap-d-3"><strong>Step 3.</strong> The left child maps <code>size</code> over its own two children.</div>
+            <div class="cap cap-d-4"><strong>Step 4.</strong> All three leaf nodes evaluate their base case and return <code>1</code>.</div>
+            <div class="cap cap-d-5"><strong>Step 5.</strong> The left intermediate node receives <code>[1; 1]</code> and folds them plus its own <code>1</code>, yielding <code>3</code>.</div>
+            <div class="cap cap-d-6"><strong>Step 6.</strong> The root node receives <code>[3; 1]</code> and folds them plus its own <code>1</code>, yielding <code>5</code>.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <a href="/concepts/constructors-exceptions">← Constructors and Exceptions</a>
+        <a href="/exercises/bank">Next: Bank Account →</a>
+      </div>
+
+      <style>
+        .demo-box {
+          margin: 24px 0 32px; border: 1px solid var(--border); border-radius: 8px;
+          background: var(--bg-warm); padding: 18px 20px 20px;
+        }
+        .demo-box input[type="radio"] { display: none; }
+        
+        .demo-timeline {
+          display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .demo-timeline label {
+          padding: 6px 12px; border: 1px solid var(--border-dk); border-radius: 20px;
+          cursor: pointer; font-family: var(--sans); font-size: 13px; font-weight: 500;
+          color: var(--muted); background: var(--bg); user-select: none;
+          transition: all .25s ease;
+        }
+        .demo-timeline label:hover { border-color: var(--accent); color: var(--accent); }
+        
+        #bs-1:checked ~ .demo-timeline label[for="bs-1"],
+        #bs-2:checked ~ .demo-timeline label[for="bs-2"],
+        #bs-3:checked ~ .demo-timeline label[for="bs-3"],
+        #sz-1:checked ~ .demo-timeline label[for="sz-1"],
+        #sz-2:checked ~ .demo-timeline label[for="sz-2"],
+        #sz-3:checked ~ .demo-timeline label[for="sz-3"],
+        #sz-4:checked ~ .demo-timeline label[for="sz-4"] {
+          background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+
+        .demo-stage { display: grid; gap: 16px; margin-bottom: 16px; }
+        
+        /* Build Tree Demo */
+        .build-stage { grid-template-columns: 1fr; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 24px; min-height: 200px; display: flex; justify-content: center; overflow: hidden; }
+        .tree-canvas { position: relative; width: 300px; height: 160px; }
+        .t-node { box-sizing: border-box; position: absolute; width: 14px; height: 14px; background: #6a8cc4; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #6a8cc4; z-index: 2; opacity: 0; transform: scale(0); transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .t-edge { position: absolute; border-top: 2px solid #ced4da; transform-origin: left center; opacity: 0; transition: all .4s ease; z-index: 1; }
+        
+        .t-lbl::after { position: absolute; font-family: var(--mono); font-size: 10px; font-weight: bold; background: var(--bg-warm); border: 1px solid var(--border-dk); padding: 0 4px; border-radius: 4px; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.05); color: var(--muted); }
+        .lbl-bot::after { top: 18px; left: 50%; transform: translateX(-50%); }
+        .lbl-top::after { top: -20px; left: 50%; transform: translateX(-50%); }
+        .lbl-l::after { top: 50%; right: 20px; transform: translateY(-50%); }
+        .lbl-r::after { top: 50%; left: 20px; transform: translateY(-50%); }
+
+        .val-t1::after { content: "t1"; color: #c46a6a; }
+        .val-t2::after { content: "t2"; color: #6a8cc4; }
+        .val-t3::after { content: "t3"; color: #2f6a30; }
+        .val-T::after { content: "T"; }
+
+        .t-1 { left: 143px; top: 73px; }
+        #bs-1:checked ~ .build-stage .t-1 { opacity: 1; transform: scale(1.5); }
+        
+        .t-2 { left: 143px; top: 40px; }
+        .t-2-1 { left: 83px; top: 100px; } .t-2-2 { left: 143px; top: 100px; } .t-2-3 { left: 203px; top: 100px; }
+        .t-e-2-1 { left: 150px; top: 47px; width: 0; transform: rotate(135deg); }
+        .t-e-2-2 { left: 150px; top: 47px; width: 0; transform: rotate(90deg); }
+        .t-e-2-3 { left: 150px; top: 47px; width: 0; transform: rotate(45deg); }
+        
+        #bs-2:checked ~ .build-stage .t-2 { opacity: 1; transform: scale(1); }
+        #bs-2:checked ~ .build-stage .t-e-2-1 { opacity: 1; width: 85px; transition-delay: 0.1s; }
+        #bs-2:checked ~ .build-stage .t-e-2-2 { opacity: 1; width: 60px; transition-delay: 0.1s; }
+        #bs-2:checked ~ .build-stage .t-e-2-3 { opacity: 1; width: 85px; transition-delay: 0.1s; }
+        #bs-2:checked ~ .build-stage .t-2-1, #bs-2:checked ~ .build-stage .t-2-2, #bs-2:checked ~ .build-stage .t-2-3 { opacity: 1; transform: scale(1); transition-delay: 0.3s; }
+        
+        .t-3 { left: 143px; top: 10px; }
+        .t-3-1 { left: 60px; top: 50px; } .t-3-2 { left: 143px; top: 50px; } .t-3-3 { left: 233px; top: 50px; }
+        .t-e-3-1 { left: 150px; top: 17px; width: 0; transform: rotate(154.2deg); }
+        .t-e-3-2 { left: 150px; top: 17px; width: 0; transform: rotate(90deg); }
+        .t-e-3-3 { left: 150px; top: 17px; width: 0; transform: rotate(23.9deg); }
+        
+        .t-3-1-1 { left: 60px; top: 90px; }
+        .t-e-3-1-1 { left: 67px; top: 57px; width: 0; transform: rotate(90deg); }
+        .t-t2-1 { left: 30px; top: 130px; } .t-t2-2 { left: 60px; top: 130px; } .t-t2-3 { left: 90px; top: 130px; }
+        .t-e-t2-1 { left: 67px; top: 97px; width: 0; transform: rotate(126.8deg); }
+        .t-e-t2-2 { left: 67px; top: 97px; width: 0; transform: rotate(90deg); }
+        .t-e-t2-3 { left: 67px; top: 97px; width: 0; transform: rotate(53.1deg); }
+        
+        .t-3-3-1 { left: 203px; top: 90px; } .t-3-3-2 { left: 233px; top: 90px; } .t-3-3-3 { left: 263px; top: 90px; }
+        .t-e-3-3-1 { left: 240px; top: 57px; width: 0; transform: rotate(126.8deg); }
+        .t-e-3-3-2 { left: 240px; top: 57px; width: 0; transform: rotate(90deg); }
+        .t-e-3-3-3 { left: 240px; top: 57px; width: 0; transform: rotate(53.1deg); }
+
+        #bs-3:checked ~ .build-stage .t-3 { opacity: 1; transform: scale(1); }
+        #bs-3:checked ~ .build-stage .t-e-3-1 { opacity: 1; width: 92px; transition-delay: 0.1s; }
+        #bs-3:checked ~ .build-stage .t-e-3-2 { opacity: 1; width: 40px; transition-delay: 0.1s; }
+        #bs-3:checked ~ .build-stage .t-e-3-3 { opacity: 1; width: 98px; transition-delay: 0.1s; }
+        
+        #bs-3:checked ~ .build-stage .t-3-1, #bs-3:checked ~ .build-stage .t-3-2, #bs-3:checked ~ .build-stage .t-3-3 { opacity: 1; transform: scale(1); transition-delay: 0.3s; }
+        
+        #bs-3:checked ~ .build-stage .t-e-3-1-1 { opacity: 1; width: 40px; transition-delay: 0.4s; }
+        #bs-3:checked ~ .build-stage .t-e-3-3-1 { opacity: 1; width: 50px; transition-delay: 0.4s; }
+        #bs-3:checked ~ .build-stage .t-e-3-3-2 { opacity: 1; width: 40px; transition-delay: 0.4s; }
+        #bs-3:checked ~ .build-stage .t-e-3-3-3 { opacity: 1; width: 50px; transition-delay: 0.4s; }
+        
+        #bs-3:checked ~ .build-stage .t-3-1-1, #bs-3:checked ~ .build-stage .t-3-3-1, #bs-3:checked ~ .build-stage .t-3-3-2, #bs-3:checked ~ .build-stage .t-3-3-3 { opacity: 1; transform: scale(1); transition-delay: 0.6s; }
+        
+        #bs-3:checked ~ .build-stage .t-e-t2-1 { opacity: 1; width: 50px; transition-delay: 0.7s; }
+        #bs-3:checked ~ .build-stage .t-e-t2-2 { opacity: 1; width: 40px; transition-delay: 0.7s; }
+        #bs-3:checked ~ .build-stage .t-e-t2-3 { opacity: 1; width: 50px; transition-delay: 0.7s; }
+        
+        #bs-3:checked ~ .build-stage .t-t2-1, #bs-3:checked ~ .build-stage .t-t2-2, #bs-3:checked ~ .build-stage .t-t2-3 { opacity: 1; transform: scale(1); transition-delay: 0.9s; }
+
+        /* Tabs */
+        .demo-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border-dk); padding-bottom: 12px; }
+        .demo-tabs .tab-label { padding: 6px 16px; border-radius: 6px; cursor: pointer; font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--muted); background: transparent; transition: all .25s ease; }
+        .demo-tabs .tab-label:hover { color: var(--text); background: var(--border); }
+        
+        #sz-tab-simple:checked ~ .demo-tabs label[for="sz-tab-simple"],
+        #sz-tab-deep:checked ~ .demo-tabs label[for="sz-tab-deep"] { color: #fff; background: #c46a6a; }
+        
+        .sz-simple-content, .sz-deep-content { display: none; }
+        #sz-tab-simple:checked ~ .sz-simple-content { display: block; }
+        #sz-tab-deep:checked ~ .sz-deep-content { display: block; }
+
+        /* Timeline active states for new inputs */
+        #sz-s-1:checked ~ .demo-timeline label[for="sz-s-1"], #sz-s-2:checked ~ .demo-timeline label[for="sz-s-2"],
+        #sz-s-3:checked ~ .demo-timeline label[for="sz-s-3"], #sz-s-4:checked ~ .demo-timeline label[for="sz-s-4"],
+        #sz-d-1:checked ~ .demo-timeline label[for="sz-d-1"], #sz-d-2:checked ~ .demo-timeline label[for="sz-d-2"],
+        #sz-d-3:checked ~ .demo-timeline label[for="sz-d-3"], #sz-d-4:checked ~ .demo-timeline label[for="sz-d-4"],
+        #sz-d-5:checked ~ .demo-timeline label[for="sz-d-5"], #sz-d-6:checked ~ .demo-timeline label[for="sz-d-6"] {
+          background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+
+        /* Size Demo */
+        .size-stage { grid-template-columns: 1fr 1fr; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px; overflow: hidden; }
+        .sz-prog { background: #fafafa; border: 1px solid var(--border); border-radius: 6px; padding: 16px; font-family: var(--mono); font-size: 13px; color: var(--text); position: relative; min-height: 120px; display: flex; flex-direction: column; justify-content: flex-start; }
+        .sz-code { color: var(--text); font-weight: 500; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-dk); display: block; }
+        .sz-code .fn, .sz-eval .fn { color: #2e6db4; }
+        .sz-code .num, .sz-eval .num { color: #a33243; }
+        .sz-code .ty, .sz-eval .ty { color: #2e8b57; }
+        
+        .sz-eval { position: absolute; left: 16px; top: 60px; color: var(--text); font-weight: 500; opacity: 0; transform: translateY(6px); transition: all .4s ease; }
+        
+        #sz-s-1:checked ~ .size-stage .se-1 { opacity: 1; transform: translateY(0); }
+        #sz-s-2:checked ~ .size-stage .se-2 { opacity: 1; transform: translateY(0); }
+        #sz-s-3:checked ~ .size-stage .se-3 { opacity: 1; transform: translateY(0); }
+        #sz-s-4:checked ~ .size-stage .se-4 { opacity: 1; transform: translateY(0); }
+        
+        #sz-d-1:checked ~ .size-stage .sd-1 { opacity: 1; transform: translateY(0); }
+        #sz-d-2:checked ~ .size-stage .sd-2 { opacity: 1; transform: translateY(0); }
+        #sz-d-3:checked ~ .size-stage .sd-3 { opacity: 1; transform: translateY(0); }
+        #sz-d-4:checked ~ .size-stage .sd-4 { opacity: 1; transform: translateY(0); }
+        #sz-d-5:checked ~ .size-stage .sd-5 { opacity: 1; transform: translateY(0); }
+
+        .sz-visual { position: relative; width: 300px; height: 160px; margin: 0 auto; }
+        .sz-root { box-sizing: border-box; position: absolute; width: 16px; height: 16px; background: #6a8cc4; border-radius: 50%; top: 20px; left: 142px; z-index: 2; }
+        .sz-branch { position: absolute; border-top: 2px solid #ced4da; transform-origin: left center; z-index: 1; }
+        .sb-l { width: 71px; transform: rotate(135deg); left: 150px; top: 28px; }
+        .sb-r { width: 71px; transform: rotate(45deg); left: 150px; top: 28px; }
+        .sz-leaf { box-sizing: border-box; position: absolute; width: 16px; height: 16px; background: #6ac48a; border-radius: 50%; top: 70px; z-index: 2; }
+        .sl-l { left: 92px; }
+        .sl-r { left: 192px; }
+        
+        .sz-flow { position: absolute; font-family: var(--mono); font-size: 12px; font-weight: bold; opacity: 0; transition: all .6s ease; z-index: 3; }
+        .sf-down-l, .sf-down-r { width: 8px; height: 8px; border-radius: 50%; background: #2e6db4; top: 24px; left: 146px; }
+        
+        #sz-s-2:checked ~ .size-stage .sf-down-l { opacity: 1; top: 74px; left: 96px; }
+        #sz-s-2:checked ~ .size-stage .sf-down-r { opacity: 1; top: 74px; left: 196px; }
+        
+        .sf-up-l, .sf-up-r { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: #fff; background: #c46a6a; border-radius: 4px; top: 66px; }
+        .sf-up-l { left: 88px; }
+        .sf-up-r { left: 188px; }
+        
+        #sz-s-3:checked ~ .size-stage .sf-up-l { opacity: 1; top: 16px; left: 112px; }
+        #sz-s-3:checked ~ .size-stage .sf-up-r { opacity: 1; top: 16px; left: 164px; }
+        #sz-s-4:checked ~ .size-stage .sf-up-l, #sz-s-4:checked ~ .size-stage .sf-up-r { opacity: 0; }
+        
+        .sz-res { position: absolute; display: flex; align-items: center; justify-content: center; color: #fff; background: #2f6a30; width: 32px; height: 24px; border-radius: 6px; font-family: var(--mono); font-weight: bold; font-size: 14px; top: 16px; left: 134px; opacity: 0; transform: scale(0.5); transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 4; }
+        #sz-s-4:checked ~ .size-stage .sz-res { opacity: 1; transform: scale(1.2); }
+
+        /* Deep Tree Elements */
+        .sz-d-root { top: 12px; }
+        .sz-node { box-sizing: border-box; position: absolute; width: 16px; height: 16px; background: #6a8cc4; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #6a8cc4; z-index: 2; }
+        .sz-d-l { top: 52px; left: 92px; }
+        .sz-d-r { top: 52px; left: 192px; }
+        .sz-d-ll { top: 92px; left: 62px; }
+        .sz-d-lr { top: 92px; left: 122px; }
+        .sbd-l { left: 150px; top: 20px; width: 64px; transform: rotate(141.3deg); }
+        .sbd-r { left: 150px; top: 20px; width: 64px; transform: rotate(38.7deg); }
+        .sbd-ll { left: 100px; top: 60px; width: 50px; transform: rotate(126.8deg); }
+        .sbd-lr { left: 100px; top: 60px; width: 50px; transform: rotate(53.1deg); }
+
+        .sfd-down-l, .sfd-down-r { width: 8px; height: 8px; border-radius: 50%; background: #2e6db4; top: 16px; left: 146px; }
+        #sz-d-2:checked ~ .size-stage .sfd-down-l, #sz-d-3:checked ~ .size-stage .sfd-down-l { opacity: 1; top: 56px; left: 96px; }
+        #sz-d-2:checked ~ .size-stage .sfd-down-r, #sz-d-3:checked ~ .size-stage .sfd-down-r { opacity: 1; top: 56px; left: 196px; }
+        
+        .sfd-down-ll, .sfd-down-lr { width: 8px; height: 8px; border-radius: 50%; background: #2e6db4; top: 56px; left: 96px; }
+        #sz-d-3:checked ~ .size-stage .sfd-down-ll { opacity: 1; top: 96px; left: 66px; }
+        #sz-d-3:checked ~ .size-stage .sfd-down-lr { opacity: 1; top: 96px; left: 126px; }
+        
+        .sfd-up-ll, .sfd-up-lr, .sfd-up-r { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: #fff; background: #c46a6a; border-radius: 4px; }
+        .sfd-up-ll { top: 88px; left: 58px; }
+        .sfd-up-lr { top: 88px; left: 118px; }
+        .sfd-up-r { top: 48px; left: 188px; }
+        
+        #sz-d-4:checked ~ .size-stage .sfd-up-ll { opacity: 1; top: 48px; left: 80px; }
+        #sz-d-4:checked ~ .size-stage .sfd-up-lr { opacity: 1; top: 48px; left: 96px; }
+        #sz-d-5:checked ~ .size-stage .sfd-up-ll, #sz-d-5:checked ~ .size-stage .sfd-up-lr { opacity: 0; top: 48px; left: 88px; transform: scale(0.5); }
+        
+        #sz-d-4:checked ~ .size-stage .sfd-up-r, #sz-d-5:checked ~ .size-stage .sfd-up-r { opacity: 1; top: 48px; left: 188px; }
+        #sz-d-6:checked ~ .size-stage .sfd-up-r { opacity: 0; top: 8px; left: 134px; transform: scale(0.5); }
+
+        .sfd-res-l { top: 48px; left: 88px; background: #8a6ac4; }
+        #sz-d-5:checked ~ .size-stage .sfd-res-l { opacity: 1; transform: scale(1); }
+        #sz-d-6:checked ~ .size-stage .sfd-res-l { opacity: 0; top: 8px; left: 134px; transform: scale(0.5); }
+        
+        .sfd-res-root { top: 8px; left: 134px; }
+        #sz-d-6:checked ~ .size-stage .sfd-res-root { opacity: 1; transform: scale(1.2); }
+
+        .demo-caption { margin-top: 14px; min-height: 48px; }
+        .cap { display: none; color: var(--text); font-size: 14px; line-height: 1.55; }
+        #bs-1:checked ~ .demo-caption .cap-1,
+        #bs-2:checked ~ .demo-caption .cap-2,
+        #bs-3:checked ~ .demo-caption .cap-3,
+        #sz-s-1:checked ~ .demo-caption .cap-s-1, #sz-s-2:checked ~ .demo-caption .cap-s-2,
+        #sz-s-3:checked ~ .demo-caption .cap-s-3, #sz-s-4:checked ~ .demo-caption .cap-s-4,
+        #sz-d-1:checked ~ .demo-caption .cap-d-1, #sz-d-2:checked ~ .demo-caption .cap-d-2,
+        #sz-d-3:checked ~ .demo-caption .cap-d-3, #sz-d-4:checked ~ .demo-caption .cap-d-4,
+        #sz-d-5:checked ~ .demo-caption .cap-d-5, #sz-d-6:checked ~ .demo-caption .cap-d-6 { display: block; }
+        
+        @media (max-width: 720px) {
+          .size-stage { grid-template-columns: 1fr; }
+        }
+      </style>
+    </div>

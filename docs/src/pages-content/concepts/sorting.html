@@ -1,0 +1,420 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 15 of 17</div>
+        <h1 class="page-title">Sorting</h1>
+        <p class="page-intro">Sorting is a fundamental operation that showcases how OCaml handles algorithms, polymorphic comparison, and recursion strategies like divide and conquer.</p>
+      </div>
+
+      <h2>Insertion Sort</h2>
+      <p>The idea is simple: take each element and insert it into its correct position in an already sorted list.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The <code>insert</code> function takes a sorted list and a value, placing it where it belongs. If the value is greater than the head, it keeps the head in place and recurses on the tail. Otherwise, it just prepends the value.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p><code>isort</code> uses <code>fold_left</code> to build the sorted list element by element. It starts with an empty accumulator and inserts each element from the input list one at a time.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">insertion_sort.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let rec</span> <span class="fn">insert</span> ys x =
+  <span class="kw">match</span> ys <span class="kw">with</span>
+  | y :: yr <span class="kw">when</span> x &gt; y -&gt; y :: <span class="fn">insert</span> yr x
+  | _ -&gt; x :: ys
+
+<span class="kw">let</span> <span class="fn">isort</span> xs = <span class="ty">List</span>.<span class="fn">fold_left</span> <span class="fn">insert</span> [] xs</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-box isort-demo">
+        <input type="radio" name="isort-step" id="is-1" checked>
+        <input type="radio" name="isort-step" id="is-2">
+        <input type="radio" name="isort-step" id="is-3">
+        <input type="radio" name="isort-step" id="is-4">
+        <input type="radio" name="isort-step" id="is-5">
+
+        <div class="demo-timeline">
+          <label for="is-1">1. Start</label>
+          <label for="is-2">2. Insert 3</label>
+          <label for="is-3">3. Insert 1</label>
+          <label for="is-4">4. Insert 4</label>
+          <label for="is-5">5. Insert 2</label>
+        </div>
+
+        <div class="demo-stage isort-stage">
+          <div class="demo-program isort-prog">
+            <div style="margin-bottom: 12px; color: #8a3030; font-weight: bold;"><span class="fn" style="color: #6a8cc4;">isort</span> [<span class="num">3</span>; <span class="num">1</span>; <span class="num">4</span>; <span class="num">2</span>]</div>
+            <div style="position: relative; height: 30px;">
+              <div class="isort-code-step is-c1"><span class="fn">fold_left</span> <span class="fn">insert</span> [] [<span class="num">3</span>; <span class="num">1</span>; <span class="num">4</span>; <span class="num">2</span>]</div>
+              <div class="isort-code-step is-c2"><span class="fn">insert</span> [] <span class="num">3</span></div>
+              <div class="isort-code-step is-c3"><span class="fn">insert</span> [<span class="num">3</span>] <span class="num">1</span></div>
+              <div class="isort-code-step is-c4"><span class="fn">insert</span> [<span class="num">1</span>; <span class="num">3</span>] <span class="num">4</span></div>
+              <div class="isort-code-step is-c5"><span class="fn">insert</span> [<span class="num">1</span>; <span class="num">3</span>; <span class="num">4</span>] <span class="num">2</span></div>
+            </div>
+          </div>
+          <div class="isort-visual">
+            <div class="is-arr-wrap">
+              <div class="is-arr-label">Input</div>
+              <div class="is-arr is-in">
+                <div class="is-blk in-3">3</div>
+                <div class="is-blk in-1">1</div>
+                <div class="is-blk in-4">4</div>
+                <div class="is-blk in-2">2</div>
+              </div>
+            </div>
+            <div class="is-arr-wrap">
+              <div class="is-arr-label">Accumulator</div>
+              <div class="is-arr is-acc">
+                <div class="is-blk acc-1">1</div>
+                <div class="is-blk acc-2">2</div>
+                <div class="is-blk acc-3">3</div>
+                <div class="is-blk acc-4">4</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-caption">
+          <div class="cap cap-1"><strong>Step 1.</strong> <code>fold_left</code> begins with an empty accumulator <code>[]</code> and the full list.</div>
+          <div class="cap cap-2"><strong>Step 2.</strong> The first element <code>3</code> is inserted into <code>[]</code>, yielding <code>[3]</code>.</div>
+          <div class="cap cap-3"><strong>Step 3.</strong> <code>1</code> is inserted. Because <code>1 &lt; 3</code>, it prepends <code>3</code>, shifting it right visually.</div>
+          <div class="cap cap-4"><strong>Step 4.</strong> <code>4</code> is inserted. It recursively passes <code>1</code> and <code>3</code>, landing at the end.</div>
+          <div class="cap cap-5"><strong>Step 5.</strong> <code>2</code> is inserted. It passes <code>1</code>, but is less than <code>3</code>, so it slides into the middle. The array is fully sorted.</div>
+        </div>
+      </div>
+
+      <h2>Polymorphic Sorting</h2>
+      <p>To sort different types (int, float, string), we parameterize the sort with a comparison function <code>cmp</code>.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">polymorphic_sort.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let</span> <span class="fn">pisort</span> cmp =
+  <span class="kw">let rec</span> <span class="fn">insert</span> ys x =
+    <span class="kw">match</span> ys <span class="kw">with</span>
+    | y :: yr <span class="kw">when</span> cmp x y &gt; <span class="num">0</span> -&gt; y :: <span class="fn">insert</span> yr x
+    | _ -&gt; x :: ys
+  <span class="kw">in</span> <span class="ty">List</span>.<span class="fn">fold_left</span> <span class="fn">insert</span> []
+
+<span class="fn">pisort</span> <span class="ty">Int</span>.<span class="fn">compare</span> [<span class="num">5</span>; <span class="num">2</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">-2</span>]
+<span class="cmt">(* [-2; 2; 2; 3; 5] *)</span>
+
+<span class="fn">pisort</span> <span class="ty">Float</span>.<span class="fn">compare</span> [<span class="num">5.0</span>; <span class="num">2.0</span>; <span class="num">2.0</span>; <span class="num">3.0</span>; <span class="num">-2.0</span>]
+<span class="cmt">(* [-2.0; 2.0; 2.0; 3.0; 5.0] *)</span></pre>
+      </div>
+
+      <h2>Comparison Functions</h2>
+      <p>OCaml represents ordering through comparison functions of type <code>'a -&gt; 'a -&gt; int</code>.</p>
+      <ul>
+        <li>Returns a negative integer if <code>a &lt; b</code></li>
+        <li>Returns 0 if <code>a = b</code></li>
+        <li>Returns a positive integer if <code>a &gt; b</code></li>
+      </ul>
+
+      <p>Inverting order is done by simply swapping the arguments. This lets you sort in descending order.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">invert.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let</span> <span class="fn">invert</span> (<span class="kw">cmp</span> : 'a -&gt; 'a -&gt; <span class="ty">int</span>) x y = cmp y x
+
+<span class="fn">pisort</span> (<span class="fn">invert</span> <span class="ty">Int</span>.<span class="fn">compare</span>) [<span class="num">5</span>; <span class="num">2</span>; <span class="num">2</span>; <span class="num">3</span>; <span class="num">-2</span>]
+<span class="cmt">(* [5; 3; 2; 2; -2] *)</span></pre>
+      </div>
+
+      <h2>Merge Sort</h2>
+      <p>Merge sort uses a divide and conquer approach with three steps: split the list into two sublists, sort each recursively, and merge them back together.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p><code>split</code> uses <code>fold_left</code> to alternate elements between two accumulators, distributing them evenly.</p>
+          <p><code>merge</code> combines two sorted lists by comparing their heads and recursing on the remaining elements.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">merge_sort.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="fn">split</span> xs =
+  <span class="ty">List</span>.<span class="fn">fold_left</span> (<span class="kw">fun</span> (ys,zs) x -&gt; (zs, x::ys)) ([],[]) xs
+
+<span class="kw">let rec</span> <span class="fn">merge</span> xs ys =
+  <span class="kw">match</span> (xs,ys) <span class="kw">with</span>
+  | ([],ys) -&gt; ys
+  | (xs,[]) -&gt; xs
+  | (x::xs,y::ys) -&gt;
+      <span class="kw">if</span> x &lt; y <span class="kw">then</span> x :: <span class="fn">merge</span> xs (y::ys)
+      <span class="kw">else</span> y :: <span class="fn">merge</span> (x::xs) ys
+
+<span class="kw">let rec</span> <span class="fn">msort</span> xs =
+  <span class="kw">match</span> xs <span class="kw">with</span>
+  | [] -&gt; []
+  | [x] -&gt; [x]
+  | xs -&gt;
+      <span class="kw">let</span> (ys,zs) = <span class="fn">split</span> xs <span class="kw">in</span>
+      <span class="fn">merge</span> (<span class="fn">msort</span> ys) (<span class="fn">msort</span> zs)</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-box msort-demo">
+        <input type="radio" name="msort-step" id="ms-1" checked>
+        <input type="radio" name="msort-step" id="ms-2">
+        <input type="radio" name="msort-step" id="ms-3">
+        <input type="radio" name="msort-step" id="ms-4">
+        <input type="radio" name="msort-step" id="ms-5">
+
+        <div class="demo-timeline">
+          <label for="ms-1">1. Start</label>
+          <label for="ms-2">2. Split</label>
+          <label for="ms-3">3. Base Cases</label>
+          <label for="ms-4">4. Merge Leaves</label>
+          <label for="ms-5">5. Final Merge</label>
+        </div>
+
+        <div class="demo-stage msort-stage">
+          <div class="ms-tree">
+            <!-- Root -->
+            <div class="ms-node ms-root">
+              <div class="ms-blk">3</div><div class="ms-blk">1</div><div class="ms-blk">4</div><div class="ms-blk">2</div>
+            </div>
+            
+            <!-- Level 1 -->
+            <div class="ms-branch ms-b-l"></div>
+            <div class="ms-branch ms-b-r"></div>
+            
+            <div class="ms-node ms-l1-left">
+              <div class="ms-blk">3</div><div class="ms-blk">4</div>
+            </div>
+            <div class="ms-node ms-l1-right">
+              <div class="ms-blk">1</div><div class="ms-blk">2</div>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="ms-branch ms-b-ll"></div>
+            <div class="ms-branch ms-b-lr"></div>
+            <div class="ms-branch ms-b-rl"></div>
+            <div class="ms-branch ms-b-rr"></div>
+
+            <div class="ms-node ms-l2-ll"><div class="ms-blk">3</div></div>
+            <div class="ms-node ms-l2-lr"><div class="ms-blk">4</div></div>
+            <div class="ms-node ms-l2-rl"><div class="ms-blk">1</div></div>
+            <div class="ms-node ms-l2-rr"><div class="ms-blk">2</div></div>
+          </div>
+        </div>
+
+        <div class="demo-caption">
+          <div class="cap cap-1"><strong>Step 1.</strong> We want to sort <code>[3; 1; 4; 2]</code>. Merge sort begins by passing it to <code>split</code>.</div>
+          <div class="cap cap-2"><strong>Step 2.</strong> <code>split</code> alternates elements, creating <code>[3; 4]</code> and <code>[1; 2]</code>.</div>
+          <div class="cap cap-3"><strong>Step 3.</strong> These sublists are split again until they reach the base case: lists of length 1, which are trivially sorted.</div>
+          <div class="cap cap-4"><strong>Step 4.</strong> The recursive calls return, and <code>merge</code> combines the leaves back into sorted sublists. Notice the elements are now ordered.</div>
+          <div class="cap cap-5"><strong>Step 5.</strong> The final <code>merge</code> combines <code>[3; 4]</code> and <code>[1; 2]</code> by repeatedly taking the smallest head, yielding the fully sorted list.</div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <a href="/concepts/derived-forms">← Derived Forms</a>
+        <a href="/concepts/constructors-exceptions">Next: Constructors and Exceptions →</a>
+      </div>
+
+      <style>
+        .demo-box {
+          margin: 24px 0 32px; border: 1px solid var(--border); border-radius: 8px;
+          background: var(--bg-warm); padding: 18px 20px 20px;
+        }
+        .demo-box > input[type="radio"] { display: none; }
+        
+        .demo-timeline {
+          display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .demo-timeline label {
+          padding: 6px 12px; border: 1px solid var(--border-dk); border-radius: 20px;
+          cursor: pointer; font-family: var(--sans); font-size: 13px; font-weight: 500;
+          color: var(--muted); background: var(--bg); user-select: none;
+          transition: all .25s ease;
+        }
+        .demo-timeline label:hover { border-color: var(--accent); color: var(--accent); }
+        
+        #is-1:checked ~ .demo-timeline label[for="is-1"],
+        #is-2:checked ~ .demo-timeline label[for="is-2"],
+        #is-3:checked ~ .demo-timeline label[for="is-3"],
+        #is-4:checked ~ .demo-timeline label[for="is-4"],
+        #is-5:checked ~ .demo-timeline label[for="is-5"],
+        #ms-1:checked ~ .demo-timeline label[for="ms-1"],
+        #ms-2:checked ~ .demo-timeline label[for="ms-2"],
+        #ms-3:checked ~ .demo-timeline label[for="ms-3"],
+        #ms-4:checked ~ .demo-timeline label[for="ms-4"],
+        #ms-5:checked ~ .demo-timeline label[for="ms-5"] {
+          background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+
+        .demo-stage { display: grid; gap: 16px; margin-bottom: 16px; }
+        
+        /* Insertion Sort Specifics */
+        .isort-stage { grid-template-columns: 1fr 1fr; }
+        .isort-prog {
+          position: relative; background: var(--bg-code); color: #e6e6e6;
+          padding: 14px 16px; border-radius: 6px; font-family: var(--mono);
+          font-size: 13px; line-height: 1.7; min-height: 120px;
+        }
+        .isort-code-step {
+          position: absolute; left: 0; right: 0; top: 0;
+          opacity: 0; transform: translateY(6px); color: #c4a76a;
+          transition: all .35s ease;
+        }
+        #is-1:checked ~ .isort-stage .is-c1,
+        #is-2:checked ~ .isort-stage .is-c2,
+        #is-3:checked ~ .isort-stage .is-c3,
+        #is-4:checked ~ .isort-stage .is-c4,
+        #is-5:checked ~ .isort-stage .is-c5 { opacity: 1; transform: translateY(0); }
+
+        .isort-visual {
+          background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+          padding: 16px; display: flex; flex-direction: column; gap: 16px;
+        }
+        .is-arr-wrap { display: flex; flex-direction: column; gap: 6px; }
+        .is-arr-label { font-family: var(--sans); font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; }
+        .is-arr {
+          display: flex; gap: 4px; height: 36px; padding: 4px;
+          background: var(--bg-warm); border-radius: 4px; border: 1px solid var(--border);
+          position: relative; overflow: hidden;
+        }
+        .is-blk {
+          width: 28px; height: 28px; background: var(--bg-code); color: #fff;
+          border-radius: 4px; display: flex; align-items: center; justify-content: center;
+          font-family: var(--mono); font-size: 13px; font-weight: bold;
+          position: absolute; transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        /* Input Array States */
+        .in-3 { left: 4px; } .in-1 { left: 36px; } .in-4 { left: 68px; } .in-2 { left: 100px; }
+        
+        #is-2:checked ~ .isort-stage .in-3,
+        #is-3:checked ~ .isort-stage .in-3,
+        #is-4:checked ~ .isort-stage .in-3,
+        #is-5:checked ~ .isort-stage .in-3 { opacity: 0; transform: translateY(-20px) scale(0.5); }
+
+        #is-2:checked ~ .isort-stage .in-1 { left: 4px; }
+        #is-2:checked ~ .isort-stage .in-4 { left: 36px; }
+        #is-2:checked ~ .isort-stage .in-2 { left: 68px; }
+
+        #is-3:checked ~ .isort-stage .in-1, #is-4:checked ~ .isort-stage .in-1, #is-5:checked ~ .isort-stage .in-1 { opacity: 0; transform: translateY(-20px) scale(0.5); }
+
+        #is-3:checked ~ .isort-stage .in-4 { left: 4px; }
+        #is-3:checked ~ .isort-stage .in-2 { left: 36px; }
+
+        #is-4:checked ~ .isort-stage .in-4, #is-5:checked ~ .isort-stage .in-4 { opacity: 0; transform: translateY(-20px) scale(0.5); }
+
+        #is-4:checked ~ .isort-stage .in-2 { left: 4px; }
+
+        #is-5:checked ~ .isort-stage .in-2 { opacity: 0; transform: translateY(-20px) scale(0.5); }
+
+        /* Acc Array States */
+        .acc-1, .acc-2, .acc-3, .acc-4 { opacity: 0; transform: translateY(20px); }
+        
+        #is-2:checked ~ .isort-stage .acc-3 { opacity: 1; transform: translateY(0); left: 4px; background: #6a8cc4; }
+        
+        #is-3:checked ~ .isort-stage .acc-3 { opacity: 1; transform: translateY(0); left: 36px; background: #6a8cc4; }
+        #is-3:checked ~ .isort-stage .acc-1 { opacity: 1; transform: translateY(0); left: 4px; background: #c46a6a; }
+        
+        #is-4:checked ~ .isort-stage .acc-1 { opacity: 1; transform: translateY(0); left: 4px; background: #c46a6a; }
+        #is-4:checked ~ .isort-stage .acc-3 { opacity: 1; transform: translateY(0); left: 36px; background: #6a8cc4; }
+        #is-4:checked ~ .isort-stage .acc-4 { opacity: 1; transform: translateY(0); left: 68px; background: #6ac48a; }
+        
+        #is-5:checked ~ .isort-stage .acc-1 { opacity: 1; transform: translateY(0); left: 4px; background: #c46a6a; }
+        #is-5:checked ~ .isort-stage .acc-2 { opacity: 1; transform: translateY(0); left: 36px; background: #c4a76a; }
+        #is-5:checked ~ .isort-stage .acc-3 { opacity: 1; transform: translateY(0); left: 68px; background: #6a8cc4; }
+        #is-5:checked ~ .isort-stage .acc-4 { opacity: 1; transform: translateY(0); left: 100px; background: #6ac48a; }
+
+        /* Merge Sort Specifics */
+        .msort-stage { grid-template-columns: 1fr; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 24px; min-height: 240px; display: flex; justify-content: center; }
+        .ms-tree { position: relative; width: 300px; height: 160px; }
+        .ms-node {
+          position: absolute; display: flex; gap: 2px; padding: 4px;
+          background: #e9ecef; border-radius: 4px; border: 1px solid #ced4da;
+          transition: all .5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .ms-blk { width: 20px; height: 24px; background: #fff; border: 1px solid #adb5bd; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 12px; font-weight: bold; color: #495057; }
+        
+        .ms-root { left: 110px; top: 0; }
+        
+        .ms-l1-left, .ms-l1-right, .ms-l2-ll, .ms-l2-lr, .ms-l2-rl, .ms-l2-rr { opacity: 0; }
+        
+        .ms-l1-left { left: 110px; top: 0; }
+        .ms-l1-right { left: 110px; top: 0; }
+        
+        #ms-2:checked ~ .msort-stage .ms-l1-left,
+        #ms-3:checked ~ .msort-stage .ms-l1-left,
+        #ms-4:checked ~ .msort-stage .ms-l1-left { opacity: 1; left: 40px; top: 60px; }
+        #ms-2:checked ~ .msort-stage .ms-l1-right,
+        #ms-3:checked ~ .msort-stage .ms-l1-right,
+        #ms-4:checked ~ .msort-stage .ms-l1-right { opacity: 1; left: 200px; top: 60px; }
+        
+        #ms-2:checked ~ .msort-stage .ms-root,
+        #ms-3:checked ~ .msort-stage .ms-root,
+        #ms-4:checked ~ .msort-stage .ms-root { opacity: 0.2; }
+
+        .ms-l2-ll { left: 40px; top: 60px; } .ms-l2-lr { left: 40px; top: 60px; }
+        .ms-l2-rl { left: 200px; top: 60px; } .ms-l2-rr { left: 200px; top: 60px; }
+        
+        #ms-3:checked ~ .msort-stage .ms-l2-ll { opacity: 1; left: 0px; top: 120px; }
+        #ms-3:checked ~ .msort-stage .ms-l2-lr { opacity: 1; left: 80px; top: 120px; }
+        #ms-3:checked ~ .msort-stage .ms-l2-rl { opacity: 1; left: 160px; top: 120px; }
+        #ms-3:checked ~ .msort-stage .ms-l2-rr { opacity: 1; left: 240px; top: 120px; }
+        
+        #ms-3:checked ~ .msort-stage .ms-l1-left,
+        #ms-3:checked ~ .msort-stage .ms-l1-right { opacity: 0.2; }
+
+        /* Change numbers inside elements for merge sorting visually */
+        #ms-4:checked ~ .msort-stage .ms-l1-left .ms-blk:nth-child(1)::before { content: '3'; position:absolute; width:20px; background:#fff; height:24px; display:flex; align-items:center; justify-content:center; left:-1px; top:-1px; border:1px solid #adb5bd; border-radius:2px;}
+        #ms-4:checked ~ .msort-stage .ms-l1-left .ms-blk:nth-child(2)::before { content: '4'; position:absolute; width:20px; background:#fff; height:24px; display:flex; align-items:center; justify-content:center; left:21px; top:-1px; border:1px solid #adb5bd; border-radius:2px;}
+        
+        #ms-4:checked ~ .msort-stage .ms-l1-right .ms-blk:nth-child(1)::before { content: '1'; position:absolute; width:20px; background:#fff; height:24px; display:flex; align-items:center; justify-content:center; left:-1px; top:-1px; border:1px solid #adb5bd; border-radius:2px;}
+        #ms-4:checked ~ .msort-stage .ms-l1-right .ms-blk:nth-child(2)::before { content: '2'; position:absolute; width:20px; background:#fff; height:24px; display:flex; align-items:center; justify-content:center; left:21px; top:-1px; border:1px solid #adb5bd; border-radius:2px;}
+        
+        #ms-5:checked ~ .msort-stage .ms-root .ms-blk:nth-child(1)::before { content: '1'; position:absolute; width:20px; background:#fff; height:24px; display:flex; align-items:center; justify-content:center; left:-1px; top:-1px; border:1px solid #adb5bd; border-radius:2px;}
+        #ms-5:checked ~ .msort-stage .ms-root .ms-blk:nth-child(2)::before { content: '2'; position:absolute; width:20px; background:#fff; height:24px; display:flex; align-items:center; justify-content:center; left:21px; top:-1px; border:1px solid #adb5bd; border-radius:2px;}
+        #ms-5:checked ~ .msort-stage .ms-root .ms-blk:nth-child(3)::before { content: '3'; position:absolute; width:20px; background:#fff; height:24px; display:flex; align-items:center; justify-content:center; left:43px; top:-1px; border:1px solid #adb5bd; border-radius:2px;}
+        #ms-5:checked ~ .msort-stage .ms-root .ms-blk:nth-child(4)::before { content: '4'; position:absolute; width:20px; background:#fff; height:24px; display:flex; align-items:center; justify-content:center; left:65px; top:-1px; border:1px solid #adb5bd; border-radius:2px;}
+
+        .ms-branch {
+          position: absolute; border-top: 2px solid #ced4da; width: 40px; transform-origin: left center;
+          opacity: 0; transition: opacity .3s ease;
+        }
+        #ms-2:checked ~ .msort-stage .ms-b-l, #ms-3:checked ~ .msort-stage .ms-b-l, #ms-4:checked ~ .msort-stage .ms-b-l { opacity: 1; top: 32px; left: 150px; transform: rotate(135deg) scaleX(1.8); }
+        #ms-2:checked ~ .msort-stage .ms-b-r, #ms-3:checked ~ .msort-stage .ms-b-r, #ms-4:checked ~ .msort-stage .ms-b-r { opacity: 1; top: 32px; left: 150px; transform: rotate(45deg) scaleX(1.8); }
+        
+        #ms-3:checked ~ .msort-stage .ms-b-ll { opacity: 1; top: 92px; left: 66px; transform: rotate(135deg) scaleX(1.2); }
+        #ms-3:checked ~ .msort-stage .ms-b-lr { opacity: 1; top: 92px; left: 66px; transform: rotate(45deg) scaleX(1.2); }
+        #ms-3:checked ~ .msort-stage .ms-b-rl { opacity: 1; top: 92px; left: 226px; transform: rotate(135deg) scaleX(1.2); }
+        #ms-3:checked ~ .msort-stage .ms-b-rr { opacity: 1; top: 92px; left: 226px; transform: rotate(45deg) scaleX(1.2); }
+
+        .demo-caption { margin-top: 14px; min-height: 48px; }
+        .cap { display: none; color: var(--text); font-size: 14px; line-height: 1.55; }
+        #is-1:checked ~ .demo-caption .cap-1,
+        #is-2:checked ~ .demo-caption .cap-2,
+        #is-3:checked ~ .demo-caption .cap-3,
+        #is-4:checked ~ .demo-caption .cap-4,
+        #is-5:checked ~ .demo-caption .cap-5,
+        #ms-1:checked ~ .demo-caption .cap-1,
+        #ms-2:checked ~ .demo-caption .cap-2,
+        #ms-3:checked ~ .demo-caption .cap-3,
+        #ms-4:checked ~ .demo-caption .cap-4,
+        #ms-5:checked ~ .demo-caption .cap-5 { display: block; }
+        
+        @media (max-width: 720px) {
+          .isort-stage { grid-template-columns: 1fr; }
+        }
+      </style>
+    </div>

@@ -1,10 +1,10 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import ContentPage from './components/ContentPage';
-import Playground from './pages/Playground';
-import MiniExerciseIndex from './pages/MiniExerciseIndex';
-import MiniExercisePage from './pages/MiniExercisePage';
-import { contentRoutes } from './pages/routes';
+import Playground from './features/playground/Playground';
+import MiniExerciseIndex from './features/mini-exercises/MiniExerciseIndex';
+import MiniExercisePage from './features/mini-exercises/MiniExercisePage';
+import { contentRoutes } from './content/registry';
 
 export default function App() {
   return (
@@ -20,13 +20,7 @@ export default function App() {
             <Route
               key={r.path}
               path={r.path}
-              element={
-                <ContentPage
-                  html={r.html}
-                  title={r.title}
-                  description={r.description}
-                />
-              }
+              element={<ContentPage html={r.html} title={r.title} description={r.description} />}
             />
           ))}
           {contentRoutes

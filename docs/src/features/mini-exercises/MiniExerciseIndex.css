@@ -15,7 +15,10 @@
   background: var(--bg);
   text-decoration: none;
   color: var(--text);
-  transition: border-color 0.1s, background 0.1s, transform 0.1s;
+  transition:
+    border-color 0.1s,
+    background 0.1s,
+    transform 0.1s;
 }
 .mini-card:hover {
   border-color: var(--accent);

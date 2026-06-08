@@ -1,4 +1,4 @@
-import type { MiniExercise } from './_types';
+import type { MiniExercise } from './types';
 
 export const data: MiniExercise = {
   id: 'power',
@@ -13,7 +13,7 @@ export const data: MiniExercise = {
     '(* Mini Exercise: Integer power with iter',
     '   Compute base ^ n using repeated multiplication. *)',
     '',
-    '(* iter : (\'a -> \'a) -> int -> \'a -> \'a *)',
+    "(* iter : ('a -> 'a) -> int -> 'a -> 'a *)",
     'let rec iter f n x =',
     '  if n = 0 then x else iter f (n - 1) (f x)',
     '',

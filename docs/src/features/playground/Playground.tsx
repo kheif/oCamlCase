@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
-import Topbar from '../components/Topbar';
-import PageMeta from '../components/PageMeta';
-import bodyHtml from '../playground-legacy/playground-body.html?raw';
-import '../playground-legacy/playground.css';
+import { useEffect } from 'react';
+import Topbar from '../../components/Topbar';
+import PageMeta from '../../components/PageMeta';
+import bodyHtml from './legacy/playground-body.html?raw';
+import './legacy/playground.css';
 
 const CODEMIRROR_SCRIPTS = [
   '/playground/js/codemirror/codemirror.js',
@@ -36,8 +36,6 @@ function loadScript(src: string): Promise<void> {
 }
 
 export default function Playground() {
-  const ref = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     document.documentElement.setAttribute('data-pg-theme', 'light');
 
@@ -48,9 +46,7 @@ export default function Playground() {
         if (cancelled) return;
       }
       // Always reload the main script on mount so init runs each time.
-      const existing = document.querySelector(
-        `script[data-pg-src="${PLAYGROUND_MAIN}"]`,
-      );
+      const existing = document.querySelector(`script[data-pg-src="${PLAYGROUND_MAIN}"]`);
       if (existing) existing.remove();
       const s = document.createElement('script');
       s.src = PLAYGROUND_MAIN + '?t=' + Date.now();
@@ -67,8 +63,8 @@ export default function Playground() {
   return (
     <>
       <PageMeta title="Playground | oCamlCase" />
-      <Topbar onMenuClick={() => {}} />
-      <div ref={ref} dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+      <Topbar />
+      <div dangerouslySetInnerHTML={{ __html: bodyHtml }} />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import type { MiniExercise } from './_types';
+import type { MiniExercise } from './types';
 
 export const data: MiniExercise = {
   id: 'gcd',

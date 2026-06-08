@@ -1,4 +1,4 @@
-import type { MiniExercise } from './_types';
+import type { MiniExercise } from './types';
 import { data as gaussSum } from './gauss-sum';
 import { data as factorial } from './factorial';
 import { data as power } from './power';

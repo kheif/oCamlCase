@@ -1,4 +1,4 @@
-import type { MiniExercise } from './_types';
+import type { MiniExercise } from './types';
 
 export const data: MiniExercise = {
   id: 'gauss-sum',
@@ -13,7 +13,7 @@ export const data: MiniExercise = {
     '(* Mini Exercise: Gauss sum with iter',
     '   Compute 1 + 2 + ... + n by iterating over (i, total). *)',
     '',
-    '(* iter : (\'a -> \'a) -> int -> \'a -> \'a *)',
+    "(* iter : ('a -> 'a) -> int -> 'a -> 'a *)",
     'let rec iter f n x =',
     '  if n = 0 then x else iter f (n - 1) (f x)',
     '',

@@ -1,0 +1,6 @@
+dist
+graphify-out
+node_modules
+public/playground
+src/**/*.html
+src/features/playground/legacy

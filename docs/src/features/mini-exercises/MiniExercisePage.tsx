@@ -1,9 +1,10 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import PageMeta from '../components/PageMeta';
-import { miniExerciseById, miniExercises } from '../pages-content/exercises/mini';
-import type { LineOrderItem, MiniExercise } from '../pages-content/exercises/mini/_types';
-import { highlightOcaml } from '../lib/highlightOcaml';
+import PageMeta from '../../components/PageMeta';
+import { miniExerciseById, miniExercises } from './data';
+import type { LineOrderItem, MiniExercise } from './data/types';
+import { highlightOcaml } from '../../lib/highlightOcaml';
+import { topbarLinks } from '../../content/nav';
 import './MiniExercisePage.css';
 
 type SlotResult = 'correct' | 'wrong' | null;
@@ -43,9 +44,10 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
 
   // slots[i] holds an item id, or null if empty.
   const [slots, setSlots] = useState<(string | null)[]>(() => new Array(slotCount).fill(null));
-  const [bank, setBank] = useState<string[]>(() => shuffleDistinct(exercise.items).map((i) => i.id));
+  const [bank, setBank] = useState<string[]>(() =>
+    shuffleDistinct(exercise.items).map((i) => i.id),
+  );
   const [results, setResults] = useState<SlotResult[]>(() => new Array(slotCount).fill(null));
-  const [showSolution, setShowSolution] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [overSlot, setOverSlot] = useState<number | null>(null);
   const [overBank, setOverBank] = useState(false);
@@ -69,7 +71,6 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
     setSlots(new Array(slotCount).fill(null));
     setBank(shuffleDistinct(exercise.items).map((i) => i.id));
     setResults(new Array(slotCount).fill(null));
-    setShowSolution(false);
     setSelectedId(null);
     setStatusMsg(null);
     setOutput(null);
@@ -81,7 +82,6 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
     setResults(new Array(slotCount).fill('correct'));
     setSelectedId(null);
     setStatusMsg({ kind: 'ok', text: 'Solution filled in.' });
-    setShowSolution(true);
     setOutput({
       kind: 'ok',
       lines: [`$ ocaml ${exercise.filename}`, exercise.expectedOutput],
@@ -144,7 +144,7 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
     const from = locate(id);
     if (!from) return;
 
-    let nextSlots = slots.slice();
+    const nextSlots = slots.slice();
     let nextBank = bank.slice();
 
     // remove from origin
@@ -293,26 +293,36 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
 
   return (
     <div className="me-page">
-      <PageMeta
-        title={`${exercise.title} | oCamlCase`}
-        description={exercise.prompt}
-      />
+      <PageMeta title={`${exercise.title} | oCamlCase`} description={exercise.prompt} />
 
       {/* Custom dark topbar */}
       <header className="me-topbar">
         <Link to="/" className="me-brand">
           <img src="/flaticon.png" alt="" />
-          <span>o<em>Caml</em>Case</span>
+          <span>
+            o<em>Caml</em>Case
+          </span>
         </Link>
         <nav className="me-topnav">
-          <Link to="/">Home</Link>
-          <Link to="/cheatsheet">Cheat Sheet</Link>
-          <Link to="/concepts/bindings">Concepts</Link>
-          <a href="/playground">Playground</a>
+          {/* Same link set as Topbar's topbarLinks; Playground always gets a
+              full page load so its script-tag-driven globals don't collide. */}
+          {topbarLinks.map((link) =>
+            link.path.startsWith('/playground') ? (
+              <a key={link.label} href={link.path}>
+                {link.label}
+              </a>
+            ) : (
+              <Link key={link.label} to={link.path}>
+                {link.label}
+              </Link>
+            ),
+          )}
         </nav>
         <div className="me-topright">
           <span className={`me-diff me-diff-${exercise.difficulty}`}>{exercise.difficulty}</span>
-          <span className="me-progress-label">Exercise {idx + 1} of {total}</span>
+          <span className="me-progress-label">
+            Exercise {idx + 1} of {total}
+          </span>
           <span className="me-dots">
             {miniExercises.map((m, i) => (
               <Link
@@ -354,9 +364,7 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
               </span>
               <span className="me-output-title">Output</span>
               {output && (
-                <span
-                  className={`me-output-pill me-output-pill-${output.kind}`}
-                >
+                <span className={`me-output-pill me-output-pill-${output.kind}`}>
                   {output.kind === 'ok' ? 'success' : 'error'}
                 </span>
               )}
@@ -364,10 +372,7 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
             <div className={`me-output-body${output ? ` me-output-${output.kind}` : ''}`}>
               {output ? (
                 output.lines.map((l, i) => (
-                  <div
-                    key={i}
-                    className={i === 0 ? 'me-output-cmd' : 'me-output-line'}
-                  >
+                  <div key={i} className={i === 0 ? 'me-output-cmd' : 'me-output-line'}>
                     {l}
                   </div>
                 ))
@@ -406,8 +411,9 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
                 return (
                   <div
                     key={id}
-                    className={`me-chip${draggedId === id ? ' me-chip-dragging' : ''}${selectedId === id ? ' me-chip-selected' : ''
-                      }`}
+                    className={`me-chip${draggedId === id ? ' me-chip-dragging' : ''}${
+                      selectedId === id ? ' me-chip-selected' : ''
+                    }`}
                     draggable
                     onDragStart={(e) => onDragStart(e, id)}
                     onDragEnd={onDragEnd}
@@ -429,8 +435,12 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
               Run &amp; Check
             </button>
             <div className="me-actions-row">
-              <button className="me-btn" onClick={reset}>Reset</button>
-              <button className="me-btn" onClick={fillFromSolution}>Solution</button>
+              <button className="me-btn" onClick={reset}>
+                Reset
+              </button>
+              <button className="me-btn" onClick={fillFromSolution}>
+                Solution
+              </button>
             </div>
             {statusMsg && (
               <div className={`me-status me-status-${statusMsg.kind}`}>{statusMsg.text}</div>
@@ -440,11 +450,12 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
                 ↗ Refresher: {exercise.conceptLink.label}
               </Link>
             )}
-            <Link to="/exercises/mini" className="me-back">← All mini exercises</Link>
+            <Link to="/exercises/mini" className="me-back">
+              ← All mini exercises
+            </Link>
           </div>
         </aside>
       </div>
     </div>
   );
 }
-

@@ -59,11 +59,16 @@ export default function ContentPage({ html, title, description }: Props) {
       const pre = block?.querySelector('pre');
       if (!pre) return;
       const text = pre.textContent ?? '';
-      navigator.clipboard?.writeText(text).then(() => {
-        const orig = btn.textContent;
-        btn.textContent = 'copied';
-        setTimeout(() => { btn.textContent = orig; }, 1200);
-      }).catch(() => {});
+      navigator.clipboard
+        ?.writeText(text)
+        .then(() => {
+          const orig = btn.textContent;
+          btn.textContent = 'copied';
+          setTimeout(() => {
+            btn.textContent = orig;
+          }, 1200);
+        })
+        .catch(() => {});
     };
 
     root.addEventListener('click', onClick);

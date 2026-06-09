@@ -4,6 +4,7 @@ import ContentPage from './components/ContentPage';
 import Playground from './features/playground/Playground';
 import MiniExerciseIndex from './features/mini-exercises/MiniExerciseIndex';
 import MiniExercisePage from './features/mini-exercises/MiniExercisePage';
+import Toycaml from './features/toycaml/Toycaml';
 import { contentRoutes } from './content/registry';
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/exercises/mini/:id" element={<MiniExercisePage />} />
         <Route element={<Layout />}>
           <Route path="/exercises/mini" element={<MiniExerciseIndex />} />
+          <Route path="/concepts/static-semantics" element={<Toycaml />} />
           {contentRoutes.map((r) => (
             <Route
               key={r.path}

@@ -25,6 +25,12 @@ export const navGroups: NavGroup[] = (() => {
     .get('Exercises')
     ?.links.push({ num: '·', label: 'Mini Exercises', path: '/exercises/mini' });
 
+  // Static Semantics is a live elaborator feature, not a registry HTML page —
+  // appended to Concepts the same way Mini Exercises joins Exercises above.
+  byLabel
+    .get('Concepts')
+    ?.links.push({ num: '·', label: 'Static Semantics', path: '/concepts/static-semantics' });
+
   return groups;
 })();
 

@@ -1,0 +1,644 @@
+/* ToyCaml interactive elaborator — widget, rule bars, and derivation tree.
+   Reuses index.css tokens (--accent, --border, --bg-warm, --mono, --syn-*) so
+   the feature reads as part of the same site, not a bolted-on app.
+
+   Theming note: --bg-code (#1d1f21) and --text (#1a1917) are BOTH near-black —
+   --bg-code is the dark *terminal* surface that the site's `pre` blocks pair
+   with a hardcoded light foreground (#e1e4e8), never with --text. Every panel
+   below either stays on the page's light surfaces (#fff / --bg-warm with
+   --text/--muted/--accent) or, where a "code" feel is wanted (the abstract-
+   syntax readout), goes fully dark-with-light-text like `pre` does. Mixing
+   --bg-code with --text (the v1 bug) renders black-on-black. */
+
+/* ---- inference rule bars ------------------------------------------------ */
+
+.tc-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 1.4rem 0 1.8rem;
+}
+
+.tc-rule {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+/* Lit up while the elaborator's current step applies this rule (B2) — ties
+   the abstract rule list to the live derivation being built below. */
+.tc-rule.is-active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.tc-rule-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tc-rule-premises {
+  padding: 0 0.6rem 0.35rem;
+  white-space: nowrap;
+  overflow-x: auto;
+  color: var(--muted);
+}
+
+.tc-rule-line {
+  width: 100%;
+  min-width: 14rem;
+  height: 1px;
+  background: var(--text);
+}
+
+.tc-rule-conclusion {
+  padding: 0.35rem 0.6rem 0;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.tc-rule-name {
+  flex: none;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+/* ---- the widget shell ---------------------------------------------------- */
+
+.tc-widget {
+  margin: 1.6rem 0 2rem;
+  padding: 1.3rem 1.4rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-warm);
+}
+
+.tc-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tc-field-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.tc-field-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Light surfaces throughout — these sit on --bg-warm, so white panels with
+   --text foreground give the strongest, most legible contrast (the inverse
+   of the v1 bug). */
+.tc-widget select,
+.tc-expr-input,
+.tc-env-name,
+.tc-env-ty,
+.tc-chip-value {
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.tc-widget select {
+  font-family: var(--sans);
+  align-self: flex-start;
+}
+
+.tc-expr-input {
+  width: 100%;
+}
+
+.tc-env-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tc-env-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+/* The binding the current derivation step is reading (Sid) or introducing
+   (Sabs extending T[x:=t]) — part of the B2 cross-panel highlight. */
+.tc-env-row.is-active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.tc-env-name {
+  width: 7rem;
+}
+
+.tc-env-colon {
+  color: var(--muted);
+}
+
+.tc-env-ty {
+  flex: 1;
+  min-width: 0;
+}
+
+.tc-env-used {
+  flex: none;
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tc-env-row.is-active .tc-env-used {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tc-env-remove {
+  flex: none;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.tc-env-remove:hover {
+  color: var(--text);
+  border-color: var(--border-dk);
+}
+
+.tc-env-add {
+  align-self: flex-start;
+  margin-top: 0.2rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.85rem;
+  border: 1px dashed var(--border-dk);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.tc-env-add:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.tc-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+  cursor: pointer;
+  width: fit-content;
+}
+
+/* ---- free identifiers panel (live `free`, B3/B5, feeds Run's sample values) */
+
+.tc-free-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.tc-free-empty {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.tc-free-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.tc-chip.is-unbound {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.tc-chip.is-fun {
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.tc-chip-name {
+  font-weight: 600;
+}
+
+.tc-chip-ty {
+  color: var(--muted);
+}
+.tc-chip.is-unbound .tc-chip-ty,
+.tc-chip.is-unbound .tc-chip-name {
+  color: var(--accent);
+}
+
+.tc-chip-value {
+  width: 4.2rem;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  text-align: center;
+}
+
+/* ---- abstract syntax readout — deliberately code-styled (dark, light text),
+   matching the site's `pre`/`.code-block`, NOT the page's light --text/--bg-warm */
+
+.tc-ast {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: var(--bg-code);
+  color: #e1e4e8;
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tc-ast-label {
+  color: var(--syn-ty);
+  font-weight: 600;
+}
+
+.tc-ast-muted {
+  color: #8a8a8a;
+}
+.tc-ast-muted code {
+  color: #e1e4e8;
+}
+
+/* ---- error / result banners — light surfaces, --accent for emphasis ------ */
+
+.tc-error {
+  margin-top: 1rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--accent);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  color: var(--accent);
+}
+
+.tc-result {
+  margin-top: 1.1rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 0.98rem;
+}
+
+.tc-result.is-ok {
+  border: 1px solid var(--accent);
+  background: var(--accent-bg);
+  color: var(--text);
+}
+
+.tc-result.is-error {
+  border: 1px solid var(--border-dk);
+  background: var(--bg);
+  color: var(--muted);
+}
+
+/* ---- mode tabs: Type-check / Run ------------------------------------------ */
+
+.tc-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tc-tab {
+  padding: 0.5rem 0.9rem;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+}
+.tc-tab:hover:not(:disabled) {
+  color: var(--text);
+}
+.tc-tab.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tc-tab:disabled {
+  color: var(--border-dk);
+  cursor: not-allowed;
+}
+
+/* ---- stepper -------------------------------------------------------------- */
+
+.tc-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.tc-stepper button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  font-family: var(--sans);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.tc-stepper button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tc-stepper button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.tc-play-btn.is-playing {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.tc-step-count {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.tc-step-skip {
+  margin-left: auto;
+}
+
+/* ---- run panel (dynamic semantics, C1) ------------------------------------ */
+
+.tc-run-panel {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.tc-run-blocked {
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.tc-run-trace {
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  color: var(--text);
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.tc-run-arrow {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tc-run-value {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.tc-run-note {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* ---- derivation tree ------------------------------------------------------ */
+
+.dt-root {
+  margin-top: 1.2rem;
+  overflow-x: auto;
+}
+
+.dt-node {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  vertical-align: bottom;
+}
+
+/* Premises above, inference bar + rule name, conclusion below — the
+   textbook natural-deduction layout (A2; v1 had this upside down). */
+.dt-children {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.dt-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.dt-bar {
+  flex: 1;
+  height: 0;
+  min-width: 5rem;
+  border-top: 1.5px solid var(--text);
+}
+
+.dt-rule {
+  flex: none;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.dt-rule-axiom {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--accent-bg);
+}
+
+.dt-judgement {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  align-self: center;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  font-family: var(--mono);
+  font-size: 0.84rem;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.dt-node.is-revealed > .dt-judgement,
+.dt-node.is-revealed > .dt-bar-row {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dt-node.is-pending > .dt-judgement,
+.dt-node.is-pending > .dt-bar-row {
+  opacity: 0.18;
+}
+
+.dt-node.has-error.is-revealed > .dt-judgement {
+  border-color: var(--accent);
+}
+
+/* The step the cursor is currently on — the focal point of the whole
+   "watch it build" experience (B2). */
+.dt-node.is-active > .dt-judgement {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.dt-env {
+  color: var(--muted);
+}
+
+.dt-turnstile {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.dt-exp {
+  color: var(--text);
+}
+
+.dt-colon {
+  color: var(--muted);
+}
+
+.dt-ty {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.dt-error {
+  margin-top: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.78rem;
+  font-family: var(--sans);
+  color: var(--accent);
+  background: var(--accent-bg);
+  max-width: 26rem;
+  white-space: normal;
+  text-align: center;
+  align-self: center;
+}
+
+/* ---- responsive ----------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .tc-rule-premises,
+  .tc-rule-conclusion {
+    font-size: 0.82rem;
+  }
+
+  .tc-env-name {
+    width: 5rem;
+  }
+
+  .tc-step-skip {
+    margin-left: 0;
+  }
+
+  .dt-judgement {
+    font-size: 0.76rem;
+  }
+
+  .dt-children {
+    gap: 0.7rem;
+  }
+}

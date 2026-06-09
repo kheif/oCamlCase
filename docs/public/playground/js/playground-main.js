@@ -774,24 +774,19 @@ async function shareCode() {
 }
 
 // ── Theme ────────────────────────────────────────────
-function toggleTheme() {
-  const html   = document.documentElement;
-  const isDark = html.getAttribute('data-pg-theme') === 'dark';
-  html.setAttribute('data-pg-theme', isDark ? 'light' : 'dark');
-  if (_editor) _editor.setOption('theme', editorTheme());
-  const btn = document.getElementById('settings-theme-btn');
-  if (btn) {
-    btn.textContent = isDark ? 'Off' : 'On';
-    btn.classList.toggle('pg-toggle-on', !isDark);
-  }
-}
+// Theme is now controlled exclusively by the site-wide topbar toggle.
+// data-pg-theme is kept in sync with data-theme by useTheme.ts / index.html.
+// A MutationObserver updates the CodeMirror editor theme live when the attribute changes.
+(function () {
+  var obs = new MutationObserver(function () {
+    if (_editor) _editor.setOption('theme', editorTheme());
+  });
+  obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-pg-theme'] });
+})();
 
 // ── Settings panel ────────────────────────────────────
 function openSettings() {
   document.getElementById('pg-settings-overlay').classList.add('open');
-  const isDark = document.documentElement.getAttribute('data-pg-theme') === 'dark';
-  const themeBtn = document.getElementById('settings-theme-btn');
-  if (themeBtn) { themeBtn.textContent = isDark ? 'On' : 'Off'; themeBtn.classList.toggle('pg-toggle-on', isDark); }
   const ev = document.getElementById('editor-zoom-val');
   const cv = document.getElementById('console-zoom-val');
   if (ev) ev.textContent = _editorFontSize  + 'px';

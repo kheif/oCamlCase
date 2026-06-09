@@ -37,8 +37,8 @@ function loadScript(src: string): Promise<void> {
 
 export default function Playground() {
   useEffect(() => {
-    document.documentElement.setAttribute('data-pg-theme', 'light');
-
+    // Theme is driven by the site-wide topbar toggle (useTheme / data-theme);
+    // data-pg-theme is kept in sync automatically — do NOT force it to 'light' here.
     let cancelled = false;
     (async () => {
       for (const src of CODEMIRROR_SCRIPTS) {

@@ -108,6 +108,36 @@ function CodeBlock({ fname, code }: { fname: string; code: string }) {
   );
 }
 
+// ---- 2a: interpreter phases pipeline — live, wired to widget state -----------
+
+type PhaseStatus = 'pass' | 'fail' | 'pending';
+
+function PhasesPipeline({
+  phases,
+}: {
+  phases: readonly { label: string; sublabel: string; status: PhaseStatus; detail?: string }[];
+}) {
+  return (
+    <div className="tc-pipeline">
+      {phases.map((phase, i) => (
+        <Fragment key={phase.label}>
+          <div className={`tc-phase tc-phase--${phase.status}`}>
+            <span className="tc-phase-icon" aria-hidden="true">
+              {phase.status === 'pass' ? '✓' : phase.status === 'fail' ? '✗' : '○'}
+            </span>
+            <span className="tc-phase-label">{phase.label}</span>
+            <span className="tc-phase-sub">{phase.sublabel}</span>
+            {phase.detail && <span className="tc-phase-detail">{phase.detail}</span>}
+          </div>
+          {i < phases.length - 1 && (
+            <div className="tc-pipeline-sep" aria-hidden="true">→</div>
+          )}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
 function RuleBar({
   name,
   premises,
@@ -314,7 +344,6 @@ export default function Toycaml() {
   const [presetIdx, setPresetIdx] = useState(0);
   const [envRows, setEnvRows] = useState<EnvRow[]>(() => clonePreset(PRESETS[0]).env);
   const [exprText, setExprText] = useState(() => clonePreset(PRESETS[0]).expr);
-  const [showAbstract, setShowAbstract] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [activeTab, setActiveTab] = useState<'check' | 'run'>('check');
@@ -428,6 +457,44 @@ export default function Toycaml() {
   const canRun = derivation !== null && derivation.ty !== null && runBlockedReason === null;
   const effectiveTab: 'check' | 'run' = canRun ? activeTab : 'check';
 
+  // 2a: which interpreter phase does the current input reach?
+  const phases = useMemo(() => {
+    const empty = !exprText.trim();
+    const parseOk = parsedExpr.ok && parsedEnv.ok;
+    const semanticOk = parseOk && derivation !== null && derivation.ty !== null;
+    return [
+      {
+        label: 'Lexical',
+        sublabel: 'tokenize',
+        status: (empty ? 'pending' : 'pass') as PhaseStatus,
+      },
+      {
+        label: 'Syntactic',
+        sublabel: 'parse → AST',
+        status: (empty ? 'pending' : parseOk ? 'pass' : 'fail') as PhaseStatus,
+        detail:
+          !parseOk && !empty
+            ? !parsedExpr.ok
+              ? parsedExpr.error
+              : !parsedEnv.ok
+                ? parsedEnv.error
+                : undefined
+            : undefined,
+      },
+      {
+        label: 'Semantic',
+        sublabel: 'elab → type',
+        status: (!parseOk ? 'pending' : semanticOk ? 'pass' : 'fail') as PhaseStatus,
+        detail: parseOk && !semanticOk ? 'type error' : undefined,
+      },
+      {
+        label: 'Execution',
+        sublabel: 'eval → value',
+        status: (!semanticOk || runBlockedReason !== null ? 'pending' : 'pass') as PhaseStatus,
+      },
+    ];
+  }, [exprText, parsedExpr, parsedEnv, derivation, runBlockedReason]);
+
   const runResult = useMemo<Parsed<Value> | null>(() => {
     if (!canRun || !parsedExpr.ok) return null;
     const venv = buildRunEnv(freeIdInfos, runValues);
@@ -462,8 +529,40 @@ export default function Toycaml() {
       <p>
         ToyCaml expressions are variables, constants, binary operators, function application,
         conditionals, and (typed) lambda abstractions. Every elaboration rule below corresponds to
-        exactly one of these six shapes.
+        exactly one of these six shapes. The abstract grammar names the syntactic categories — each
+        metavariable (<code>c</code>, <code>e</code>, <code>t</code>) ranges over one level of the
+        language:
       </p>
+
+      {/* 2c: abstract grammar BNF card */}
+      <div className="tc-grammar">
+        <div className="tc-grammar-title">Abstract Grammar</div>
+        <table className="tc-grammar-table">
+          <tbody>
+            <tr>
+              <td className="tc-grammar-meta">c ∈ Con</td>
+              <td className="tc-grammar-sep">::=</td>
+              <td className="tc-grammar-prod">
+                true &nbsp;|&nbsp; false &nbsp;|&nbsp; 0 &nbsp;|&nbsp; 1 &nbsp;|&nbsp; −1 &nbsp;|&nbsp; …
+              </td>
+            </tr>
+            <tr>
+              <td className="tc-grammar-meta">e ∈ Exp</td>
+              <td className="tc-grammar-sep">::=</td>
+              <td className="tc-grammar-prod">
+                c &nbsp;|&nbsp; x &nbsp;|&nbsp; e₁ ⊕ e₂ &nbsp;|&nbsp; e₁ e₂ &nbsp;|&nbsp; if e₁
+                then e₂ else e₃ &nbsp;|&nbsp; fun (x : t) → e
+              </td>
+            </tr>
+            <tr>
+              <td className="tc-grammar-meta">t ∈ Ty</td>
+              <td className="tc-grammar-sep">::=</td>
+              <td className="tc-grammar-prod">bool &nbsp;|&nbsp; int &nbsp;|&nbsp; t₁ → t₂</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <CodeBlock fname="syntax.ml" code={ABSTRACT_SYNTAX} />
 
       <h2>Free Identifiers</h2>
@@ -532,6 +631,17 @@ export default function Toycaml() {
         />
       </div>
 
+      {/* 2d: determinism callout (PDF p.26) */}
+      <div className="callout callout-tip">
+        <div className="callout-title">Determinism</div>
+        <p>
+          For any typing environment <code>T</code> and expression <code>e</code>, there is{' '}
+          <strong>at most one</strong> type <code>t</code> such that <code>T ⊢ e : t</code>. Each
+          syntactic shape maps to exactly one rule — no ambiguity, no choice. The elaborator above
+          never returns two types for the same input; verify by typing anything below.
+        </p>
+      </div>
+
       <div className="callout callout-key">
         <div className="callout-title">Pattern</div>
         <p>
@@ -559,6 +669,7 @@ export default function Toycaml() {
       </p>
 
       <div className="tc-widget">
+        <PhasesPipeline phases={phases} />
         <div className="tc-controls">
           <label className="tc-field">
             <span className="tc-field-label">Preset</span>
@@ -678,14 +789,6 @@ export default function Toycaml() {
             )}
           </div>
 
-          <label className="tc-toggle">
-            <input
-              type="checkbox"
-              checked={showAbstract}
-              onChange={(e) => setShowAbstract(e.target.checked)}
-            />
-            show abstract syntax
-          </label>
         </div>
 
         {!parsedEnv.ok && <div className="tc-error">environment: {parsedEnv.error}</div>}
@@ -693,19 +796,27 @@ export default function Toycaml() {
 
         {parsedEnv.ok && parsedExpr.ok && (
           <>
-            {showAbstract && (
-              <div className="tc-ast">
-                <div className="tc-ast-row">
-                  <span className="tc-ast-label">T</span> = {showEnv(parsedEnv.value)}
-                </div>
-                <div className="tc-ast-row">
-                  <span className="tc-ast-label">e</span> = {showExpAst(parsedExpr.value)}
-                </div>
-                <div className="tc-ast-row tc-ast-muted">
-                  parsed from: <code>{showExp(parsedExpr.value)}</code>
+            {/* 2b: always-visible concrete ↔ abstract syntax side-by-side */}
+            <div className="tc-syntax-bridge">
+              <div className="tc-syntax-col">
+                <div className="tc-syntax-col-label">Concrete syntax</div>
+                <code className="tc-syntax-concrete">{showExp(parsedExpr.value)}</code>
+              </div>
+              <div className="tc-syntax-arrow" aria-hidden="true">→</div>
+              <div className="tc-syntax-col">
+                <div className="tc-syntax-col-label">Abstract syntax (AST)</div>
+                <div className="tc-ast">
+                  <div className="tc-ast-row">
+                    <span className="tc-ast-label">T</span> ={' '}
+                    {showEnv(parsedEnv.value)}
+                  </div>
+                  <div className="tc-ast-row">
+                    <span className="tc-ast-label">e</span> ={' '}
+                    {showExpAst(parsedExpr.value)}
+                  </div>
                 </div>
               </div>
-            )}
+            </div>
 
             {derivation && (
               <>

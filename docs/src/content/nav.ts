@@ -31,6 +31,11 @@ export const navGroups: NavGroup[] = (() => {
     .get('Concepts')
     ?.links.push({ num: '·', label: 'Static Semantics', path: '/concepts/static-semantics' });
 
+  // Tree Lab is a live interactive feature (4 stepper modes, editable tree).
+  byLabel
+    .get('Concepts')
+    ?.links.push({ num: '·', label: 'Tree Lab', path: '/concepts/tree-lab' });
+
   return groups;
 })();
 

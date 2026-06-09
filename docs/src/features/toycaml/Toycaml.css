@@ -618,6 +618,200 @@
   align-self: center;
 }
 
+/* ---- 2a: interpreter phases pipeline ------------------------------------- */
+
+.tc-pipeline {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: 1.2rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  overflow-x: auto;
+}
+
+.tc-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.18rem;
+  min-width: 5.5rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.tc-phase--pass {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.tc-phase--fail {
+  border-color: #c0392b;
+  background: #fdf0ef;
+}
+
+[data-theme='dark'] .tc-phase--fail {
+  background: #2e1212;
+}
+
+.tc-phase--pending {
+  border-color: var(--border);
+  background: transparent;
+}
+
+.tc-phase-icon {
+  font-size: 1rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.tc-phase--pass .tc-phase-icon { color: var(--accent); }
+.tc-phase--fail .tc-phase-icon { color: #c0392b; }
+.tc-phase--pending .tc-phase-icon { color: var(--border-dk); }
+
+.tc-phase-label {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+
+.tc-phase--pass .tc-phase-label { color: var(--accent); }
+.tc-phase--fail .tc-phase-label { color: #c0392b; }
+.tc-phase--pending .tc-phase-label { color: var(--muted); }
+
+.tc-phase-sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.tc-phase-detail {
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  font-family: var(--mono);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 7rem;
+}
+
+.tc-phase--fail .tc-phase-detail { color: #c0392b; }
+.tc-phase--pass .tc-phase-detail { color: var(--accent); }
+
+.tc-pipeline-sep {
+  align-self: center;
+  padding: 0 0.5rem;
+  color: var(--border-dk);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ---- 2b: concrete ↔ abstract syntax bridge -------------------------------- */
+
+.tc-syntax-bridge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.tc-syntax-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tc-syntax-col-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.tc-syntax-concrete {
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.tc-syntax-arrow {
+  align-self: center;
+  color: var(--accent);
+  font-size: 1.2rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  padding: 0 0.2rem;
+}
+
+/* tc-ast inside the bridge inherits the bridge's bg, so no extra border needed */
+.tc-syntax-bridge .tc-ast {
+  margin-top: 0;
+  border-color: var(--border);
+  background: var(--bg-warm);
+}
+
+/* ---- 2c: abstract grammar BNF card --------------------------------------- */
+
+.tc-grammar {
+  margin: 1.2rem 0 1.4rem;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-warm);
+}
+
+.tc-grammar-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+
+.tc-grammar-table {
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 0.87rem;
+}
+
+.tc-grammar-table tr + tr td {
+  padding-top: 0.35rem;
+}
+
+.tc-grammar-meta {
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+  padding-right: 0.9rem;
+}
+
+.tc-grammar-sep {
+  color: var(--muted);
+  padding-right: 0.9rem;
+  white-space: nowrap;
+}
+
+.tc-grammar-prod {
+  color: var(--text);
+}
+
 /* ---- responsive ----------------------------------------------------------- */
 
 @media (max-width: 720px) {
@@ -640,5 +834,27 @@
 
   .dt-children {
     gap: 0.7rem;
+  }
+
+  .tc-syntax-bridge {
+    flex-direction: column;
+  }
+
+  .tc-syntax-arrow {
+    align-self: flex-start;
+    transform: rotate(90deg);
+  }
+
+  .tc-pipeline {
+    gap: 0;
+  }
+
+  .tc-phase {
+    min-width: 4.2rem;
+    padding: 0.4rem 0.3rem;
+  }
+
+  .tc-phase-detail {
+    display: none;
   }
 }

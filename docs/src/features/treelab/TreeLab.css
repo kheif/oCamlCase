@@ -1,0 +1,368 @@
+/* Tree Lab — styles for the interactive rose-tree explorer.
+   All values reference src/index.css design tokens so the feature matches
+   the site's light/dark theme automatically.
+   Class prefix: tl-                                                         */
+
+/* ---- colour tokens for the badge colours (not in the base palette) -------- */
+:root {
+  --pre-badge:   #4a90d9;   /* blue — first visit */
+  --post-badge:  #e8a317;   /* amber — last visit */
+  --depth-badge: #2ecc71;   /* green — computed depth */
+  --error:       #c0392b;
+  --error-bg:    #fff0ee;
+}
+[data-theme='dark'] {
+  --pre-badge:   #6aaff5;
+  --post-badge:  #f0b429;
+  --depth-badge: #4cd98a;
+  --error:       #e74c3c;
+  --error-bg:    #3a1a18;
+}
+
+/* ---- mode tab strip -------------------------------------------------------- */
+.tl-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+  margin: var(--s5) 0 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--s2);
+}
+
+.tl-tab {
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg-warm);
+  color: var(--muted);
+  font: 0.88rem var(--mono);
+  cursor: pointer;
+  transition: border-color var(--t) var(--ease), color var(--t) var(--ease), background var(--t) var(--ease);
+}
+.tl-tab:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.tl-tab.is-active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ---- sub-mode buttons (pre/post, prep/pop) -------------------------------- */
+.tl-submode {
+  display: flex;
+  gap: var(--s2);
+  margin: var(--s3) 0 0;
+  flex-wrap: wrap;
+}
+
+.tl-submode-btn {
+  padding: var(--s1) var(--s3);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--muted);
+  font: 0.82rem var(--mono);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.tl-submode-btn:hover   { color: var(--text); border-color: var(--dim); }
+.tl-submode-btn.is-active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ---- main two-column layout ----------------------------------------------- */
+.tl-main {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--s6);
+  margin-top: var(--s5);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .tl-main { grid-template-columns: 1fr; }
+}
+
+/* ---- toolbar (preset + edit buttons) -------------------------------------- */
+.tl-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  flex-wrap: wrap;
+  margin-bottom: var(--s3);
+  padding: var(--s2) var(--s3);
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+}
+
+.tl-toolbar-label {
+  font: 0.8rem var(--mono);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.tl-toolbar select {
+  font: 0.85rem var(--mono);
+  padding: var(--s1) var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tl-toolbar-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 var(--s1);
+}
+
+.tl-toolbar-btn {
+  padding: var(--s1) var(--s3);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg);
+  color: var(--text);
+  font: 0.82rem var(--mono);
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+.tl-toolbar-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.tl-toolbar-btn:disabled  { opacity: 0.38; cursor: default; }
+.tl-toolbar-btn-remove:hover:not(:disabled) { border-color: var(--error); color: var(--error); }
+
+.tl-selected-hint {
+  font: 0.8rem var(--mono);
+  color: var(--accent);
+  margin-left: var(--s1);
+}
+
+/* ---- SVG container -------------------------------------------------------- */
+.tl-svg-wrap {
+  overflow-x: auto;
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: var(--s3);
+  min-height: 120px;
+  display: flex;
+  justify-content: center;
+}
+
+.tl-svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* ---- label editor (projection mode) --------------------------------------- */
+.tl-label-editor {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-top: var(--s2);
+}
+
+.tl-label-input {
+  width: 60px;
+  font: 0.9rem var(--mono);
+  padding: var(--s1) var(--s2);
+  border: 1px solid var(--accent);
+  border-radius: var(--r1);
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ---- output list panel ---------------------------------------------------- */
+.tl-output-panel {
+  margin-top: var(--s4);
+  padding: var(--s3) var(--s4);
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+.tl-output-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  flex-wrap: wrap;
+}
+
+.tl-output-fn   { color: var(--syn-fn);  font-weight: 600; white-space: nowrap; }
+.tl-output-eq   { color: var(--muted); }
+
+.tl-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  transition: opacity var(--t) var(--ease);
+}
+.tl-list.is-dimmed { opacity: 0.4; }
+
+.tl-list-sep    { color: var(--muted); margin: 0 1px; }
+
+.tl-list-item {
+  color: var(--text);
+  transition: color var(--t-fast) var(--ease);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tl-list-item.is-new {
+    color: var(--accent);
+    animation: tl-pop 0.3s var(--ease) both;
+  }
+  @keyframes tl-pop {
+    from { transform: scale(0.6); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+}
+
+.tl-list-ghost  { color: var(--dim); opacity: 0.4; }
+.tl-list-pending { opacity: 0.4; }
+
+/* ---- balance result banner ------------------------------------------------ */
+.tl-balance-result {
+  margin-top: var(--s4);
+  padding: var(--s3) var(--s4);
+  border-radius: var(--r2);
+  font: 0.9rem var(--mono);
+  font-weight: 600;
+  border: 1px solid;
+}
+.tl-balance-result.is-ok {
+  background: color-mix(in srgb, var(--depth-badge) 12%, transparent);
+  border-color: var(--depth-badge);
+  color: var(--depth-badge);
+}
+.tl-balance-result.is-fail {
+  background: var(--error-bg);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+/* ---- right column --------------------------------------------------------- */
+.tl-right {
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--s4));
+}
+
+.tl-code-block {
+  margin-bottom: var(--s4);
+}
+
+/* ---- legend --------------------------------------------------------------- */
+.tl-legend {
+  display: flex;
+  gap: var(--s4);
+  margin-bottom: var(--s3);
+  font: 0.8rem var(--mono);
+  color: var(--muted);
+}
+
+.tl-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.tl-badge-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ---- stepper controls ----------------------------------------------------- */
+.tl-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-bottom: var(--s2);
+}
+
+.tl-step-btn {
+  padding: var(--s1) var(--s3);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg-warm);
+  color: var(--text);
+  font: 0.85rem var(--mono);
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.tl-step-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tl-step-btn:disabled { opacity: 0.35; cursor: default; }
+
+.tl-play-btn.is-playing {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.tl-progress {
+  font: 0.8rem var(--mono);
+  color: var(--dim);
+  margin-bottom: var(--s3);
+}
+
+/* ---- caption -------------------------------------------------------------- */
+.tl-caption {
+  padding: var(--s3) var(--s4);
+  background: var(--bg-warm);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--r1) var(--r1) 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.65;
+  min-height: 3.5em;
+  margin-bottom: var(--s4);
+  transition: color var(--t) var(--ease);
+}
+
+/* ---- concept note --------------------------------------------------------- */
+.tl-concept-note {
+  padding: var(--s3) var(--s4);
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: var(--s4);
+}
+.tl-concept-note code {
+  font-family: var(--mono);
+  background: var(--bg);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+/* ---- back link ------------------------------------------------------------ */
+.tl-back-link {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.tl-back-link a {
+  color: var(--link);
+  text-decoration: none;
+}
+.tl-back-link a:hover { text-decoration: underline; }

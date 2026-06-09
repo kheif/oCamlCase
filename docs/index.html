@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -12,6 +12,15 @@
       name="description"
       content="A practical guide to OCaml with functional patterns, type system features, and coding exercises. Written for programmers who want to understand the language."
     />
+    <script>
+      // Apply stored/system theme before first paint to avoid flash
+      (function () {
+        var t = localStorage.getItem('theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+        document.documentElement.dataset.pgTheme = t;
+      })();
+    </script>
     <script>
       // GitHub Pages SPA fallback: 404.html redirects unknown paths to /?p=...
       // Restore the real path before React mounts so React Router sees it.

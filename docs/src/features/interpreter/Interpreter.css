@@ -1,0 +1,517 @@
+/* Building an Interpreter feature — scoped styles (lx- = lexer slice). All
+   colors/spacing come from the global design tokens in index.css. */
+
+.lx-widget {
+  border: 1px solid var(--border);
+  border-radius: var(--r3);
+  background: var(--bg-warm);
+  padding: var(--s4);
+  margin: var(--s4) 0 var(--s6);
+}
+
+.lx-input-row {
+  display: flex;
+  gap: var(--s2);
+}
+
+.lx-input {
+  flex: 1;
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--border-dk);
+  border-radius: var(--r2);
+  background: var(--bg);
+  color: var(--text);
+  font: 0.95rem var(--mono);
+}
+.lx-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.lx-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s2);
+}
+.lx-preset-btn {
+  padding: var(--s1) var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg);
+  color: var(--muted);
+  font: 0.78rem var(--mono);
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+.lx-preset-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.lx-preset-btn.is-active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.lx-label {
+  margin-top: var(--s4);
+  font: 0.72rem var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ---- character strip ------------------------------------------------------ */
+.lx-chars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: var(--s2);
+}
+.lx-char {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  padding: 2px 4px;
+  border-radius: var(--r1);
+  font: 1rem var(--mono);
+  border: 1px solid transparent;
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
+}
+.lx-char.is-future {
+  color: var(--dim);
+}
+.lx-char.is-done {
+  color: var(--muted);
+  background: var(--bg);
+}
+.lx-char.is-active {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}
+
+.lx-arrow {
+  margin: var(--s2) 0;
+  font: 0.8rem var(--mono);
+  color: var(--dim);
+}
+
+/* ---- token strip ---------------------------------------------------------- */
+.lx-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s2);
+  min-height: 2em;
+}
+.lx-tokens-empty {
+  color: var(--dim);
+  font: 0.9rem var(--mono);
+}
+.lx-token {
+  padding: 2px var(--s2);
+  border: 1px solid var(--border-dk);
+  border-radius: var(--r1);
+  background: var(--bg);
+  color: var(--text);
+  font: 0.85rem var(--mono);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lx-token.is-new {
+    border-color: var(--accent);
+    color: var(--accent);
+    animation: lx-pop 0.3s var(--ease) both;
+  }
+  @keyframes lx-pop {
+    from {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+.lx-caption {
+  margin-top: var(--s3);
+  padding: var(--s2) var(--s3);
+  border-left: 2px solid var(--accent);
+  background: var(--bg);
+  border-radius: 0 var(--r1) var(--r1) 0;
+  font: 0.85rem var(--mono);
+  color: var(--text);
+}
+
+/* ---- stepper -------------------------------------------------------------- */
+.lx-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
+  margin-top: var(--s3);
+}
+.lx-step-btn {
+  padding: var(--s1) var(--s3);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg);
+  color: var(--text);
+  font: 0.85rem var(--mono);
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+.lx-step-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.lx-step-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.lx-play-btn.is-playing {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.lx-progress {
+  font: 0.8rem var(--mono);
+  color: var(--dim);
+}
+
+.lx-result {
+  margin-top: var(--s3);
+  padding: var(--s2) var(--s3);
+  border: 1px dashed var(--border-dk);
+  border-radius: var(--r2);
+  font: 0.85rem var(--mono);
+  color: var(--text);
+  word-break: break-word;
+}
+.lx-result-label {
+  display: inline-block;
+  margin-right: var(--s2);
+  font: 0.72rem var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ---- error ---------------------------------------------------------------- */
+.lx-error {
+  margin-top: var(--s4);
+  padding: var(--s3);
+  border: 1px solid var(--accent);
+  border-radius: var(--r2);
+  background: var(--accent-bg);
+}
+.lx-error-msg {
+  font: 0.85rem var(--mono);
+  color: var(--accent);
+}
+.lx-error-src {
+  margin-top: var(--s2);
+  font: 1rem var(--mono);
+  color: var(--muted);
+}
+.lx-error-caret {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+}
+
+.lx-next {
+  margin-top: var(--s6);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--border);
+  font: 0.9rem var(--sans);
+  color: var(--muted);
+}
+
+/* ---- parser slice: token cursor states ------------------------------------ */
+.lx-token.is-consumed {
+  color: var(--dim);
+  opacity: 0.55;
+}
+.lx-token.is-cursor {
+  border-color: var(--accent);
+  border-style: dashed;
+  color: var(--accent);
+}
+.lx-token.is-ahead {
+  color: var(--muted);
+}
+.lx-token.is-consumed-now {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+/* ---- concrete syntax tree ------------------------------------------------- */
+.cst-canvas {
+  margin-top: var(--s2);
+  padding: var(--s4) var(--s3);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  background: var(--bg);
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+  min-height: 4em;
+}
+.cst-node {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cst-box {
+  padding: 2px var(--s2);
+  border-radius: var(--r1);
+  font: 0.82rem var(--mono);
+  white-space: nowrap;
+  border: 1px solid var(--border-dk);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+/* syntactic categories vs terminals read differently */
+.cst-cat {
+  background: var(--accent-bg);
+  color: var(--link);
+  font-style: italic;
+}
+.cst-term {
+  background: var(--bg-warm);
+  color: var(--text);
+}
+.cst-box.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
+  color: var(--accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cst-box.is-active {
+    animation: lx-pop 0.3s var(--ease) both;
+  }
+}
+.cst-connector {
+  width: 1px;
+  height: var(--s3);
+  background: var(--border-dk);
+}
+.cst-children {
+  display: flex;
+  gap: var(--s3);
+  align-items: flex-start;
+  padding-top: 0;
+  border-top: 1px solid var(--border-dk);
+  margin-top: -1px;
+}
+
+/* ---- value derivation tree (V ⊢ e ⇒ v) ----------------------------------- */
+.vd-canvas {
+  margin-top: var(--s2);
+  /* Full-bleed: break out of the article's side padding so the tree gets the
+     whole content width, then re-pad the sides. No border — the extra width
+     plus shrunk nodes lets most derivations fit without horizontal scroll. */
+  margin-inline: calc(-1 * var(--s8));
+  padding: var(--s4) var(--s8);
+  background: var(--bg);
+  /* Bounded height still: very deep recursive derivations stay contained
+     instead of pushing the page. */
+  max-height: 70vh;
+  overflow: auto;
+}
+@media (max-width: 860px) {
+  .vd-canvas {
+    margin-inline: -22px;
+    padding-inline: 22px;
+  }
+}
+.vd-root {
+  /* Sit at top-left of the canvas so the first content is always in view. */
+  display: inline-block;
+  min-width: 100%;
+}
+.vd-node {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  vertical-align: bottom;
+}
+.vd-children {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.35rem;
+}
+.vd-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+  opacity: 0;
+  transition: opacity var(--t) var(--ease);
+}
+.vd-bar {
+  flex: 1;
+  height: 0;
+  min-width: 3rem;
+  border-top: 1.5px solid var(--text);
+}
+.vd-rule {
+  flex: none;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+.vd-rule-axiom {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.vd-judgement {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  align-self: center;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg-warm);
+  font: 0.74rem var(--mono);
+  white-space: nowrap;
+  transition:
+    opacity var(--t) var(--ease),
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+.vd-node.is-revealed > .vd-judgement,
+.vd-node.is-revealed > .vd-bar-row {
+  opacity: 1;
+}
+.vd-node.is-pending > .vd-judgement,
+.vd-node.is-pending > .vd-bar-row {
+  opacity: 0.18;
+}
+.vd-node.is-active > .vd-judgement {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.vd-env {
+  color: var(--muted);
+}
+.vd-turnstile {
+  color: var(--accent);
+  font-weight: 600;
+}
+.vd-exp {
+  color: var(--text);
+}
+.vd-arrow {
+  color: var(--accent);
+  font-weight: 600;
+}
+.vd-val {
+  color: var(--accent);
+  font-weight: 600;
+}
+.vd-error {
+  margin-top: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--r1);
+  font: 0.78rem var(--sans);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+/* ---- dynamic-semantics rule cards ----------------------------------------- */
+.vr-rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--s3);
+  margin: var(--s3) 0;
+}
+.vr-rule {
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  background: var(--bg-warm);
+  padding: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+.vr-rule.is-active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.vr-rule-body {
+  text-align: center;
+  font: 0.78rem var(--mono);
+  color: var(--text);
+}
+.vr-rule-premises {
+  color: var(--muted);
+  padding-bottom: var(--s1);
+}
+.vr-rule-line {
+  border-top: 1px solid var(--border-dk);
+  margin: var(--s1) 0;
+}
+.vr-rule-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+.vr-rule-name {
+  font: 600 0.72rem var(--sans);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+.vr-rule-side {
+  font: 0.72rem var(--mono);
+  color: var(--dim);
+}
+
+/* ---- derivation sequence -------------------------------------------------- */
+.deriv-seq {
+  margin: var(--s3) 0;
+  padding: var(--s3) var(--s4);
+  border-left: 2px solid var(--border-dk);
+  background: var(--bg-warm);
+  border-radius: 0 var(--r2) var(--r2) 0;
+}
+.deriv-line {
+  display: flex;
+  gap: var(--s2);
+  align-items: baseline;
+  font: 0.9rem var(--mono);
+  padding: 1px 0;
+}
+.deriv-arrow {
+  color: var(--accent);
+  width: 1.2em;
+  flex-shrink: 0;
+}

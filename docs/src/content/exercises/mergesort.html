@@ -1,0 +1,178 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Exercise E6 · Medium</div>
+        <h1 class="page-title">Merge Sort</h1>
+        <p class="page-intro">Implement merge sort from scratch in OCaml. Build three core functions step by step: split a list in half, merge two sorted lists, and the recursive sort. Make it polymorphic by accepting a comparison function.</p>
+      </div>
+
+      <!-- Prompt -->
+      <div class="exercise-box">
+        <div class="exercise-head">
+          <div class="exercise-meta">
+            <div class="exercise-label">The challenge</div>
+            <div class="exercise-title">Build a polymorphic merge sort</div>
+          </div>
+          <span class="diff diff-medium">Medium</span>
+        </div>
+        <div class="exercise-body">
+          <p class="exercise-desc">Implement merge sort by composing three functions: split, merge, and sort. By parameterising over a comparison function, one implementation handles ascending order, descending order, and sort-by-any-criterion.</p>
+          <ul class="req-list">
+            <li><span class="req-n">01</span>Write <code>split : 'a list -> 'a list * 'a list</code> that divides a list into two roughly equal halves by alternating elements.</li>
+            <li><span class="req-n">02</span>Write <code>merge : ('a -> 'a -> int) -> 'a list -> 'a list -> 'a list</code> that merges two sorted lists into one sorted list using a comparison function.</li>
+            <li><span class="req-n">03</span>Write <code>msort : ('a -> 'a -> int) -> 'a list -> 'a list</code> that recursively splits, sorts, and merges.</li>
+            <li><span class="req-n">04</span>Test <code>msort compare</code> on an integer list (<code>compare</code> is OCaml's built-in polymorphic comparison).</li>
+            <li><span class="req-n">05</span>Write <code>sort_descending</code> using <code>msort</code> with a reversed comparator: <code>fun a b -> compare b a</code>.</li>
+            <li><span class="req-n">06</span>Write <code>sort_by_length : string list -> string list</code> that sorts strings by their length using <code>msort</code> with a custom comparator.</li>
+            <li><span class="req-n">07</span>Write <code>is_sorted : ('a -> 'a -> int) -> 'a list -> bool</code> that checks whether a list is sorted according to a comparison function.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Starter + hints -->
+      <div class="two-col lean">
+        <div>
+          <h2>Starter code</h2>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">mergesort.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="kw">rec</span> <span class="fn">split</span> = <span class="kw">function</span>
+  | [] -> ([], [])
+  | [x] -> ([x], [])
+  | x :: y :: rest ->
+    <span class="cmt">(* TODO: split rest, then put x in one half, y in the other *)</span>
+    ([], [])
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">merge</span> cmp l1 l2 =
+  <span class="cmt">(* TODO: merge two sorted lists using cmp *)</span>
+  <span class="kw">match</span> l1, l2 <span class="kw">with</span>
+  | [], _ -> l2
+  | _, [] -> l1
+  | x :: xs, y :: ys ->
+    <span class="cmt">(* TODO: compare x and y, cons the smaller, recurse *)</span>
+    []
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">msort</span> cmp = <span class="kw">function</span>
+  | ([] | [_]) <span class="kw">as</span> lst -> lst
+  | lst ->
+    <span class="cmt">(* TODO: split, sort halves, merge *)</span>
+    lst
+
+<span class="kw">let</span> <span class="fn">sort_descending</span> lst =
+  <span class="cmt">(* TODO: use msort with reversed comparator *)</span>
+  lst
+
+<span class="kw">let</span> <span class="fn">sort_by_length</span> lst =
+  <span class="cmt">(* TODO: use msort comparing string lengths *)</span>
+  lst
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">is_sorted</span> cmp = <span class="kw">function</span>
+  | [] | [_] -> <span class="kw">true</span>
+  | x :: (y :: _ <span class="kw">as</span> rest) ->
+    <span class="cmt">(* TODO *)</span> <span class="kw">false</span></pre>
+          </div>
+        </div>
+        <div>
+          <h2>Hints</h2>
+          <p>For <code>split</code>, the recursive call returns a pair. Destructure it with <code>let (l, r) = split rest in</code> then cons <code>x</code> onto <code>l</code> and <code>y</code> onto <code>r</code>.</p>
+          <p>For <code>merge</code>, compare with <code>cmp x y &lt;= 0</code>. If <code>x</code> comes first, cons it and recurse on <code>xs</code> and <code>l2</code>. Otherwise cons <code>y</code> and recurse on <code>l1</code> and <code>ys</code>.</p>
+          <p>For <code>msort</code>, the base case is lists of length 0 or 1 (already sorted). The or-pattern <code>([] | [_])</code> matches both.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key insight</div>
+            <p><code>msort</code> is polymorphic because it never looks at element values. It delegates all comparisons to <code>cmp</code>. By swapping the comparator you get ascending sort, descending sort, or sort-by-any-criterion for free.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playground link -->
+      <div class="pg-link-wrap">
+        <a href="/playground?exercise=mergesort" class="pg-link-btn">Try in Playground →</a>
+      </div>
+
+      <!-- Solution -->
+      <div class="sol-toggle" id="sol-toggle" onclick="toggleSolution()">
+        <span class="sol-icon" id="sol-icon">+</span>
+        Show solution
+        <span class="sol-hint">try it yourself first</span>
+      </div>
+
+      <div class="sol-body" id="sol-body">
+        <div class="two-col lean">
+          <div>
+            <div class="code-block">
+              <div class="code-top">
+                <span class="code-fname">mergesort_solution.ml</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+<pre><span class="kw">let</span> <span class="kw">rec</span> <span class="fn">split</span> = <span class="kw">function</span>
+  | [] -> ([], [])
+  | [x] -> ([x], [])
+  | x :: y :: rest ->
+    <span class="kw">let</span> (l, r) = <span class="fn">split</span> rest <span class="kw">in</span>
+    (x :: l, y :: r)
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">merge</span> cmp l1 l2 =
+  <span class="kw">match</span> l1, l2 <span class="kw">with</span>
+  | [], _ -> l2
+  | _, [] -> l1
+  | x :: xs, y :: ys ->
+    <span class="kw">if</span> cmp x y <= <span class="num">0</span> <span class="kw">then</span> x :: <span class="fn">merge</span> cmp xs l2
+    <span class="kw">else</span> y :: <span class="fn">merge</span> cmp l1 ys
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">msort</span> cmp = <span class="kw">function</span>
+  | ([] | [_]) <span class="kw">as</span> lst -> lst
+  | lst ->
+    <span class="kw">let</span> (l, r) = <span class="fn">split</span> lst <span class="kw">in</span>
+    <span class="fn">merge</span> cmp (<span class="fn">msort</span> cmp l) (<span class="fn">msort</span> cmp r)
+
+<span class="kw">let</span> <span class="fn">sort_descending</span> lst =
+  <span class="fn">msort</span> (<span class="kw">fun</span> a b -> compare b a) lst
+
+<span class="kw">let</span> <span class="fn">sort_by_length</span> lst =
+  <span class="fn">msort</span> (<span class="kw">fun</span> a b -> compare (<span class="ty">String</span>.<span class="fn">length</span> a) (<span class="ty">String</span>.<span class="fn">length</span> b)) lst
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">is_sorted</span> cmp = <span class="kw">function</span>
+  | [] | [_] -> <span class="kw">true</span>
+  | x :: (y :: _ <span class="kw">as</span> rest) ->
+    cmp x y <= <span class="num">0</span> && <span class="fn">is_sorted</span> cmp rest
+
+<span class="kw">let</span> () =
+  <span class="kw">let</span> nums = [<span class="num">5</span>; <span class="num">2</span>; <span class="num">8</span>; <span class="num">1</span>; <span class="num">9</span>; <span class="num">3</span>] <span class="kw">in</span>
+  <span class="kw">let</span> sorted = <span class="fn">msort</span> compare nums <span class="kw">in</span>
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"sorted: [%s]\n"</span>
+    (<span class="ty">String</span>.<span class="fn">concat</span> <span class="str">"; "</span> (<span class="ty">List</span>.<span class="fn">map</span> string_of_int sorted));
+  <span class="kw">let</span> desc = <span class="fn">sort_descending</span> nums <span class="kw">in</span>
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"desc:   [%s]\n"</span>
+    (<span class="ty">String</span>.<span class="fn">concat</span> <span class="str">"; "</span> (<span class="ty">List</span>.<span class="fn">map</span> string_of_int desc));
+  <span class="kw">let</span> words = [<span class="str">"cat"</span>; <span class="str">"elephant"</span>; <span class="str">"ox"</span>; <span class="str">"bear"</span>] <span class="kw">in</span>
+  <span class="kw">let</span> by_len = <span class="fn">sort_by_length</span> words <span class="kw">in</span>
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"by len: [%s]\n"</span>
+    (<span class="ty">String</span>.<span class="fn">concat</span> <span class="str">"; "</span> by_len);
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"is_sorted: %b\n"</span> (<span class="fn">is_sorted</span> compare sorted)</pre>
+            </div>
+          </div>
+          <div>
+            <h2>Walkthrough</h2>
+            <p><strong>split.</strong> Alternates elements between two accumulating lists. This ensures roughly equal halves regardless of input order.</p>
+            <p><strong>merge.</strong> The heart of merge sort. The comparison function <code>cmp</code> returns a negative number, zero, or positive number, the same convention as OCaml's built-in <code>compare</code>.</p>
+            <p><strong>msort.</strong> Divide-and-conquer: split the problem in half, solve each half, combine the solutions. The recursion bottoms out at length 0 or 1.</p>
+            <p><strong>sort_descending.</strong> Demonstrates the power of higher-order functions: one line changes the sort order by flipping the comparator arguments.</p>
+            <p><strong>is_sorted.</strong> Uses an <code>as</code> pattern: <code>y :: _ as rest</code> binds both <code>y</code> (the head) and <code>rest</code> (the full tail starting at <code>y</code>), avoiding redundant destructuring.</p>
+
+            <h2>Going further</h2>
+            <p>Once the basic model works:</p>
+            <ul>
+              <li>Make <code>merge</code> tail-recursive using an accumulator and <code>List.rev</code> at the end.</li>
+              <li>Write <code>msort_stable</code> and verify that equal elements preserve their original order.</li>
+              <li>Benchmark against <code>List.sort</code> from the standard library on large random lists.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <a href="/exercises/evaluator">&larr; Expression Evaluator</a>
+        <span></span>
+      </div>
+    </div>

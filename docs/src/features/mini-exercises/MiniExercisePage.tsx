@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
 import { miniExerciseById, miniExercises } from './data';
@@ -6,6 +6,7 @@ import type { LineOrderItem, MiniExercise } from './data/types';
 import { highlightOcaml } from '../../lib/highlightOcaml';
 import { topbarLinks } from '../../content/nav';
 import { useMiniProgress } from '../../hooks/useMiniProgress';
+import { useTheme } from '../../hooks/useTheme';
 import './MiniExercisePage.css';
 
 type SlotResult = 'correct' | 'wrong' | null;
@@ -36,7 +37,6 @@ export default function MiniExercisePage() {
   if (!exercise) return <Navigate to="/exercises/mini" replace />;
   return (
     <MiniExerciseInner
-      key={exercise.id}
       exercise={exercise}
       completed={completed}
       markComplete={markComplete}
@@ -53,13 +53,13 @@ function MiniExerciseInner({
   completed: Set<string>;
   markComplete: (id: string) => void;
 }) {
+  const { theme, toggle } = useTheme();
   const total = miniExercises.length;
   const idx = miniExercises.findIndex((m) => m.id === exercise.id);
 
   const slotCount = exercise.items.length;
   const correctIds = useMemo(() => exercise.items.map((i) => i.id), [exercise.items]);
 
-  // slots[i] holds an item id, or null if empty.
   const [slots, setSlots] = useState<(string | null)[]>(() => new Array(slotCount).fill(null));
   const [bank, setBank] = useState<string[]>(() =>
     shuffleDistinct(exercise.items).map((i) => i.id),
@@ -72,17 +72,37 @@ function MiniExerciseInner({
   const [statusMsg, setStatusMsg] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null);
   const [output, setOutput] = useState<{ kind: 'ok' | 'err'; lines: string[] } | null>(null);
 
+  const [transitioning, setTransitioning] = useState(false);
+  const prevIdRef = useRef(exercise.id);
+
+  useEffect(() => {
+    if (prevIdRef.current !== exercise.id) {
+      setTransitioning(true);
+      const timer = setTimeout(() => {
+        setSlots(new Array(exercise.items.length).fill(null));
+        setBank(shuffleDistinct(exercise.items).map((i) => i.id));
+        setResults(new Array(exercise.items.length).fill(null));
+        setSelectedId(null);
+        setStatusMsg(null);
+        setOutput(null);
+        prevIdRef.current = exercise.id;
+        requestAnimationFrame(() => setTransitioning(false));
+      }, 180);
+      return () => clearTimeout(timer);
+    }
+  }, [exercise.id, exercise.items]);
+
   const itemsById = useMemo(() => {
     const m: Record<string, LineOrderItem> = {};
     for (const it of exercise.items) m[it.id] = it;
     return m;
   }, [exercise.items]);
 
-  function clearFeedback() {
-    if (results.some((r) => r !== null)) setResults(new Array(slotCount).fill(null));
-    if (statusMsg) setStatusMsg(null);
-    if (output) setOutput(null);
-  }
+  const clearFeedback = useCallback(() => {
+    setResults((prev) => (prev.some((r) => r !== null) ? new Array(slotCount).fill(null) : prev));
+    setStatusMsg(null);
+    setOutput(null);
+  }, [slotCount]);
 
   function reset() {
     setSlots(new Array(slotCount).fill(null));
@@ -149,7 +169,6 @@ function MiniExerciseInner({
     }
   }
 
-  // Find where an id currently lives (slot index or 'bank').
   function locate(id: string): { kind: 'bank' } | { kind: 'slot'; index: number } | null {
     if (bank.includes(id)) return { kind: 'bank' };
     const idx = slots.indexOf(id);
@@ -157,7 +176,6 @@ function MiniExerciseInner({
     return null;
   }
 
-  // Move an item to a destination slot index, or back to the bank.
   function moveTo(id: string, dest: { kind: 'bank' } | { kind: 'slot'; index: number }) {
     clearFeedback();
     const from = locate(id);
@@ -166,18 +184,15 @@ function MiniExerciseInner({
     const nextSlots = slots.slice();
     let nextBank = bank.slice();
 
-    // remove from origin
     if (from.kind === 'bank') nextBank = nextBank.filter((x) => x !== id);
     else nextSlots[from.index] = null;
 
-    // place in destination
     if (dest.kind === 'bank') {
       if (!nextBank.includes(id)) nextBank.push(id);
     } else {
       const evicted = nextSlots[dest.index];
       nextSlots[dest.index] = id;
       if (evicted && evicted !== id) {
-        // if we came from another slot, swap; if we came from bank, evict to bank
         if (from.kind === 'slot') nextSlots[from.index] = evicted;
         else nextBank.push(evicted);
       }
@@ -212,7 +227,6 @@ function MiniExerciseInner({
     onDragEnd();
   }
 
-  // Click to select then click empty slot / bank to place.
   function onClickItem(id: string) {
     clearFeedback();
     setSelectedId((prev) => (prev === id ? null : id));
@@ -232,7 +246,6 @@ function MiniExerciseInner({
 
   const breadcrumb = ['exercises', exercise.category, exercise.filename];
 
-  // Render the full file as a single line-numbered editor: prefix + slots + suffix.
   const prefixLines = exercise.prefixCode.split('\n');
   const suffixLines = exercise.suffixCode.split('\n');
   let lineNo = 0;
@@ -317,7 +330,6 @@ function MiniExerciseInner({
     <div className="me-page">
       <PageMeta title={`${exercise.title} | oCamlCase`} description={exercise.prompt} />
 
-      {/* Custom dark topbar */}
       <header className="me-topbar">
         <Link to="/" className="me-brand">
           <img src="/flaticon.png" alt="" />
@@ -326,8 +338,6 @@ function MiniExerciseInner({
           </span>
         </Link>
         <nav className="me-topnav">
-          {/* Same link set as Topbar's topbarLinks; Playground always gets a
-              full page load so its script-tag-driven globals don't collide. */}
           {topbarLinks.map((link) =>
             link.path.startsWith('/playground') ? (
               <a key={link.label} href={link.path}>
@@ -341,11 +351,37 @@ function MiniExerciseInner({
           )}
         </nav>
         <div className="me-topright">
+          <button
+            className="me-theme-toggle"
+            onClick={toggle}
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {theme === 'light' ? (
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor">
+                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+              </svg>
+            )}
+          </button>
           <span className={`me-diff me-diff-${exercise.difficulty}`}>{exercise.difficulty}</span>
           <span className="me-progress-label">
-            Exercise {idx + 1} of {total}
+            {idx + 1} / {total}
           </span>
           <span className="me-dots">
+            {idx > 0 ? (
+              <Link
+                to={`/exercises/mini/${miniExercises[idx - 1].id}`}
+                className="me-nav-chevron"
+                title={miniExercises[idx - 1].title}
+              >
+                ‹
+              </Link>
+            ) : (
+              <span className="me-nav-chevron me-nav-chevron-disabled">‹</span>
+            )}
             {miniExercises.map((m, i) => (
               <Link
                 key={m.id}
@@ -360,6 +396,17 @@ function MiniExerciseInner({
                 title={m.title}
               />
             ))}
+            {idx < total - 1 ? (
+              <Link
+                to={`/exercises/mini/${miniExercises[idx + 1].id}`}
+                className="me-nav-chevron"
+                title={miniExercises[idx + 1].title}
+              >
+                ›
+              </Link>
+            ) : (
+              <span className="me-nav-chevron me-nav-chevron-disabled">›</span>
+            )}
           </span>
         </div>
       </header>
@@ -381,7 +428,9 @@ function MiniExerciseInner({
               </span>
             ))}
           </div>
-          <div className="me-code">{editorRows}</div>
+          <div className={`me-code${transitioning ? ' me-code-out' : ' me-code-in'}`}>
+            {editorRows}
+          </div>
 
           <div className="me-output">
             <div className="me-output-head">
@@ -413,14 +462,20 @@ function MiniExerciseInner({
           </div>
         </section>
 
-        {/* Right panel */}
+        {/* Right panel — stable structure, content transitions */}
         <aside className="me-side">
           <div className="me-side-head">
+            <span className="me-side-title">{exercise.title}</span>
+          </div>
+          <div className="me-side-prompt">
+            {exercise.prompt}
+          </div>
+          <div className="me-side-divider">
             <span>Available lines</span>
             <span className="me-side-count">{bank.length}</span>
           </div>
           <div
-            className={`me-bank${overBank ? ' me-bank-dragover' : ''}`}
+            className={`me-bank${overBank ? ' me-bank-dragover' : ''}${transitioning ? ' me-bank-out' : ''}`}
             onDragOver={(e) => {
               e.preventDefault();
               setOverBank(true);
@@ -486,8 +541,8 @@ function MiniExerciseInner({
                 ↗ Refresher: {exercise.conceptLink.label}
               </Link>
             )}
-            <Link to="/exercises/mini" className="me-back">
-              ← All mini exercises
+            <Link to="/exercises" className="me-back">
+              ← All exercises
             </Link>
           </div>
         </aside>

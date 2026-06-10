@@ -8,7 +8,7 @@ export const data: MiniExercise = {
   category: 'bindings',
   filename: 'shadowing_exercise.ml',
   prompt:
-    'Arrange the let bindings in order. Each new binding shadows the previous x — the value of x changes with each step. What does shadow_example () return?',
+    'Arrange the let bindings in order. Each new binding shadows the previous x, so the value changes with each step. What does shadow_example () return?',
   prefixCode: [
     '(* Mini Exercise: Binding shadowing',
     '   Each let x = ... creates a new x that shadows the old one. *)',

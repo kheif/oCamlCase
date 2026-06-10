@@ -494,6 +494,220 @@ let () =
 ;;
 `,
   },
+
+  phonebook: {
+    label: 'E4 · Phonebook',
+    filename: 'phonebook.ml',
+    starterCode:
+`type entry = string * string
+
+let phonebook = [
+  ("Alice", "555-1234");
+  ("Bob", "555-5678");
+  ("Charlie", "555-9012");
+  ("Diana", "555-3456")
+]
+
+let add name number pb =
+  (* TODO: prepend a new entry *)
+  pb
+
+let find_number name pb =
+  (* TODO: return Some number or None *)
+  None
+
+let remove name pb =
+  (* TODO: use List.filter *)
+  pb
+
+let search prefix pb =
+  (* TODO: filter entries whose name starts with prefix *)
+  pb
+
+let names pb =
+  (* TODO: use List.map *)
+  []
+
+let count pb =
+  (* TODO *)
+  0
+
+let format_entry (name, number) =
+  (* TODO: return "name: number" *)
+  ""
+
+let format_all pb =
+  List.map format_entry pb`,
+    tests: [
+      { name: '01  add - adds entry to front',                       expected: '5'          },
+      { name: '02  find_number - finds existing entry',              expected: '555-1234'   },
+      { name: '03  find_number - returns None for missing',          expected: 'None'       },
+      { name: '04  remove - removes matching entries',               expected: '3'          },
+      { name: '05  search - finds entries by prefix',                expected: '1'          },
+      { name: '06  search - prefix matching multiple',               expected: '2'          },
+      { name: '07  names - extracts all names',                      expected: 'Alice,Bob,Charlie,Diana' },
+      { name: '08  count - returns number of entries',               expected: '4'          },
+      { name: '09  format_entry - formats as "name: number"',       expected: 'Alice: 555-1234' },
+    ],
+    testCode: `
+let () =
+  let pb2 = add "Eve" "555-7890" phonebook in
+  Printf.printf "%d\\n%!" (count pb2);
+  (match find_number "Alice" phonebook with
+   | Some n -> Printf.printf "%s\\n%!" n
+   | None -> Printf.printf "None\\n%!");
+  (match find_number "Zara" phonebook with
+   | Some n -> Printf.printf "%s\\n%!" n
+   | None -> Printf.printf "None\\n%!");
+  Printf.printf "%d\\n%!" (count (remove "Alice" phonebook));
+  Printf.printf "%d\\n%!" (List.length (search "Ch" phonebook));
+  Printf.printf "%d\\n%!" (List.length (search "D" (add "Dave" "555-0000" phonebook)));
+  Printf.printf "%s\\n%!" (String.concat "," (names phonebook));
+  Printf.printf "%d\\n%!" (count phonebook);
+  Printf.printf "%s\\n%!" (format_entry ("Alice", "555-1234"))
+;;
+`,
+  },
+
+  evaluator: {
+    label: 'E5 · Expression Evaluator',
+    filename: 'evaluator.ml',
+    starterCode:
+`type expr =
+  | Num of int
+  | Add of expr * expr
+  | Mul of expr * expr
+  | Neg of expr
+
+let rec eval_expr = function
+  | Num n -> (* TODO *) 0
+  | Add (l, r) -> (* TODO *) 0
+  | Mul (l, r) -> (* TODO *) 0
+  | Neg e -> (* TODO *) 0
+
+let rec to_string = function
+  | Num n -> (* TODO *) ""
+  | Add (l, r) -> (* TODO *) ""
+  | Mul (l, r) -> (* TODO *) ""
+  | Neg e -> (* TODO *) ""
+
+let rec count_nodes = function
+  | Num _ -> (* TODO *) 0
+  | Add (l, r) -> (* TODO *) 0
+  | Mul (l, r) -> (* TODO *) 0
+  | Neg e -> (* TODO *) 0
+
+let rec simplify = function
+  | Add (e, Num 0) | Add (Num 0, e) -> simplify e
+  | Mul (e, Num 1) | Mul (Num 1, e) -> simplify e
+  | Mul (_, Num 0) | Mul (Num 0, _) -> Num 0
+  | Neg (Neg e) -> simplify e
+  | Add (l, r) -> Add (simplify l, simplify r)
+  | Mul (l, r) -> Mul (simplify l, simplify r)
+  | Neg e -> Neg (simplify e)
+  | e -> e
+
+let rec contains_zero = function
+  | Num n -> (* TODO *) false
+  | Add (l, r) -> (* TODO *) false
+  | Mul (l, r) -> (* TODO *) false
+  | Neg e -> (* TODO *) false`,
+    tests: [
+      { name: '01  eval_expr - Num 42',                                    expected: '42'              },
+      { name: '02  eval_expr - Add(Num 2, Num 3)',                         expected: '5'               },
+      { name: '03  eval_expr - Mul(Num 4, Add(Num 1, Num 2))',             expected: '12'              },
+      { name: '04  eval_expr - Neg(Num 7)',                                expected: '-7'              },
+      { name: '05  to_string - Add(Num 1, Mul(Num 2, Num 3))',             expected: '(1 + (2 * 3))'  },
+      { name: '06  to_string - Neg(Num 5)',                                expected: '(-5)'            },
+      { name: '07  count_nodes - Add(Mul(Num 2, Num 3), Neg(Num 4))',      expected: '6'               },
+      { name: '08  simplify - Add(Num 5, Num 0) -> Num 5',                 expected: '5'               },
+      { name: '09  simplify - Mul(Num 1, Num 7) -> Num 7',                 expected: '7'               },
+      { name: '10  simplify - Neg(Neg(Num 3)) -> Num 3',                   expected: '3'               },
+      { name: '11  contains_zero - Add(Num 1, Num 0)',                     expected: 'true'            },
+      { name: '12  contains_zero - Mul(Num 2, Num 3)',                     expected: 'false'           },
+    ],
+    testCode: `
+let () =
+  Printf.printf "%d\\n%!" (eval_expr (Num 42));
+  Printf.printf "%d\\n%!" (eval_expr (Add (Num 2, Num 3)));
+  Printf.printf "%d\\n%!" (eval_expr (Mul (Num 4, Add (Num 1, Num 2))));
+  Printf.printf "%d\\n%!" (eval_expr (Neg (Num 7)));
+  Printf.printf "%s\\n%!" (to_string (Add (Num 1, Mul (Num 2, Num 3))));
+  Printf.printf "%s\\n%!" (to_string (Neg (Num 5)));
+  Printf.printf "%d\\n%!" (count_nodes (Add (Mul (Num 2, Num 3), Neg (Num 4))));
+  Printf.printf "%d\\n%!" (eval_expr (simplify (Add (Num 5, Num 0))));
+  Printf.printf "%d\\n%!" (eval_expr (simplify (Mul (Num 1, Num 7))));
+  Printf.printf "%d\\n%!" (eval_expr (simplify (Neg (Neg (Num 3)))));
+  Printf.printf "%b\\n%!" (contains_zero (Add (Num 1, Num 0)));
+  Printf.printf "%b\\n%!" (contains_zero (Mul (Num 2, Num 3)))
+;;
+`,
+  },
+
+  mergesort: {
+    label: 'E6 · Merge Sort',
+    filename: 'mergesort.ml',
+    starterCode:
+`let rec split = function
+  | [] -> ([], [])
+  | [x] -> ([x], [])
+  | x :: y :: rest ->
+    (* TODO: split rest, put x in one half, y in the other *)
+    ([], [])
+
+let rec merge cmp l1 l2 =
+  match l1, l2 with
+  | [], _ -> l2
+  | _, [] -> l1
+  | x :: xs, y :: ys ->
+    (* TODO: compare x and y, cons the smaller, recurse *)
+    []
+
+let rec msort cmp = function
+  | ([] | [_]) as lst -> lst
+  | lst ->
+    (* TODO: split, sort halves, merge *)
+    lst
+
+let sort_descending lst =
+  (* TODO: use msort with reversed comparator *)
+  lst
+
+let sort_by_length lst =
+  (* TODO: use msort comparing String.length *)
+  lst
+
+let rec is_sorted cmp = function
+  | [] | [_] -> true
+  | x :: (y :: _ as rest) ->
+    (* TODO *) false`,
+    tests: [
+      { name: '01  split - empty list',                              expected: '0,0'           },
+      { name: '02  split - 4 elements splits evenly',               expected: '2,2'           },
+      { name: '03  merge - two sorted lists',                        expected: '1,2,3,4,5,6'  },
+      { name: '04  msort - sorts integers ascending',               expected: '1,2,3,5,8,9'  },
+      { name: '05  sort_descending - sorts integers descending',     expected: '9,8,5,3,2,1'  },
+      { name: '06  sort_by_length - sorts strings by length',        expected: 'ox,cat,bear,elephant' },
+      { name: '07  is_sorted - sorted list returns true',            expected: 'true'          },
+      { name: '08  is_sorted - unsorted list returns false',         expected: 'false'         },
+    ],
+    testCode: `
+let print_ints lst = Printf.printf "%s\\n%!" (String.concat "," (List.map string_of_int lst))
+let print_strs lst = Printf.printf "%s\\n%!" (String.concat "," lst)
+let () =
+  let (a, b) = split [] in
+  Printf.printf "%d,%d\\n%!" (List.length a) (List.length b);
+  let (c, d) = split [1;2;3;4] in
+  Printf.printf "%d,%d\\n%!" (List.length c) (List.length d);
+  print_ints (merge compare [1;3;5] [2;4;6]);
+  print_ints (msort compare [5;2;8;1;9;3]);
+  print_ints (sort_descending [5;2;8;1;9;3]);
+  print_strs (sort_by_length ["cat";"elephant";"ox";"bear"]);
+  Printf.printf "%b\\n%!" (is_sorted compare [1;2;3;4;5]);
+  Printf.printf "%b\\n%!" (is_sorted compare [1;3;2;4;5])
+;;
+`,
+  },
 };
 
 let _editor = null;

@@ -1,0 +1,185 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Exercise E5 · Hard</div>
+        <h1 class="page-title">Expression Evaluator</h1>
+        <p class="page-intro">Define an arithmetic expression type as a variant and build an evaluator, a pretty-printer, and a simplifier. This exercise ties together variant types, pattern matching, and structural recursion on a tree-shaped data type.</p>
+      </div>
+
+      <!-- Prompt -->
+      <div class="exercise-box">
+        <div class="exercise-head">
+          <div class="exercise-meta">
+            <div class="exercise-label">The challenge</div>
+            <div class="exercise-title">Build an expression evaluator</div>
+          </div>
+          <span class="diff diff-hard">Hard</span>
+        </div>
+        <div class="exercise-body">
+          <p class="exercise-desc">Support evaluation, pretty-printing, simplification, and tree inspection over a recursive variant type representing arithmetic expressions.</p>
+          <ul class="req-list">
+            <li><span class="req-n">01</span>Define a variant type <code>expr</code> with constructors: <code>Num of int</code>, <code>Add of expr * expr</code>, <code>Mul of expr * expr</code>, <code>Neg of expr</code>.</li>
+            <li><span class="req-n">02</span>Write <code>eval : expr -> int</code> that recursively evaluates an expression.</li>
+            <li><span class="req-n">03</span>Write <code>to_string : expr -> string</code> that converts an expression to a fully parenthesized string, e.g. <code>"(1 + (2 * 3))"</code>.</li>
+            <li><span class="req-n">04</span>Write <code>count_nodes : expr -> int</code> that counts the total number of nodes in the expression tree.</li>
+            <li><span class="req-n">05</span>Write <code>simplify : expr -> expr</code> that applies algebraic simplifications: <code>Add(e, Num 0)</code> and <code>Add(Num 0, e)</code> → <code>e</code>, <code>Mul(e, Num 1)</code> and <code>Mul(Num 1, e)</code> → <code>e</code>, <code>Mul(_, Num 0)</code> and <code>Mul(Num 0, _)</code> → <code>Num 0</code>, <code>Neg(Neg e)</code> → <code>e</code>.</li>
+            <li><span class="req-n">06</span>Write <code>contains_zero : expr -> bool</code> that checks whether any <code>Num 0</code> appears in the tree.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Starter + hints -->
+      <div class="two-col lean">
+        <div>
+          <h2>Starter code</h2>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">evaluator.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">type</span> <span class="ty">expr</span> =
+  | <span class="ty">Num</span> <span class="kw">of</span> <span class="ty">int</span>
+  | <span class="ty">Add</span> <span class="kw">of</span> <span class="ty">expr</span> * <span class="ty">expr</span>
+  | <span class="ty">Mul</span> <span class="kw">of</span> <span class="ty">expr</span> * <span class="ty">expr</span>
+  | <span class="ty">Neg</span> <span class="kw">of</span> <span class="ty">expr</span>
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">eval</span> = <span class="kw">function</span>
+  | <span class="ty">Num</span> n -> <span class="cmt">(* TODO *)</span> <span class="num">0</span>
+  | <span class="ty">Add</span> (l, r) -> <span class="cmt">(* TODO *)</span> <span class="num">0</span>
+  | <span class="ty">Mul</span> (l, r) -> <span class="cmt">(* TODO *)</span> <span class="num">0</span>
+  | <span class="ty">Neg</span> e -> <span class="cmt">(* TODO *)</span> <span class="num">0</span>
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">to_string</span> = <span class="kw">function</span>
+  | <span class="ty">Num</span> n -> <span class="cmt">(* TODO *)</span> <span class="str">""</span>
+  | <span class="ty">Add</span> (l, r) -> <span class="cmt">(* TODO *)</span> <span class="str">""</span>
+  | <span class="ty">Mul</span> (l, r) -> <span class="cmt">(* TODO *)</span> <span class="str">""</span>
+  | <span class="ty">Neg</span> e -> <span class="cmt">(* TODO *)</span> <span class="str">""</span>
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">count_nodes</span> = <span class="kw">function</span>
+  | <span class="ty">Num</span> _ -> <span class="cmt">(* TODO *)</span> <span class="num">0</span>
+  | <span class="ty">Add</span> (l, r) -> <span class="cmt">(* TODO *)</span> <span class="num">0</span>
+  | <span class="ty">Mul</span> (l, r) -> <span class="cmt">(* TODO *)</span> <span class="num">0</span>
+  | <span class="ty">Neg</span> e -> <span class="cmt">(* TODO *)</span> <span class="num">0</span>
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">simplify</span> = <span class="kw">function</span>
+  | <span class="ty">Add</span> (e, <span class="ty">Num</span> <span class="num">0</span>) | <span class="ty">Add</span> (<span class="ty">Num</span> <span class="num">0</span>, e) -> <span class="cmt">(* TODO *)</span> <span class="ty">Num</span> <span class="num">0</span>
+  | <span class="ty">Mul</span> (e, <span class="ty">Num</span> <span class="num">1</span>) | <span class="ty">Mul</span> (<span class="ty">Num</span> <span class="num">1</span>, e) -> <span class="cmt">(* TODO *)</span> <span class="ty">Num</span> <span class="num">0</span>
+  | <span class="ty">Mul</span> (_, <span class="ty">Num</span> <span class="num">0</span>) | <span class="ty">Mul</span> (<span class="ty">Num</span> <span class="num">0</span>, _) -> <span class="cmt">(* TODO *)</span> <span class="ty">Num</span> <span class="num">0</span>
+  | <span class="ty">Neg</span> (<span class="ty">Neg</span> e) -> <span class="cmt">(* TODO *)</span> <span class="ty">Num</span> <span class="num">0</span>
+  | e -> e
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">contains_zero</span> = <span class="kw">function</span>
+  | <span class="ty">Num</span> n -> <span class="cmt">(* TODO *)</span> <span class="kw">false</span>
+  | <span class="ty">Add</span> (l, r) -> <span class="cmt">(* TODO *)</span> <span class="kw">false</span>
+  | <span class="ty">Mul</span> (l, r) -> <span class="cmt">(* TODO *)</span> <span class="kw">false</span>
+  | <span class="ty">Neg</span> e -> <span class="cmt">(* TODO *)</span> <span class="kw">false</span></pre>
+          </div>
+        </div>
+        <div>
+          <h2>Hints</h2>
+          <p>For <code>eval</code>, pattern match on each constructor. <code>Add</code> evaluates both sides and adds; <code>Neg</code> negates the recursive result.</p>
+          <p>For <code>to_string</code>, use <code>Printf.sprintf</code> to build parenthesized strings. <code>string_of_int</code> converts integers.</p>
+          <p>For <code>simplify</code>, the key insight: simplify recursively FIRST, then check for algebraic identities. The or-pattern <code>| Add(e, Num 0) | Add(Num 0, e)</code> matches both orderings.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key insight</div>
+            <p>The <code>expr</code> type is a tree. Each constructor is a node: <code>Num</code> is a leaf, <code>Add</code> and <code>Mul</code> have two children, <code>Neg</code> has one. Every function on <code>expr</code> is structural recursion over this tree.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playground link -->
+      <div class="pg-link-wrap">
+        <a href="/playground?exercise=evaluator" class="pg-link-btn">Try in Playground →</a>
+      </div>
+
+      <!-- Solution -->
+      <div class="sol-toggle" id="sol-toggle" onclick="toggleSolution()">
+        <span class="sol-icon" id="sol-icon">+</span>
+        Show solution
+        <span class="sol-hint">try it yourself first</span>
+      </div>
+
+      <div class="sol-body" id="sol-body">
+        <div class="two-col lean">
+          <div>
+            <div class="code-block">
+              <div class="code-top">
+                <span class="code-fname">evaluator_solution.ml</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+<pre><span class="kw">type</span> <span class="ty">expr</span> =
+  | <span class="ty">Num</span> <span class="kw">of</span> <span class="ty">int</span>
+  | <span class="ty">Add</span> <span class="kw">of</span> <span class="ty">expr</span> * <span class="ty">expr</span>
+  | <span class="ty">Mul</span> <span class="kw">of</span> <span class="ty">expr</span> * <span class="ty">expr</span>
+  | <span class="ty">Neg</span> <span class="kw">of</span> <span class="ty">expr</span>
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">eval</span> = <span class="kw">function</span>
+  | <span class="ty">Num</span> n -> n
+  | <span class="ty">Add</span> (l, r) -> <span class="fn">eval</span> l + <span class="fn">eval</span> r
+  | <span class="ty">Mul</span> (l, r) -> <span class="fn">eval</span> l * <span class="fn">eval</span> r
+  | <span class="ty">Neg</span> e -> -(<span class="fn">eval</span> e)
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">to_string</span> = <span class="kw">function</span>
+  | <span class="ty">Num</span> n -> <span class="fn">string_of_int</span> n
+  | <span class="ty">Add</span> (l, r) ->
+    <span class="ty">Printf</span>.<span class="fn">sprintf</span> <span class="str">"(%s + %s)"</span> (<span class="fn">to_string</span> l) (<span class="fn">to_string</span> r)
+  | <span class="ty">Mul</span> (l, r) ->
+    <span class="ty">Printf</span>.<span class="fn">sprintf</span> <span class="str">"(%s * %s)"</span> (<span class="fn">to_string</span> l) (<span class="fn">to_string</span> r)
+  | <span class="ty">Neg</span> e ->
+    <span class="ty">Printf</span>.<span class="fn">sprintf</span> <span class="str">"(-%s)"</span> (<span class="fn">to_string</span> e)
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">count_nodes</span> = <span class="kw">function</span>
+  | <span class="ty">Num</span> _ -> <span class="num">1</span>
+  | <span class="ty">Add</span> (l, r) -> <span class="num">1</span> + <span class="fn">count_nodes</span> l + <span class="fn">count_nodes</span> r
+  | <span class="ty">Mul</span> (l, r) -> <span class="num">1</span> + <span class="fn">count_nodes</span> l + <span class="fn">count_nodes</span> r
+  | <span class="ty">Neg</span> e -> <span class="num">1</span> + <span class="fn">count_nodes</span> e
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">simplify</span> = <span class="kw">function</span>
+  | <span class="ty">Add</span> (e, <span class="ty">Num</span> <span class="num">0</span>) | <span class="ty">Add</span> (<span class="ty">Num</span> <span class="num">0</span>, e) -> <span class="fn">simplify</span> e
+  | <span class="ty">Mul</span> (e, <span class="ty">Num</span> <span class="num">1</span>) | <span class="ty">Mul</span> (<span class="ty">Num</span> <span class="num">1</span>, e) -> <span class="fn">simplify</span> e
+  | <span class="ty">Mul</span> (_, <span class="ty">Num</span> <span class="num">0</span>) | <span class="ty">Mul</span> (<span class="ty">Num</span> <span class="num">0</span>, _) -> <span class="ty">Num</span> <span class="num">0</span>
+  | <span class="ty">Neg</span> (<span class="ty">Neg</span> e) -> <span class="fn">simplify</span> e
+  | <span class="ty">Add</span> (l, r) -> <span class="ty">Add</span> (<span class="fn">simplify</span> l, <span class="fn">simplify</span> r)
+  | <span class="ty">Mul</span> (l, r) -> <span class="ty">Mul</span> (<span class="fn">simplify</span> l, <span class="fn">simplify</span> r)
+  | <span class="ty">Neg</span> e -> <span class="ty">Neg</span> (<span class="fn">simplify</span> e)
+  | e -> e
+
+<span class="kw">let</span> <span class="kw">rec</span> <span class="fn">contains_zero</span> = <span class="kw">function</span>
+  | <span class="ty">Num</span> <span class="num">0</span> -> <span class="kw">true</span>
+  | <span class="ty">Num</span> _ -> <span class="kw">false</span>
+  | <span class="ty">Add</span> (l, r) -> <span class="fn">contains_zero</span> l || <span class="fn">contains_zero</span> r
+  | <span class="ty">Mul</span> (l, r) -> <span class="fn">contains_zero</span> l || <span class="fn">contains_zero</span> r
+  | <span class="ty">Neg</span> e -> <span class="fn">contains_zero</span> e
+
+<span class="kw">let</span> () =
+  <span class="kw">let</span> e = <span class="ty">Add</span> (<span class="ty">Mul</span> (<span class="ty">Num</span> <span class="num">2</span>, <span class="ty">Num</span> <span class="num">3</span>), <span class="ty">Neg</span> (<span class="ty">Num</span> <span class="num">4</span>)) <span class="kw">in</span>
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"expr: %s\n"</span> (<span class="fn">to_string</span> e);
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"eval: %d\n"</span> (<span class="fn">eval</span> e);
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"nodes: %d\n"</span> (<span class="fn">count_nodes</span> e);
+  <span class="kw">let</span> e2 = <span class="ty">Add</span> (<span class="ty">Mul</span> (<span class="ty">Num</span> <span class="num">5</span>, <span class="ty">Num</span> <span class="num">1</span>), <span class="ty">Num</span> <span class="num">0</span>) <span class="kw">in</span>
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"before: %s\n"</span> (<span class="fn">to_string</span> e2);
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"after:  %s\n"</span> (<span class="fn">to_string</span> (<span class="fn">simplify</span> e2))</pre>
+            </div>
+          </div>
+          <div>
+            <h2>Walkthrough</h2>
+            <p><strong>eval.</strong> The simplest structural recursion. Each node computes its value from its children's values.</p>
+            <p><strong>to_string.</strong> Demonstrates that different representations of the same data can be derived from the same recursive structure. <code>Printf.sprintf</code> builds fully parenthesized strings at each level.</p>
+            <p><strong>simplify.</strong> Combines pattern matching with recursive descent. It must simplify children before checking for identities, or nested simplifiable expressions will be missed. The or-patterns handle commutativity of identity elements.</p>
+            <p><strong>contains_zero.</strong> Shows that boolean predicates over trees use <code>||</code> to combine recursive results. The <code>Num 0</code> pattern matches before the wildcard <code>Num _</code> because OCaml checks patterns top to bottom.</p>
+
+            <h2>Going further</h2>
+            <p>Once the basic evaluator works:</p>
+            <ul>
+              <li>Add a <code>Div of expr * expr</code> constructor and handle division by zero with the <code>result</code> type.</li>
+              <li>Write <code>depth : expr -> int</code> to compute the depth of the expression tree.</li>
+              <li>Write <code>substitute : string -> expr -> expr -> expr</code> by adding a <code>Var of string</code> constructor for symbolic expressions.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <a href="/exercises/phonebook">← Phonebook</a>
+        <a href="/exercises/mergesort">Next: Merge Sort →</a>
+      </div>
+    </div>

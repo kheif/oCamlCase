@@ -11,7 +11,7 @@ export const data: MiniExercise = {
     'Match on each variant constructor and compute the area. Circle uses pi * r^2, Square uses a^2, Triangle uses half base times height. Arrange the three match arms.',
   prefixCode: [
     '(* Mini Exercise: Match on variant constructors',
-    '   Each constructor carries different data — unpack and compute. *)',
+    '   Each constructor carries different data. Unpack and compute. *)',
     '',
     'type shape =',
     '  | Circle of float',

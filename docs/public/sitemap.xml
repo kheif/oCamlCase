@@ -126,6 +126,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://ocamlcase.dev/exercises</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://ocamlcase.dev/exercises/bank</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -137,6 +143,24 @@
   </url>
   <url>
     <loc>https://ocamlcase.dev/exercises/search</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/exercises/phonebook</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/exercises/evaluator</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/exercises/mergesort</loc>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

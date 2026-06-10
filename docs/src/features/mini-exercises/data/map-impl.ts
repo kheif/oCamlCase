@@ -11,7 +11,7 @@ export const data: MiniExercise = {
     'Implement map from scratch: for an empty list return []; for x :: rest, apply f to x and cons it onto the recursive result.',
   prefixCode: [
     '(* Mini Exercise: Implement map',
-    '   Apply f to every element — base case is [], recursive case uses ::. *)',
+    '   Apply f to every element. Base case is [], recursive case uses ::. *)',
     '',
     '(* Fill in the match arms below *)',
     "let rec map (f : 'a -> 'b) (xs : 'a list) : 'b list =",

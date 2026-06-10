@@ -1,0 +1,322 @@
+/* ---- Section layout ---- */
+.hub-section {
+  margin-bottom: var(--s8);
+}
+.hub-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s4);
+  margin-bottom: var(--s5);
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--border);
+}
+.hub-section-title {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.hub-section-sub {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--dim);
+  margin-left: var(--s3);
+}
+
+/* ---- Challenge cards ---- */
+.hub-challenges {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hub-challenge-card {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  background: var(--bg);
+  text-decoration: none;
+  color: var(--text);
+  overflow: hidden;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast);
+}
+.hub-challenge-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--sh2);
+  transform: translateY(-1px);
+  color: var(--text);
+  text-decoration: none;
+}
+.hub-challenge-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  background: var(--accent-bg);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+}
+.hub-challenge-body {
+  flex: 1;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hub-challenge-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hub-challenge-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.hub-challenge-desc {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.hub-challenge-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+.hub-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
+.hub-challenge-arrow {
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-size: 18px;
+  color: var(--dim);
+  flex-shrink: 0;
+  transition: color var(--t-fast), transform var(--t-fast);
+}
+.hub-challenge-card:hover .hub-challenge-arrow {
+  color: var(--accent);
+  transform: translateX(2px);
+}
+
+/* ---- Mini progress bar ---- */
+.hub-mini-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  flex-shrink: 0;
+}
+.hub-mini-progress-track {
+  width: 80px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.hub-mini-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s var(--ease);
+}
+.hub-mini-progress-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+/* ---- Concept rows ---- */
+.hub-concepts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hub-concept-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s4);
+  padding: 10px 14px;
+  border-radius: var(--r2);
+  transition: background var(--t-fast);
+}
+.hub-concept-row:hover {
+  background: var(--accent-bg);
+}
+.hub-concept-done {
+  opacity: 0.7;
+}
+.hub-concept-label {
+  min-width: 160px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+}
+.hub-concept-name {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.hub-concept-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+}
+
+/* ---- Exercise pills ---- */
+.hub-concept-exercises {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.hub-ex-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  text-decoration: none;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 12px;
+  white-space: nowrap;
+  transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast);
+}
+.hub-ex-pill:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--text);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+.hub-ex-done {
+  border-color: #3a8a3d;
+}
+.hub-ex-done:hover {
+  border-color: #4caf50;
+}
+.hub-ex-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.hub-ex-dot-easy { color: #2e7d32; }
+.hub-ex-dot-medium { color: var(--accent); }
+.hub-ex-dot-hard { color: #7b1fa2; }
+.hub-ex-done .hub-ex-dot {
+  background: #3a8a3d;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+}
+.hub-ex-name {
+  line-height: 1;
+}
+
+/* ---- Footer link ---- */
+.hub-mini-footer {
+  margin-top: var(--s5);
+  text-align: center;
+}
+.hub-mini-all-link {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.hub-mini-all-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 720px) {
+  .hub-concept-row {
+    flex-direction: column;
+    gap: var(--s2);
+    padding: 10px 10px;
+  }
+  .hub-concept-label {
+    min-width: 0;
+  }
+  .hub-challenge-num {
+    min-width: 44px;
+    font-size: 12px;
+  }
+  .hub-challenge-body {
+    padding: 12px 14px;
+  }
+  .hub-challenge-arrow {
+    padding: 0 12px;
+  }
+}
+
+/* ---- Dark mode ---- */
+[data-theme='dark'] .hub-ex-done {
+  background: rgba(46, 125, 50, 0.08);
+}
+[data-theme='dark'] .hub-ex-done .hub-ex-dot {
+  background: #4caf50;
+}
+
+/* ---- Staggered entrance ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .hub-challenge-card {
+    animation: fade-up 0.35s var(--ease) both;
+  }
+  .hub-challenge-card:nth-child(1) { animation-delay: 0ms; }
+  .hub-challenge-card:nth-child(2) { animation-delay: 60ms; }
+  .hub-challenge-card:nth-child(3) { animation-delay: 120ms; }
+  .hub-challenge-card:nth-child(4) { animation-delay: 180ms; }
+  .hub-challenge-card:nth-child(5) { animation-delay: 240ms; }
+  .hub-challenge-card:nth-child(6) { animation-delay: 300ms; }
+
+  .hub-concept-row {
+    animation: fade-up 0.25s var(--ease) both;
+  }
+  .hub-concept-row:nth-child(1) { animation-delay: 0ms; }
+  .hub-concept-row:nth-child(2) { animation-delay: 30ms; }
+  .hub-concept-row:nth-child(3) { animation-delay: 60ms; }
+  .hub-concept-row:nth-child(4) { animation-delay: 90ms; }
+  .hub-concept-row:nth-child(5) { animation-delay: 120ms; }
+  .hub-concept-row:nth-child(6) { animation-delay: 150ms; }
+  .hub-concept-row:nth-child(7) { animation-delay: 180ms; }
+  .hub-concept-row:nth-child(8) { animation-delay: 210ms; }
+  .hub-concept-row:nth-child(9) { animation-delay: 240ms; }
+  .hub-concept-row:nth-child(10) { animation-delay: 270ms; }
+  .hub-concept-row:nth-child(11) { animation-delay: 300ms; }
+  .hub-concept-row:nth-child(12) { animation-delay: 330ms; }
+  .hub-concept-row:nth-child(13) { animation-delay: 360ms; }
+  .hub-concept-row:nth-child(14) { animation-delay: 390ms; }
+  .hub-concept-row:nth-child(15) { animation-delay: 420ms; }
+  .hub-concept-row:nth-child(16) { animation-delay: 450ms; }
+  .hub-concept-row:nth-child(17) { animation-delay: 480ms; }
+}

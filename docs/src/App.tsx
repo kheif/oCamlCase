@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import ContentPage from './components/ContentPage';
 import Playground from './features/playground/Playground';
 import MiniExerciseIndex from './features/mini-exercises/MiniExerciseIndex';
+import ExercisesHub from './features/exercises/ExercisesHub';
 import MiniExercisePage from './features/mini-exercises/MiniExercisePage';
 import Toycaml from './features/toycaml/Toycaml';
 import TreeLab from './features/treelab/TreeLab';
@@ -21,6 +22,7 @@ export default function App() {
         {/* Full-screen mini exercise (no sidebar) */}
         <Route path="/exercises/mini/:id" element={<MiniExercisePage />} />
         <Route element={<Layout />}>
+          <Route path="/exercises" element={<ExercisesHub />} />
           <Route path="/exercises/mini" element={<MiniExerciseIndex />} />
           <Route path="/concepts/static-semantics" element={<Toycaml />} />
           <Route path="/concepts/tree-lab" element={<TreeLab />} />

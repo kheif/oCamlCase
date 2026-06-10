@@ -14,16 +14,37 @@ import { data as mapImpl } from './map-impl';
 import { data as filterImpl } from './filter-impl';
 import { data as foldSum } from './fold-sum';
 import { data as matchShape } from './match-shape';
+import { data as anonApply } from './anon-apply';
+import { data as scopeShadow } from './scope-shadow';
+import { data as closureAdder } from './closure-adder';
+import { data as closureCompose } from './closure-compose';
+import { data as typePipeline } from './type-pipeline';
+import { data as polyPair } from './poly-pair';
+import { data as matchList } from './match-list';
+import { data as matchNested } from './match-nested';
+import { data as desugarBool } from './desugar-bool';
+import { data as insertSorted } from './insert-sorted';
+import { data as treeSize } from './tree-size';
 
 export const miniExercises: MiniExercise[] = [
   shadowing,
   partialApp,
+  anonApply,
+  scopeShadow,
+  closureAdder,
+  closureCompose,
+  typePipeline,
+  polyPair,
+  matchList,
+  matchNested,
+  matchShape,
   listCons,
   listLength,
   mapImpl,
   filterImpl,
   foldSum,
-  matchShape,
+  desugarBool,
+  insertSorted,
   gaussSum,
   factorial,
   power,
@@ -31,6 +52,7 @@ export const miniExercises: MiniExercise[] = [
   fibPair,
   gcd,
   countDigits,
+  treeSize,
 ];
 
 export const miniExerciseById: Record<string, MiniExercise> = Object.fromEntries(

@@ -22,6 +22,9 @@ import trees from './concepts/trees.html?raw';
 import bank from './exercises/bank.html?raw';
 import playlist from './exercises/playlist.html?raw';
 import search from './exercises/search.html?raw';
+import phonebook from './exercises/phonebook.html?raw';
+import evaluator from './exercises/evaluator.html?raw';
+import mergesort from './exercises/mergesort.html?raw';
 
 // Single source of truth for content pages: each page is declared exactly once,
 // carrying its route (path/html/title/description) AND its sidebar placement
@@ -203,5 +206,29 @@ export const contentRoutes: ContentPageDef[] = [
     description:
       'Practice OCaml iteration patterns: implement iter for definite repetition and first for indefinite search, then use them to solve concrete problems with partial application.',
     nav: { group: 'Exercises', num: 'E3.', label: 'Search' },
+  },
+  {
+    path: '/exercises/phonebook',
+    html: phonebook,
+    title: 'Phonebook | oCamlCase',
+    description:
+      'Practice OCaml list operations, closures, and higher-order functions by building a phonebook with lookup, filtering, and formatting.',
+    nav: { group: 'Exercises', num: 'E4.', label: 'Phonebook' },
+  },
+  {
+    path: '/exercises/evaluator',
+    html: evaluator,
+    title: 'Expression Evaluator | oCamlCase',
+    description:
+      'Practice OCaml variant types, pattern matching, and structural recursion by building an arithmetic expression evaluator, pretty-printer, and simplifier.',
+    nav: { group: 'Exercises', num: 'E5.', label: 'Expression Evaluator' },
+  },
+  {
+    path: '/exercises/mergesort',
+    html: mergesort,
+    title: 'Merge Sort | oCamlCase',
+    description:
+      'Practice OCaml recursion, pattern matching, and polymorphism by implementing merge sort with split, merge, and a polymorphic comparator.',
+    nav: { group: 'Exercises', num: 'E6.', label: 'Merge Sort' },
   },
 ];

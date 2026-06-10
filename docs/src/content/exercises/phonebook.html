@@ -1,0 +1,180 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Exercise E4 · Easy</div>
+        <h1 class="page-title">Phonebook</h1>
+        <p class="page-intro">Model a phonebook as a <code>(string * string) list</code> of name-number pairs. Practice list operations, closures for filtering predicates, and higher-order functions.</p>
+      </div>
+
+      <!-- Prompt -->
+      <div class="exercise-box">
+        <div class="exercise-head">
+          <div class="exercise-meta">
+            <div class="exercise-label">The challenge</div>
+            <div class="exercise-title">Build a phonebook with lookup, search, and formatting</div>
+          </div>
+          <span class="diff diff-easy">Easy</span>
+        </div>
+        <div class="exercise-body">
+          <p class="exercise-desc">A phonebook is a list of <code>(name, number)</code> pairs. Build a library of functions that add, find, remove, search, and format entries using list operations, closures, and higher-order functions.</p>
+          <ul class="req-list">
+            <li><span class="req-n">01</span>Define a type alias <code>type entry = string * string</code> and create a sample phonebook list with at least 4 entries.</li>
+            <li><span class="req-n">02</span>Write <code>add name number phonebook</code> that prepends a new entry.</li>
+            <li><span class="req-n">03</span>Write <code>find_number name phonebook</code> that returns <code>string option</code>, the phone number for a given name or <code>None</code>.</li>
+            <li><span class="req-n">04</span>Write <code>remove name phonebook</code> using <code>List.filter</code> to remove all entries with that name.</li>
+            <li><span class="req-n">05</span>Write <code>search prefix phonebook</code> that returns all entries whose name starts with <code>prefix</code> (hint: use <code>String.sub</code> and <code>String.length</code>).</li>
+            <li><span class="req-n">06</span>Write <code>names phonebook</code> using <code>List.map</code> to extract just the names.</li>
+            <li><span class="req-n">07</span>Write <code>count phonebook</code> to return the number of entries.</li>
+            <li><span class="req-n">08</span>Write <code>format_entry</code> that returns <code>"name: number"</code> and <code>format_all</code> that formats every entry using <code>List.map</code>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Starter + hints -->
+      <div class="two-col lean">
+        <div>
+          <h2>Starter code</h2>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">phonebook.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">type</span> <span class="ty">entry</span> = <span class="ty">string</span> * <span class="ty">string</span>
+
+<span class="kw">let</span> phonebook = [
+  (<span class="str">"Alice"</span>, <span class="str">"555-1234"</span>);
+  (<span class="str">"Bob"</span>, <span class="str">"555-5678"</span>);
+  (<span class="str">"Charlie"</span>, <span class="str">"555-9012"</span>);
+  (<span class="str">"Diana"</span>, <span class="str">"555-3456"</span>)
+]
+
+<span class="kw">let</span> <span class="fn">add</span> name number pb =
+  <span class="cmt">(* TODO: prepend a new entry *)</span>
+  pb
+
+<span class="kw">let</span> <span class="fn">find_number</span> name pb =
+  <span class="cmt">(* TODO: return Some number or None *)</span>
+  <span class="ty">None</span>
+
+<span class="kw">let</span> <span class="fn">remove</span> name pb =
+  <span class="cmt">(* TODO: use List.filter *)</span>
+  pb
+
+<span class="kw">let</span> <span class="fn">search</span> prefix pb =
+  <span class="cmt">(* TODO: filter entries whose name starts with prefix *)</span>
+  pb
+
+<span class="kw">let</span> <span class="fn">names</span> pb =
+  <span class="cmt">(* TODO: use List.map *)</span>
+  []
+
+<span class="kw">let</span> <span class="fn">count</span> pb =
+  <span class="cmt">(* TODO *)</span>
+  <span class="num">0</span>
+
+<span class="kw">let</span> <span class="fn">format_entry</span> (name, number) =
+  <span class="cmt">(* TODO: return "name: number" *)</span>
+  <span class="str">""</span></pre>
+          </div>
+        </div>
+        <div>
+          <h2>Hints</h2>
+          <p>For <code>find_number</code>, <code>List.find_opt</code> returns <code>Some element</code> or <code>None</code>. Match on the result to extract just the number from the pair.</p>
+          <p>For <code>search</code>, compare a substring: <code>String.sub name 0 (String.length prefix) = prefix</code>. Guard against short names with a length check first, otherwise <code>String.sub</code> will raise an exception.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Notice the pattern</div>
+            <p>Every filtering function follows the same shape: <code>List.filter (fun (n, _) -> &lt;condition&gt;) pb</code>. The closure captures the parameter (<code>name</code>, <code>prefix</code>) from the enclosing scope.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playground link -->
+      <div class="pg-link-wrap">
+        <a href="/playground?exercise=phonebook" class="pg-link-btn">Try in Playground →</a>
+      </div>
+
+      <!-- Solution -->
+      <div class="sol-toggle" id="sol-toggle" onclick="toggleSolution()">
+        <span class="sol-icon" id="sol-icon">+</span>
+        Show solution
+        <span class="sol-hint">try it yourself first</span>
+      </div>
+
+      <div class="sol-body" id="sol-body">
+        <div class="two-col lean">
+          <div>
+            <div class="code-block">
+              <div class="code-top">
+                <span class="code-fname">phonebook_solution.ml</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+<pre><span class="kw">type</span> <span class="ty">entry</span> = <span class="ty">string</span> * <span class="ty">string</span>
+
+<span class="kw">let</span> phonebook = [
+  (<span class="str">"Alice"</span>, <span class="str">"555-1234"</span>);
+  (<span class="str">"Bob"</span>, <span class="str">"555-5678"</span>);
+  (<span class="str">"Charlie"</span>, <span class="str">"555-9012"</span>);
+  (<span class="str">"Diana"</span>, <span class="str">"555-3456"</span>)
+]
+
+<span class="kw">let</span> <span class="fn">add</span> name number pb = (name, number) :: pb
+
+<span class="kw">let</span> <span class="fn">find_number</span> name pb =
+  <span class="kw">match</span> <span class="ty">List</span>.<span class="fn">find_opt</span> (<span class="kw">fun</span> (n, _) -> n = name) pb <span class="kw">with</span>
+  | <span class="ty">Some</span> (_, num) -> <span class="ty">Some</span> num
+  | <span class="ty">None</span> -> <span class="ty">None</span>
+
+<span class="kw">let</span> <span class="fn">remove</span> name pb =
+  <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> (n, _) -> n <> name) pb
+
+<span class="kw">let</span> <span class="fn">search</span> prefix pb =
+  <span class="kw">let</span> len = <span class="ty">String</span>.<span class="fn">length</span> prefix <span class="kw">in</span>
+  <span class="ty">List</span>.<span class="fn">filter</span> (<span class="kw">fun</span> (n, _) ->
+    <span class="ty">String</span>.<span class="fn">length</span> n >= len &&
+    <span class="ty">String</span>.<span class="fn">sub</span> n <span class="num">0</span> len = prefix
+  ) pb
+
+<span class="kw">let</span> <span class="fn">names</span> pb = <span class="ty">List</span>.<span class="fn">map</span> (<span class="kw">fun</span> (n, _) -> n) pb
+
+<span class="kw">let</span> <span class="fn">count</span> pb = <span class="ty">List</span>.<span class="fn">length</span> pb
+
+<span class="kw">let</span> <span class="fn">format_entry</span> (name, number) =
+  <span class="ty">Printf</span>.<span class="fn">sprintf</span> <span class="str">"%s: %s"</span> name number
+
+<span class="kw">let</span> <span class="fn">format_all</span> pb =
+  <span class="ty">List</span>.<span class="fn">map</span> <span class="fn">format_entry</span> pb
+
+<span class="kw">let</span> () =
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"Find Alice: %s\n"</span>
+    (<span class="kw">match</span> <span class="fn">find_number</span> <span class="str">"Alice"</span> phonebook <span class="kw">with</span>
+     | <span class="ty">Some</span> n -> n | <span class="ty">None</span> -> <span class="str">"not found"</span>);
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"Names: %s\n"</span>
+    (<span class="ty">String</span>.<span class="fn">concat</span> <span class="str">", "</span> (<span class="fn">names</span> phonebook));
+  <span class="kw">let</span> pb2 = <span class="fn">add</span> <span class="str">"Eve"</span> <span class="str">"555-7890"</span> phonebook <span class="kw">in</span>
+  <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"After add: %d entries\n"</span> (<span class="fn">count</span> pb2);
+  <span class="kw">let</span> matches = <span class="fn">search</span> <span class="str">"Ch"</span> phonebook <span class="kw">in</span>
+  <span class="ty">List</span>.<span class="fn">iter</span> (<span class="kw">fun</span> e -> <span class="fn">print_endline</span> (<span class="fn">format_entry</span> e)) matches</pre>
+            </div>
+          </div>
+          <div>
+            <h2>Walkthrough</h2>
+            <p><strong>add.</strong> Uses cons <code>::</code>. Prepending is O(1) and produces a new list without mutating the original.</p>
+            <p><strong>find_number.</strong> Uses <code>List.find_opt</code> which returns an option, avoiding exceptions. The match extracts just the number from the found pair.</p>
+            <p><strong>remove and search.</strong> Both use <code>List.filter</code> with closures that capture the function parameter. <code>remove</code> keeps entries where the name does not match; <code>search</code> keeps entries where the name starts with the prefix.</p>
+            <p><strong>format_entry.</strong> Uses <code>Printf.sprintf</code> for type-safe string formatting. <code>format_all</code> maps it over every entry, demonstrating that named functions can be passed directly to higher-order functions without wrapping in a lambda.</p>
+
+            <h2>Going further</h2>
+            <p>Once the basic version works, try these extensions:</p>
+            <ul>
+              <li>Write <code>update name new_number pb</code> that removes the old entry and adds the updated one.</li>
+              <li>Write <code>sort_by_name</code> using <code>List.sort</code> with <code>String.compare</code>.</li>
+              <li>Write <code>group_by_prefix n pb</code> that groups entries by the first <code>n</code> characters of the name.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <a href="/exercises/search">← Search</a>
+        <a href="/exercises/evaluator">Next: Expression Evaluator →</a>
+      </div>
+    </div>

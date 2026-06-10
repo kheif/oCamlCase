@@ -19,6 +19,7 @@ export type NavLink = {
   num: string;
   label: string;
   path: string;
+  subHeader?: boolean;
 };
 
 export type NavGroup = {

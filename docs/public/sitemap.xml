@@ -56,6 +56,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://ocamlcase.dev/concepts/list-operations</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://ocamlcase.dev/concepts/higher-order</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -76,6 +81,51 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://ocamlcase.dev/concepts/sorting</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/concepts/constructors-exceptions</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/concepts/trees</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/concepts/static-semantics</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/concepts/tree-lab</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/interpreter/lexing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/interpreter/parsing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/interpreter/dynamics</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/interpreter/recursion</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://ocamlcase.dev/exercises/bank</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -89,5 +139,15 @@
     <loc>https://ocamlcase.dev/exercises/search</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/exercises/mini</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ocamlcase.dev/playground</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>

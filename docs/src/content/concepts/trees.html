@@ -245,16 +245,16 @@
       </div>
 
       <h2>Linearizations</h2>
-      <p>A <strong>linearization</strong> turns a tree into a flat sequence — useful whenever you need to print, serialize, or compare trees as simple lists. The two natural strategies differ only in <em>when</em> a node contributes to the output relative to its children.</p>
+      <p>A <strong>linearization</strong> turns a tree into a flat sequence, useful whenever you need to print, serialize, or compare trees as simple lists. The two natural strategies differ only in <em>when</em> a node contributes to the output relative to its children.</p>
 
-      <p>The key to understanding why the two strategies produce different lists is the <strong>standard tour</strong>: a traversal that visits every node twice — once descending (first visit) and once returning (last visit), with successor trees explored left to right. <code>pre</code> emits a node's arity on the <em>first</em> visit; <code>post</code> emits it on the <em>last</em> visit. This is the causal chain the interactive demo below makes concrete.</p>
+      <p>The key to understanding why the two strategies produce different lists is the <strong>standard tour</strong>: a traversal that visits every node twice, once descending (first visit) and once returning (last visit), with successor trees explored left to right. <code>pre</code> emits a node's arity on the <em>first</em> visit; <code>post</code> emits it on the <em>last</em> visit. This is the causal chain the interactive demo below makes concrete.</p>
 
       <div class="two-col lean">
         <div>
-          <p><code>pre</code> records a node's arity <em>before</em> recursing into its children (left to right); <code>post</code> records it <em>after</em>. Both share the same recursive shape as <code>size</code> — only the position of the node's own contribution changes.</p>
+          <p><code>pre</code> records a node's arity <em>before</em> recursing into its children (left to right); <code>post</code> records it <em>after</em>. Both share the same recursive shape as <code>size</code>; only the position of the node's own contribution changes.</p>
           <div class="callout callout-key">
             <div class="callout-title">Pattern</div>
-            <p>Same tree, same traversal order, two different output sequences — purely because of where each node's value is placed relative to <code>List.concat (List.map ... ts)</code>.</p>
+            <p>Same tree, same traversal order, two different output sequences, purely because of where each node's value is placed relative to <code>List.concat (List.map ... ts)</code>.</p>
           </div>
         </div>
         <div class="sticky">
@@ -273,17 +273,17 @@
       </div>
 
       <div class="callout callout-lab">
-        <div class="callout-title">🌳 Interactive: Tree Lab — Tour &amp; Linearizations</div>
-        <p>The <strong>Standard Tour &amp; Numbering</strong> tab animates the tour cursor moving through any tree you choose, assigning pre- and post-numbers live as it goes. The <strong>Linearizations</strong> tab then shows the output list growing in lockstep with the tour — one element added per visit event — so you can see exactly <em>why</em> <code>pre</code> and <code>post</code> produce different lists.</p>
+        <div class="callout-title">🌳 Interactive: Tree Lab, Tour &amp; Linearizations</div>
+        <p>The <strong>Standard Tour &amp; Numbering</strong> tab animates the tour cursor moving through any tree you choose, assigning pre- and post-numbers live as it goes. The <strong>Linearizations</strong> tab then shows the output list growing in lockstep with the tour, one element added per visit event, so you can see exactly <em>why</em> <code>pre</code> and <code>post</code> produce different lists.</p>
         <a class="callout-link" href="/concepts/tree-lab">Open Tree Lab → Tour &amp; Linearizations</a>
       </div>
 
       <h2>Labeled Trees and Projections</h2>
-      <p>A <strong><code>'a ltree</code></strong> attaches a label of type <code>'a</code> to every node. <strong>Projections</strong> collect those labels into a list — <code>prep</code> in pre-order, <code>pop</code> in post-order — using exactly the same recursive shape as <code>pre</code> and <code>post</code>, just collecting labels instead of counting children.</p>
+      <p>A <strong><code>'a ltree</code></strong> attaches a label of type <code>'a</code> to every node. <strong>Projections</strong> collect those labels into a list (<code>prep</code> in pre-order, <code>pop</code> in post-order) using exactly the same recursive shape as <code>pre</code> and <code>post</code>, just collecting labels instead of counting children.</p>
 
       <div class="two-col lean">
         <div>
-          <p>Read <code>prep</code> as "this node's label, then its children's labels, left to right"; <code>pop</code> as "the children's labels first, then this node's label last". The traversal order is identical to <code>pre</code>/<code>post</code> — only what gets collected (a label vs. an arity) differs.</p>
+          <p>Read <code>prep</code> as "this node's label, then its children's labels, left to right"; <code>pop</code> as "the children's labels first, then this node's label last". The traversal order is identical to <code>pre</code>/<code>post</code>; only what gets collected (a label vs. an arity) differs.</p>
           <div class="callout callout-key">
             <div class="callout-title">Pattern</div>
             <p><code>prep t = [x] @ List.concat (List.map prep ts)</code> mirrors <code>pre</code>'s <code>List.length ts :: ...</code>; <code>pop</code> mirrors <code>post</code> in the same way.</p>
@@ -307,17 +307,17 @@
       </div>
 
       <div class="callout callout-lab">
-        <div class="callout-title">🌳 Interactive: Tree Lab — Projections</div>
-        <p>The <strong>Projections</strong> tab runs <code>prep</code> and <code>pop</code> on any labeled tree you construct. Every label collected by the tour is highlighted in the output list the moment the tour cursor visits that node — making the traversal order and the resulting list literally the same thing.</p>
+        <div class="callout-title">🌳 Interactive: Tree Lab, Projections</div>
+        <p>The <strong>Projections</strong> tab runs <code>prep</code> and <code>pop</code> on any labeled tree you construct. Every label collected by the tour is highlighted in the output list the moment the tour cursor visits that node, making the traversal order and the resulting list literally the same thing.</p>
         <a class="callout-link" href="/concepts/tree-lab">Open Tree Lab → Projections</a>
       </div>
 
       <h2>Balanced Trees</h2>
-      <p>A tree is <strong>balanced</strong> when every node's successor trees all have the same depth. Checking this calls for something <code>size</code> never needed: a way to <em>fail</em> when two computed depths disagree — which is exactly what exceptions are for.</p>
+      <p>A tree is <strong>balanced</strong> when every node's successor trees all have the same depth. Checking this calls for something <code>size</code> never needed: a way to <em>fail</em> when two computed depths disagree, which is exactly what exceptions are for.</p>
 
       <div class="two-col lean">
         <div>
-          <p><code>check n m</code> returns the common value when <code>n = m</code>, and otherwise <code>raise</code>s <code>Unbalanced</code>. <code>depthb</code> folds <code>check</code> over the depths of all successor trees, starting from the depth of the first one — so any mismatch propagates the exception straight out of the fold. <code>balanced</code> simply <code>try</code>s <code>depthb</code> and turns the exception into <code>false</code>.</p>
+          <p><code>check n m</code> returns the common value when <code>n = m</code>, and otherwise <code>raise</code>s <code>Unbalanced</code>. <code>depthb</code> folds <code>check</code> over the depths of all successor trees, starting from the depth of the first one, so any mismatch propagates the exception straight out of the fold. <code>balanced</code> simply <code>try</code>s <code>depthb</code> and turns the exception into <code>false</code>.</p>
           <div class="callout callout-key">
             <div class="callout-title">Pattern</div>
             <p>Exceptions let <code>depthb</code> stay a clean total-looking recursion: the "all depths agree" invariant is enforced by <code>check</code>, and <code>balanced</code> is the one place that decides what a violation <em>means</em> (here, simply <code>false</code>).</p>
@@ -345,14 +345,9 @@
       </div>
 
       <div class="callout callout-lab">
-        <div class="callout-title">🌳 Interactive: Tree Lab — Balancedness</div>
-        <p>The <strong>Balancedness</strong> tab animates the <code>depthb</code> fold post-order: green badges show computed depths climbing from leaves to root, and on an unbalanced tree the red badge appears exactly where <code>check</code> raises <code>Unbalanced</code> — stopping the fold immediately. Switch between a balanced and an unbalanced example, or build your own.</p>
+        <div class="callout-title">🌳 Interactive: Tree Lab, Balancedness</div>
+        <p>The <strong>Balancedness</strong> tab animates the <code>depthb</code> fold post-order: green badges show computed depths climbing from leaves to root, and on an unbalanced tree the red badge appears exactly where <code>check</code> raises <code>Unbalanced</code>, stopping the fold immediately. Switch between a balanced and an unbalanced example, or build your own.</p>
         <a class="callout-link" href="/concepts/tree-lab">Open Tree Lab → Balancedness</a>
-      </div>
-
-      <div class="page-footer">
-        <a href="/concepts/constructors-exceptions">← Constructors and Exceptions</a>
-        <a href="/exercises/bank">Next: Bank Account →</a>
       </div>
 
       <style>
@@ -558,3 +553,11 @@
 
       </style>
     </div>
+<div class="page-nav">
+  <p class="page-nav-label">Continue learning</p>
+  <div class="page-nav-links">
+    <a href="/concepts/constructors-exceptions" class="page-nav-prev">Constructors and Exceptions</a>
+    <a href="/concepts/tree-lab" class="page-nav-next">Next: Tree Lab</a>
+    <a href="/interpreter/lexing" class="page-nav-deep">Deep dive: Building an Interpreter</a>
+  </div>
+</div>

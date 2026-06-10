@@ -47,7 +47,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/bindings',
     html: bindings,
-    title: 'Bindings | oCamlCase',
+    title: 'OCaml Let Bindings | oCamlCase',
     description:
       'Understand let bindings in OCaml: how names are linked to values, local let ... in scoping, shadowing as a substitute for assignment, and opt-in mutability with refs.',
     nav: { group: 'Concepts', num: '1.', label: 'Bindings' },
@@ -55,7 +55,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/currying',
     html: currying,
-    title: 'Currying | oCamlCase',
+    title: 'OCaml Currying and Partial Application | oCamlCase',
     description:
       'Understand currying in OCaml: how every function takes exactly one argument, what partial application is, and how labeled arguments change the picture.',
     nav: { group: 'Concepts', num: '2.', label: 'Currying' },
@@ -63,7 +63,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/abstractions',
     html: abstractions,
-    title: 'Abstractions | oCamlCase',
+    title: 'OCaml Anonymous Functions | oCamlCase',
     description:
       'Learn how OCaml uses anonymous functions (abstractions) as first-class values, and how let bindings are just syntactic sugar for naming them.',
     nav: { group: 'Concepts', num: '3.', label: 'Abstractions' },
@@ -71,7 +71,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/lexical-scope',
     html: lexicalScope,
-    title: 'Lexical Scope | oCamlCase',
+    title: 'OCaml Lexical Scope and Binding | oCamlCase',
     description:
       'Reason about names in OCaml: defining vs. using occurrences, bound vs. free occurrences, lexical binding, and the sanitization conditions that make substitution safe.',
     nav: { group: 'Concepts', num: '4.', label: 'Lexical Scope' },
@@ -79,7 +79,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/closures',
     html: closures,
-    title: 'Closures | oCamlCase',
+    title: 'OCaml Closures Explained | oCamlCase',
     description:
       'Learn how OCaml represents function values as closures: a tuple of argument, body, and captured environment. See why recursive functions also store their own name.',
     nav: { group: 'Concepts', num: '5.', label: 'Closures' },
@@ -87,7 +87,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/type-inference',
     html: typeInference,
-    title: 'Type Inference | oCamlCase',
+    title: 'OCaml Type Inference Step by Step | oCamlCase',
     description:
       'How OCaml infers the most general type for every binding using Hindley-Milner: how constraints propagate, when type variables appear, and when annotations help.',
     nav: { group: 'Concepts', num: '6.', label: 'Type Inference' },
@@ -95,7 +95,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/polymorphism',
     html: polymorphism,
-    title: 'Polymorphism | oCamlCase',
+    title: 'OCaml Parametric Polymorphism | oCamlCase',
     description:
       'Parametric polymorphism in OCaml: type variables, generic functions like List.length and List.map, and the value restriction that keeps the type system sound.',
     nav: { group: 'Concepts', num: '7.', label: 'Polymorphism' },
@@ -103,7 +103,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/pattern-matching',
     html: patternMatching,
-    title: 'Pattern Matching | oCamlCase',
+    title: 'OCaml Pattern Matching | oCamlCase',
     description:
       'Learn pattern matching in OCaml: the match expression, variant types, exhaustiveness checking, guards, and nested patterns.',
     nav: { group: 'Concepts', num: '8.', label: 'Pattern Matching' },
@@ -111,7 +111,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/lists',
     html: lists,
-    title: 'Lists | oCamlCase',
+    title: 'OCaml Lists | oCamlCase',
     description:
       'Understand OCaml lists from the ground up: the two constructors, the recursive construction rule, tree representation, pattern matching, and recursive implementations of length, append, rev, and concat.',
     nav: { group: 'Concepts', num: '9.', label: 'Lists' },
@@ -119,7 +119,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/list-operations',
     html: listOperations,
-    title: 'List Operations | oCamlCase',
+    title: 'OCaml List Operations: Map, Filter, Exists | oCamlCase',
     description:
       'Build map, filter, and exists from scratch as recursive functions, see how they compare to imperative loops, and learn to pipe them together with the standard List module.',
     nav: { group: 'Concepts', num: '10.', label: 'List Operations' },
@@ -127,7 +127,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/higher-order',
     html: higherOrder,
-    title: 'Higher-Order Functions | oCamlCase',
+    title: 'OCaml Higher-Order Functions | oCamlCase',
     description:
       'Learn higher-order functions in OCaml: map, filter, fold, the pipe operator, and how passing functions as arguments compares to dependency injection in OOP.',
     nav: { group: 'Concepts', num: '11.', label: 'Higher-Order Functions' },
@@ -135,7 +135,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/tail-recursion',
     html: tailRecursion,
-    title: 'Tail Recursion | oCamlCase',
+    title: 'OCaml Tail Recursion | oCamlCase',
     description:
       'Understand tail recursion in OCaml: what tail position means, how the compiler optimizes tail calls, the accumulator pattern, and divergence.',
     nav: { group: 'Concepts', num: '12.', label: 'Tail Recursion' },
@@ -143,7 +143,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/iteration',
     html: iteration,
-    title: 'Iteration | oCamlCase',
+    title: 'OCaml Iteration Patterns | oCamlCase',
     description:
       'Learn definite and indefinite iteration in OCaml: how to apply a function n times with iter, and how to search for the first value satisfying a predicate with first.',
     nav: { group: 'Concepts', num: '13.', label: 'Iteration' },
@@ -151,7 +151,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/derived-forms',
     html: derivedForms,
-    title: 'Derived Forms | oCamlCase',
+    title: 'OCaml Derived Forms and Syntactic Sugar | oCamlCase',
     description:
       'See how OCaml syntax desugars to a small core: && and || are if-expressions, operators in parentheses are functions, and let f x = ... is sugar for fun.',
     nav: { group: 'Concepts', num: '14.', label: 'Derived Forms' },
@@ -159,7 +159,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/sorting',
     html: sorting,
-    title: 'Sorting | oCamlCase',
+    title: 'OCaml Sorting Algorithms | oCamlCase',
     description:
       'Learn about sorting algorithms in OCaml, including insertion sort, polymorphic sorting, and merge sort, and understand recursion trees.',
     nav: { group: 'Concepts', num: '15.', label: 'Sorting' },
@@ -167,7 +167,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/constructors-exceptions',
     html: constructorsExceptions,
-    title: 'Constructors and Exceptions | oCamlCase',
+    title: 'OCaml Variant Types and Exceptions | oCamlCase',
     description:
       'Understand variant types, structural recursion, exceptions, and option types for handling alternative data shapes and control flow.',
     nav: { group: 'Concepts', num: '16.', label: 'Constructors and Exceptions' },
@@ -175,7 +175,7 @@ export const contentRoutes: ContentPageDef[] = [
   {
     path: '/concepts/trees',
     html: trees,
-    title: 'Trees | oCamlCase',
+    title: 'OCaml Trees and Structural Recursion | oCamlCase',
     description:
       'Explore rose trees, structural terminology, and computing properties of tree data structures recursively.',
     nav: { group: 'Concepts', num: '17.', label: 'Trees' },

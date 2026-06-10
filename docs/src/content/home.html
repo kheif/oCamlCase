@@ -1,11 +1,28 @@
 <div class="home-hero">
-      <!-- Official OCaml logo -->
       <a href="https://ocaml.org" target="_blank" rel="noopener" style="display:inline-block; margin-bottom:24px;">
         <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/OCaml_Logo.svg"
              alt="OCaml logo" style="height:52px; width:auto; display:block;">
       </a>
       <h1>Learn OCaml<br>by example.</h1>
-      <p>A practical guide to OCaml covering functional patterns, type system features, and coding exercises. Written for programmers who want to understand the language, not just copy it.</p>
+      <p>Build mental models for the type system, recursion patterns, closures, and evaluation. Not just syntax. Understand the language from the ground up.</p>
+    </div>
+
+    <div class="home-cards">
+      <a href="/concepts/bindings" class="home-card">
+        <span class="home-card-icon">&#x1D53B;</span>
+        <span class="home-card-title">Concepts</span>
+        <span class="home-card-desc">17 topics from let bindings to trees, covering types, recursion, closures, and pattern matching.</span>
+      </a>
+      <a href="/concepts/static-semantics" class="home-card">
+        <span class="home-card-icon">&#x29D6;</span>
+        <span class="home-card-title">Interactive Labs</span>
+        <span class="home-card-desc">TreeLab, Static Semantics, Interpreter Pipeline, Playground, and Mini Exercises.</span>
+      </a>
+      <a href="/exercises/bank" class="home-card">
+        <span class="home-card-icon">&#x270E;</span>
+        <span class="home-card-title">Exercises</span>
+        <span class="home-card-desc">3 project challenges and 7 drag-and-drop coding exercises to practice what you learn.</span>
+      </a>
     </div>
 
     <div class="home-toc">
@@ -15,7 +32,7 @@
         </div>
         <div class="toc-items">
           <a href="/cheatsheet" class="toc-item">
-            <span class="toc-num">·</span>
+            <span class="toc-num">&middot;</span>
             Cheat Sheet
             <span class="toc-desc">Syntax quick-reference: bindings, types, functions, modules</span>
           </a>
@@ -41,7 +58,7 @@
           <a href="/concepts/abstractions" class="toc-item">
             <span class="toc-num">3.</span>
             Abstractions
-            <span class="toc-desc">Hiding complexity behind clean interfaces</span>
+            <span class="toc-desc">Anonymous functions as first-class values</span>
           </a>
           <a href="/concepts/lexical-scope" class="toc-item">
             <span class="toc-num">4.</span>
@@ -112,6 +129,55 @@
             <span class="toc-num">17.</span>
             Trees
             <span class="toc-desc">Rose trees and structural recursion</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="toc-section">
+        <div class="toc-section-head">
+          <span class="toc-section-title">Interactive Labs</span>
+          <span class="toc-section-count">5+ tools</span>
+        </div>
+        <div class="toc-items">
+          <a href="/concepts/static-semantics" class="toc-item">
+            <span class="toc-num">&middot;</span>
+            Static Semantics
+            <span class="toc-desc">Live type elaborator with derivation trees</span>
+          </a>
+          <a href="/concepts/tree-lab" class="toc-item">
+            <span class="toc-num">&middot;</span>
+            Tree Lab
+            <span class="toc-desc">Interactive rose tree explorer with traversals</span>
+          </a>
+          <a href="/playground" class="toc-item">
+            <span class="toc-num">&middot;</span>
+            Playground
+            <span class="toc-desc">Run OCaml code in the browser</span>
+          </a>
+          <a href="/exercises/mini" class="toc-item">
+            <span class="toc-num">&middot;</span>
+            Mini Exercises
+            <span class="toc-desc">7 drag-and-drop coding exercises</span>
+          </a>
+          <a href="/interpreter/lexing" class="toc-item">
+            <span class="toc-num">1.</span>
+            Interpreter: Lexing
+            <span class="toc-desc">Characters to tokens with maximal munch</span>
+          </a>
+          <a href="/interpreter/parsing" class="toc-item">
+            <span class="toc-num">2.</span>
+            Interpreter: Parsing
+            <span class="toc-desc">Tokens to abstract syntax trees</span>
+          </a>
+          <a href="/interpreter/dynamics" class="toc-item">
+            <span class="toc-num">3.</span>
+            Interpreter: Dynamics
+            <span class="toc-desc">Evaluation rules and derivation</span>
+          </a>
+          <a href="/interpreter/recursion" class="toc-item">
+            <span class="toc-num">4.</span>
+            Interpreter: Recursion
+            <span class="toc-desc">Recursive functions and divergence</span>
           </a>
         </div>
       </div>

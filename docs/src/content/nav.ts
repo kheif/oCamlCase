@@ -19,22 +19,21 @@ export const navGroups: NavGroup[] = (() => {
     group.links.push({ num: route.nav.num, label: route.nav.label, path: route.path });
   }
 
-  // Mini Exercises isn't a single-HTML content route (it's its own feature with
-  // its own routing), so it's appended to the Exercises group here.
-  byLabel
-    .get('Exercises')
-    ?.links.push({ num: '·', label: 'Mini Exercises', path: '/exercises/mini' });
-
-  // Static Semantics is a live elaborator feature, not a registry HTML page —
-  // appended to Concepts the same way Mini Exercises joins Exercises above.
-  byLabel
-    .get('Concepts')
-    ?.links.push({ num: '·', label: 'Static Semantics', path: '/concepts/static-semantics' });
-
-  // Tree Lab is a live interactive feature (4 stepper modes, editable tree).
-  byLabel
-    .get('Concepts')
-    ?.links.push({ num: '·', label: 'Tree Lab', path: '/concepts/tree-lab' });
+  groups.push({
+    label: 'Interactive Labs',
+    links: [
+      { num: '·', label: 'Static Semantics', path: '/concepts/static-semantics' },
+      { num: '·', label: 'Tree Lab', path: '/concepts/tree-lab' },
+      { num: '·', label: 'Playground', path: '/playground' },
+      { num: '·', label: 'Mini Exercises', path: '/exercises/mini' },
+      { num: '', label: 'Building an Interpreter', path: '', subHeader: true },
+      { num: '1.', label: 'Lexing', path: '/interpreter/lexing' },
+      { num: '2.', label: 'Parsing', path: '/interpreter/parsing' },
+      { num: '3.', label: 'Static Semantics', path: '/concepts/static-semantics' },
+      { num: '4.', label: 'Dynamic Semantics', path: '/interpreter/dynamics' },
+      { num: '5.', label: 'Recursion & Divergence', path: '/interpreter/recursion' },
+    ],
+  });
 
   return groups;
 })();
@@ -52,5 +51,6 @@ export const topbarLinks: TopbarLink[] = [
   { label: 'Home', path: pathFor('Home') },
   { label: 'Cheat Sheet', path: pathFor('Cheat Sheet') },
   { label: 'Concepts', path: pathFor('Bindings'), matchPrefix: '/concepts/' },
+  { label: 'Labs', path: '/concepts/static-semantics', matchPrefix: '/interpreter/' },
   { label: 'Playground', path: '/playground' },
 ];

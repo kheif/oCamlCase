@@ -29,7 +29,9 @@ import { showOp, type Exp, type Op, type Var } from './ast';
 export type Value =
   | { kind: 'VBool'; value: boolean }
   | { kind: 'VInt'; value: number }
-  | { kind: 'VClosure'; param: Var; body: Exp; env: VEnv };
+  | { kind: 'VClosure'; param: Var; body: Exp; env: VEnv }
+  // Recursive closure: carries its own name so the body can call itself.
+  | { kind: 'VRClosure'; fnName: Var; param: Var; body: Exp; env: VEnv };
 
 export type VEnvEntry = { name: Var; value: Value };
 /** Same ordered-association-list shape as `Env` in elab.ts, and for the same reason. */
@@ -53,6 +55,8 @@ export function showValue(v: Value): string {
       return String(v.value);
     case 'VClosure':
       return `<closure: fun (${v.param}) -> ...>`;
+    case 'VRClosure':
+      return `<rec closure: rfun ${v.fnName} (${v.param}) -> ...>`;
   }
 }
 
@@ -99,7 +103,7 @@ export function evaluate(env: VEnv, exp: Exp): EvalResult {
       if (v === undefined) {
         return {
           ok: false,
-          error: `unbound identifier "${exp.name}" at runtime — Unbound "${exp.name}"`,
+          error: `unbound identifier "${exp.name}" at runtime; Unbound "${exp.name}"`,
         };
       }
       return { ok: true, value: v };
@@ -118,10 +122,15 @@ export function evaluate(env: VEnv, exp: Exp): EvalResult {
       if (!f.ok) return f;
       const a = evaluate(env, exp.arg);
       if (!a.ok) return a;
-      if (f.value.kind !== 'VClosure') {
-        return { ok: false, error: 'cannot apply a non-function value at runtime' };
+      if (f.value.kind === 'VClosure') {
+        return evaluate(vupdate(f.value.env, f.value.param, a.value), f.value.body);
       }
-      return evaluate(vupdate(f.value.env, f.value.param, a.value), f.value.body);
+      if (f.value.kind === 'VRClosure') {
+        // Drapp: bind both the recursive name and the argument before running.
+        const rc = f.value;
+        return evaluate(vupdate(vupdate(rc.env, rc.fnName, rc), rc.param, a.value), rc.body);
+      }
+      return { ok: false, error: 'cannot apply a non-function value at runtime' };
     }
 
     case 'If': {
@@ -138,5 +147,11 @@ export function evaluate(env: VEnv, exp: Exp): EvalResult {
 
     case 'Fun':
       return { ok: true, value: { kind: 'VClosure', param: exp.param, body: exp.body, env } };
+
+    case 'RFun':
+      return {
+        ok: true,
+        value: { kind: 'VRClosure', fnName: exp.fnName, param: exp.param, body: exp.body, env },
+      };
   }
 }

@@ -33,9 +33,10 @@ export class ParseError extends Error {
 type TokKind = 'ident' | 'int' | 'kw' | 'punct' | 'eof';
 type Token = { kind: TokKind; text: string; pos: number };
 
-const KEYWORDS = new Set(['if', 'then', 'else', 'fun', 'true', 'false']);
-const PUNCT3 = ['->'];
-const PUNCT2 = ['<='];
+const KEYWORDS = new Set(['if', 'then', 'else', 'fun', 'rfun', 'true', 'false']);
+// Two-character tokens, tested before the single-character set so "->" and
+// "<=" win over "-"/"<" (maximal munch). ToyCaml has no three-character tokens.
+const PUNCT2 = ['->', '<='];
 const PUNCT1 = '()+-*:';
 
 function lex(src: string): Token[] {
@@ -60,12 +61,6 @@ function lex(src: string): Token[] {
       const word = src.slice(i, j);
       toks.push({ kind: KEYWORDS.has(word) ? 'kw' : 'ident', text: word, pos: i });
       i = j;
-      continue;
-    }
-    const three = src.slice(i, i + 3);
-    if (PUNCT3.includes(three)) {
-      toks.push({ kind: 'punct', text: three, pos: i });
-      i += 3;
       continue;
     }
     const two = src.slice(i, i + 2);
@@ -112,7 +107,7 @@ class Parser {
     if (!this.at('eof')) {
       const t = this.peek();
       throw new ParseError(
-        `unexpected "${t.text}" — did you mean to stop the expression earlier?`,
+        `unexpected "${t.text}"; did you mean to stop the expression earlier?`,
         t.pos,
       );
     }
@@ -123,6 +118,7 @@ class Parser {
   expr(): Exp {
     if (this.at('kw', 'if')) return this.ifExpr();
     if (this.at('kw', 'fun')) return this.funExpr();
+    if (this.at('kw', 'rfun')) return this.rfunExpr();
     return this.leqExpr();
   }
 
@@ -146,6 +142,24 @@ class Parser {
     this.expect('punct', '->');
     const body = this.expr();
     return { kind: 'Fun', param, paramTy, body };
+  }
+
+  // rfun f (x : t) : t' -> e
+  private rfunExpr(): Exp {
+    this.expect('kw', 'rfun');
+    const fnName = this.expect('ident').text;
+    this.expect('punct', '(');
+    const param = this.expect('ident').text;
+    this.expect('punct', ':');
+    const paramTy = this.ty();
+    this.expect('punct', ')');
+    this.expect('punct', ':');
+    // Atomic return type: the next `->` separates the body, so a function return
+    // type must be parenthesized, e.g. `rfun f (x:int) : (int -> int) -> ...`.
+    const retTy = this.atomTy();
+    this.expect('punct', '->');
+    const body = this.expr();
+    return { kind: 'RFun', fnName, param, paramTy, retTy, body };
   }
 
   private leqExpr(): Exp {

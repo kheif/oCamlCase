@@ -6,6 +6,10 @@ import MiniExerciseIndex from './features/mini-exercises/MiniExerciseIndex';
 import MiniExercisePage from './features/mini-exercises/MiniExercisePage';
 import Toycaml from './features/toycaml/Toycaml';
 import TreeLab from './features/treelab/TreeLab';
+import Lexing from './features/interpreter/Lexing';
+import Parsing from './features/interpreter/Parsing';
+import Dynamics from './features/interpreter/Dynamics';
+import Recursion from './features/interpreter/Recursion';
 import { contentRoutes } from './content/registry';
 
 export default function App() {
@@ -20,6 +24,10 @@ export default function App() {
           <Route path="/exercises/mini" element={<MiniExerciseIndex />} />
           <Route path="/concepts/static-semantics" element={<Toycaml />} />
           <Route path="/concepts/tree-lab" element={<TreeLab />} />
+          <Route path="/interpreter/lexing" element={<Lexing />} />
+          <Route path="/interpreter/parsing" element={<Parsing />} />
+          <Route path="/interpreter/dynamics" element={<Dynamics />} />
+          <Route path="/interpreter/recursion" element={<Recursion />} />
           {contentRoutes.map((r) => (
             <Route
               key={r.path}

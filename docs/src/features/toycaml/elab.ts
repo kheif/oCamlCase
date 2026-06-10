@@ -93,7 +93,7 @@ export function elabOp(op: Op): readonly [Ty, Ty, Ty] {
 
 // ---- instrumented elaborator: builds a derivation tree --------------------
 
-export type Rule = 'Sconst' | 'Sid' | 'Sop' | 'Sapp' | 'Sabs' | 'Sif';
+export type Rule = 'Sconst' | 'Sid' | 'Sop' | 'Sapp' | 'Sabs' | 'Sif' | 'Srabs';
 
 export type DerivationNode = {
   rule: Rule;
@@ -138,7 +138,7 @@ export function elaborate(env: Env, exp: Exp): DerivationNode {
           exp,
           null,
           [],
-          `unbound identifier "${exp.name}" — Unbound "${exp.name}"`,
+          `unbound identifier "${exp.name}"; Unbound "${exp.name}"`,
         );
       }
       return node('Sid', env, exp, ty, []);
@@ -151,7 +151,7 @@ export function elaborate(env: Env, exp: Exp): DerivationNode {
       let ty: Ty | null = null;
       let error: string | undefined;
       if (left.ty === null || right.ty === null) {
-        error = 'cannot apply this operator — one of its operands does not type-check';
+        error = 'cannot apply this operator: one of its operands does not type-check';
       } else if (!tyEquals(left.ty, t1)) {
         error = `"${showOp(exp.op)}" expects a left operand of type ${showTy(t1)}, but found ${showTy(left.ty)}`;
       } else if (!tyEquals(right.ty, t2)) {
@@ -168,7 +168,7 @@ export function elaborate(env: Env, exp: Exp): DerivationNode {
       let ty: Ty | null = null;
       let error: string | undefined;
       if (fn.ty === null || arg.ty === null) {
-        error = 'cannot apply — the function or its argument does not type-check';
+        error = 'cannot apply: the function or its argument does not type-check';
       } else if (fn.ty.kind !== 'Arrow') {
         error = `expected a function on the left of the application, but found type ${showTy(fn.ty)}`;
       } else if (!tyEquals(fn.ty.from, arg.ty)) {
@@ -186,6 +186,24 @@ export function elaborate(env: Env, exp: Exp): DerivationNode {
       return node('Sabs', env, exp, ty, [body], error);
     }
 
+    case 'RFun': {
+      // Srabs: while checking the body we may ASSUME the recursive function
+      // already has its declared type t -> t', so both f and x are in scope.
+      const fnTy = Arrow(exp.paramTy, exp.retTy);
+      const env2 = update(update(env, exp.fnName, fnTy), exp.param, exp.paramTy);
+      const body = elaborate(env2, exp.body);
+      let ty: Ty | null = null;
+      let error: string | undefined;
+      if (body.ty === null) {
+        error = 'the body of the recursive function does not type-check';
+      } else if (!tyEquals(body.ty, exp.retTy)) {
+        error = `the body has type ${showTy(body.ty)}, but the declared return type is ${showTy(exp.retTy)}`;
+      } else {
+        ty = fnTy;
+      }
+      return node('Srabs', env, exp, ty, [body], error);
+    }
+
     case 'If': {
       const cond = elaborate(env, exp.cond);
       const then = elaborate(env, exp.then);
@@ -193,7 +211,7 @@ export function elaborate(env: Env, exp: Exp): DerivationNode {
       let ty: Ty | null = null;
       let error: string | undefined;
       if (cond.ty === null || then.ty === null || els.ty === null) {
-        error = 'cannot type this conditional — one of its branches does not type-check';
+        error = 'cannot type this conditional: one of its branches does not type-check';
       } else if (!tyEquals(cond.ty, Bool)) {
         error = `the condition of "if" must have type bool, but found ${showTy(cond.ty)}`;
       } else if (!tyEquals(then.ty, els.ty)) {

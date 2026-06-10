@@ -19,9 +19,9 @@ Every concept includes worked examples, and the interactive labs let you see eva
 **Interactive Labs:**
 - **Static Semantics** - Live type elaborator with derivation trees. Type an expression, watch constraints propagate.
 - **Tree Lab** - Rose tree explorer with 4 modes: tour, linearize, project, and balance.
-- **Interpreter Pipeline** - Build an interpreter in 5 stages: lexing, parsing, static semantics, dynamics, and recursion.
+- **Interpreter Pipeline** - Build an interpreter in 4 slices: lexing, parsing, dynamic semantics, and recursion & divergence. Animated steppers, derivation trees, rule cards.
 - **Playground** - Run OCaml code in the browser.
-- **Mini Exercises** - 7 drag-and-drop coding exercises.
+- **Mini Exercises** - 15 drag-and-drop coding exercises. Group by concept or difficulty (Easy / Medium / Hard). Progress persisted in localStorage.
 
 **3 Project Exercises:** Bank Account (variant types + fold), Playlist (list operations), Search (iteration patterns).
 

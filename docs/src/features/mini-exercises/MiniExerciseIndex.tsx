@@ -1,37 +1,149 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
 import { miniExercises } from './data';
+import { useMiniProgress } from '../../hooks/useMiniProgress';
 import './MiniExerciseIndex.css';
 
+const CATEGORY_ORDER = [
+  'bindings',
+  'currying',
+  'lists',
+  'list-ops',
+  'higher-order',
+  'variants',
+  'iteration',
+  'recursion',
+];
+
+const CATEGORY_LABELS: Record<string, string> = {
+  bindings: 'Bindings',
+  currying: 'Currying',
+  lists: 'Lists',
+  'list-ops': 'List Operations',
+  'higher-order': 'Higher-Order Functions',
+  variants: 'Variant Types',
+  iteration: 'Iteration',
+  recursion: 'Recursion',
+};
+
+const DIFFICULTY_ORDER = ['easy', 'medium', 'hard'] as const;
+const DIFFICULTY_LABELS: Record<string, string> = {
+  easy: 'Easy',
+  medium: 'Medium',
+  hard: 'Hard',
+};
+
+type ViewMode = 'concept' | 'difficulty';
+
+function loadViewMode(): ViewMode {
+  try {
+    const v = localStorage.getItem('mini-view-mode');
+    if (v === 'concept' || v === 'difficulty') return v;
+  } catch {}
+  return 'concept';
+}
+
 export default function MiniExerciseIndex() {
+  const { completed } = useMiniProgress();
+  const [viewMode, setViewMode] = useState<ViewMode>(loadViewMode);
+  const total = miniExercises.length;
+  const doneCount = miniExercises.filter((m) => completed.has(m.id)).length;
+  const pct = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+
+  const groups =
+    viewMode === 'concept'
+      ? CATEGORY_ORDER.map((cat) => ({
+          key: cat,
+          label: CATEGORY_LABELS[cat] ?? cat,
+          exercises: miniExercises.filter((m) => m.category === cat),
+        })).filter((g) => g.exercises.length > 0)
+      : DIFFICULTY_ORDER.map((diff) => ({
+          key: diff,
+          label: DIFFICULTY_LABELS[diff],
+          exercises: miniExercises.filter((m) => m.difficulty === diff),
+        })).filter((g) => g.exercises.length > 0);
+
+  function handleViewMode(mode: ViewMode) {
+    setViewMode(mode);
+    try { localStorage.setItem('mini-view-mode', mode); } catch {}
+  }
+
   return (
     <div className="article">
       <PageMeta
         title="Mini Exercises | oCamlCase"
-        description="Short OCaml mini-exercises: drag the lines of a correct solution into the right order. Practice iter, first, recursion, and more."
+        description="Short OCaml drag-and-drop exercises covering bindings, currying, lists, higher-order functions, variant types, iteration and recursion."
       />
       <div className="page-header">
         <div className="page-label">Mini Exercises</div>
         <h1 className="page-title">Drag the lines into order</h1>
         <p className="page-intro">
-          Short, focused exercises that present the lines of a correct OCaml solution shuffled and
-          unindented. Drag them into the right order. Faster than writing from scratch, and good for
-          cementing one idea at a time.
+          Short, focused exercises: lines of a correct OCaml solution, shuffled. Drag them into
+          the right order. Covers 8 core concepts from bindings to variant types.
         </p>
       </div>
 
-      <div className="mini-grid">
-        {miniExercises.map((m) => (
-          <Link key={m.id} to={`/exercises/mini/${m.id}`} className="mini-card">
-            <div className="mini-card-head">
-              <span className={`diff diff-${m.difficulty}`}>{m.difficulty}</span>
-              {m.conceptLink && <span className="mini-card-concept">{m.conceptLink.label}</span>}
-            </div>
-            <div className="mini-card-title">{m.title}</div>
-            <div className="mini-card-prompt">{m.prompt}</div>
-          </Link>
-        ))}
+      <div className="mini-progress-bar-wrap">
+        <div className="mini-progress-meta">
+          <span className="mini-progress-label">Progress</span>
+          <span className="mini-progress-count">
+            {doneCount} / {total}
+          </span>
+        </div>
+        <div className="mini-progress-track">
+          <div className="mini-progress-fill" style={{ width: `${pct}%` }} />
+        </div>
       </div>
+
+      <div className="mini-view-toggle">
+        <span className="mini-view-label">Group by:</span>
+        <button
+          className={`mini-view-btn${viewMode === 'concept' ? ' active' : ''}`}
+          onClick={() => handleViewMode('concept')}
+        >
+          Concept
+        </button>
+        <button
+          className={`mini-view-btn${viewMode === 'difficulty' ? ' active' : ''}`}
+          onClick={() => handleViewMode('difficulty')}
+        >
+          Difficulty
+        </button>
+      </div>
+
+      {groups.map((group) => {
+        const groupDone = group.exercises.filter((m) => completed.has(m.id)).length;
+        return (
+          <div key={group.key} className="mini-group">
+            <div className="mini-group-head">
+              <span className="mini-group-label">{group.label}</span>
+              <span className="mini-group-count">
+                {groupDone}/{group.exercises.length}
+              </span>
+            </div>
+            <div className="mini-grid">
+              {group.exercises.map((m) => {
+                const done = completed.has(m.id);
+                return (
+                  <Link
+                    key={m.id}
+                    to={`/exercises/mini/${m.id}`}
+                    className={`mini-card${done ? ' mini-card-done' : ''}`}
+                  >
+                    <div className="mini-card-head">
+                      <span className={`diff diff-${m.difficulty}`}>{m.difficulty}</span>
+                      {done && <span className="mini-card-check">✓</span>}
+                    </div>
+                    <div className="mini-card-title">{m.title}</div>
+                    <div className="mini-card-prompt">{m.prompt}</div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -268,7 +268,7 @@ export function tourCaption(events: TourEvent[], step: number): string {
     case 'firstVisit':
       return `First visit → assign pre-number ${e.preNum} to this node (arity ${e.arity}).${
         e.arity === 0
-          ? ' Leaf: the last visit follows immediately — no children to descend into.'
+          ? ' Leaf: the last visit follows immediately; no children to descend into.'
           : ` Now descend into ${e.arity} successor tree${e.arity !== 1 ? 's' : ''} left to right.`
       }`;
     case 'lastVisit':
@@ -278,9 +278,9 @@ export function tourCaption(events: TourEvent[], step: number): string {
           : `All ${e.arity} successor tree${e.arity !== 1 ? 's' : ''} fully visited; returning to parent.`
       }`;
     case 'edgeDown':
-      return 'Move down along this edge (first traversal — descending into the subtree).';
+      return 'Move down along this edge (first traversal, descending into the subtree).';
     case 'edgeUp':
-      return 'Move back up along this edge (second traversal — subtree fully visited).';
+      return 'Move back up along this edge (second traversal, subtree fully visited).';
   }
 }
 
@@ -292,15 +292,15 @@ export function linCaption(events: TourEvent[], step: number, subMode: 'pre' | '
     case 'firstVisit':
       return subMode === 'pre'
         ? `Pre-order first visit → emit arity ${e.arity}. The arity is prepended before descending into children (pre = arity :: concat (map pre ts)).`
-        : `First visit (arity ${e.arity}) — in post-order this node waits until all its ${e.arity} child tree${e.arity !== 1 ? 's' : ''} finish before contributing.`;
+        : `First visit (arity ${e.arity}): in post-order this node waits until all its ${e.arity} child tree${e.arity !== 1 ? 's' : ''} finish before contributing.`;
     case 'lastVisit':
       return subMode === 'post'
         ? `Post-order last visit → emit arity ${e.arity}. All children done; now appended (post = concat (map post ts) @ [arity]).`
-        : `Last visit (arity ${e.arity}) — pre-order already emitted this arity on the way down; nothing new to the list now.`;
+        : `Last visit (arity ${e.arity}): pre-order already emitted this arity on the way down; nothing new to the list now.`;
     case 'edgeDown':
       return 'Descend to child (first traversal of this edge).';
     case 'edgeUp':
-      return 'Return to parent (second traversal — subtree complete).';
+      return 'Return to parent (second traversal, subtree complete).';
   }
 }
 
@@ -312,11 +312,11 @@ export function projCaption(events: LTourEvent[], step: number, subMode: 'prep' 
     case 'firstVisit':
       return subMode === 'prep'
         ? `prep: first visit → emit label "${e.label}" before children (prep = [x] @ concat (map prep ts)).`
-        : `First visit (label "${e.label}") — pop waits until all children finish.`;
+        : `First visit (label "${e.label}"): pop waits until all children finish.`;
     case 'lastVisit':
       return subMode === 'pop'
         ? `pop: last visit → emit label "${e.label}" after children (pop = concat (map pop ts) @ [x]).`
-        : `Last visit (label "${e.label}") — prep already emitted this label on the way down.`;
+        : `Last visit (label "${e.label}"): prep already emitted this label on the way down.`;
     case 'edgeDown':
       return 'Descend to child (first edge traversal).';
     case 'edgeUp':
@@ -329,15 +329,15 @@ export function balCaption(events: BalEvent[], step: number): string {
   const e = events[step - 1];
   switch (e.kind) {
     case 'leaf':
-      return 'T [] — leaf node. depthb (T []) = 0 (base case — no children, no fold).';
+      return 'T []: leaf node. depthb (T []) = 0 (base case, no children, no fold).';
     case 'ok': {
       const ds = e.childDepths;
       if (ds.length === 1) {
-        return `fold_left check ${ds[0]} [] — single child, check trivially succeeds. depth = ${ds[0]} + 1 = ${e.depth}.`;
+        return `fold_left check ${ds[0]} []: single child, check trivially succeeds. depth = ${ds[0]} + 1 = ${e.depth}.`;
       }
-      return `fold_left check ${ds[0]} [${ds.slice(1).join('; ')}] — all ${ds.length} child depths equal ${ds[0]}. depth = ${ds[0]} + 1 = ${e.depth}.`;
+      return `fold_left check ${ds[0]} [${ds.slice(1).join('; ')}]: all ${ds.length} child depths equal ${ds[0]}. depth = ${ds[0]} + 1 = ${e.depth}.`;
     }
     case 'fail':
-      return `fold_left check ${e.mismatch[0]} [... ${e.mismatch[1]} ...] — depths ${e.mismatch[0]} ≠ ${e.mismatch[1]}. check raises Unbalanced. balanced t = false.`;
+      return `fold_left check ${e.mismatch[0]} [... ${e.mismatch[1]} ...]: depths ${e.mismatch[0]} ≠ ${e.mismatch[1]}. check raises Unbalanced. balanced t = false.`;
   }
 }

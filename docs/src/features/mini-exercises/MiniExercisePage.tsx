@@ -5,6 +5,7 @@ import { miniExerciseById, miniExercises } from './data';
 import type { LineOrderItem, MiniExercise } from './data/types';
 import { highlightOcaml } from '../../lib/highlightOcaml';
 import { topbarLinks } from '../../content/nav';
+import { useMiniProgress } from '../../hooks/useMiniProgress';
 import './MiniExercisePage.css';
 
 type SlotResult = 'correct' | 'wrong' | null;
@@ -31,11 +32,27 @@ function shuffleDistinct(items: LineOrderItem[]): LineOrderItem[] {
 export default function MiniExercisePage() {
   const { id } = useParams<{ id: string }>();
   const exercise = id ? miniExerciseById[id] : undefined;
+  const { completed, markComplete } = useMiniProgress();
   if (!exercise) return <Navigate to="/exercises/mini" replace />;
-  return <MiniExerciseInner key={exercise.id} exercise={exercise} />;
+  return (
+    <MiniExerciseInner
+      key={exercise.id}
+      exercise={exercise}
+      completed={completed}
+      markComplete={markComplete}
+    />
+  );
 }
 
-function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
+function MiniExerciseInner({
+  exercise,
+  completed,
+  markComplete,
+}: {
+  exercise: MiniExercise;
+  completed: Set<string>;
+  markComplete: (id: string) => void;
+}) {
   const total = miniExercises.length;
   const idx = miniExercises.findIndex((m) => m.id === exercise.id);
 
@@ -86,6 +103,7 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
       kind: 'ok',
       lines: [`$ ocaml ${exercise.filename}`, exercise.expectedOutput],
     });
+    markComplete(exercise.id);
   }
 
   function runCheck() {
@@ -110,6 +128,7 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
     setResults(r);
     const ok = r.every((x) => x === 'correct');
     if (ok) {
+      markComplete(exercise.id);
       setStatusMsg({ kind: 'ok', text: 'All lines in the right order.' });
       setOutput({
         kind: 'ok',
@@ -207,6 +226,9 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
     const where = locate(selectedId);
     if (where && where.kind === 'slot') moveTo(selectedId, { kind: 'bank' });
   }
+
+  const nextExercise = miniExercises[(idx + 1) % total];
+  const isSolved = completed.has(exercise.id);
 
   const breadcrumb = ['exercises', exercise.category, exercise.filename];
 
@@ -328,7 +350,13 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
               <Link
                 key={m.id}
                 to={`/exercises/mini/${m.id}`}
-                className={`me-dot${i === idx ? ' me-dot-current' : ''}${i < idx ? ' me-dot-past' : ''}`}
+                className={[
+                  'me-dot',
+                  i === idx ? 'me-dot-current' : '',
+                  completed.has(m.id) && i !== idx ? 'me-dot-done' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 title={m.title}
               />
             ))}
@@ -444,6 +472,14 @@ function MiniExerciseInner({ exercise }: { exercise: MiniExercise }) {
             </div>
             {statusMsg && (
               <div className={`me-status me-status-${statusMsg.kind}`}>{statusMsg.text}</div>
+            )}
+            {isSolved && nextExercise.id !== exercise.id && (
+              <Link
+                to={`/exercises/mini/${nextExercise.id}`}
+                className="me-btn me-btn-next"
+              >
+                Next: {nextExercise.title} →
+              </Link>
             )}
             {exercise.conceptLink && (
               <Link to={exercise.conceptLink.href} className="me-refresher">

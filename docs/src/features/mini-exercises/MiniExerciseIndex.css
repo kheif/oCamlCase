@@ -1,30 +1,140 @@
+/* ---- Progress bar ---- */
+.mini-progress-bar-wrap {
+  margin-bottom: var(--s6);
+}
+.mini-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--s2);
+}
+.mini-progress-label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+}
+.mini-progress-count {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+.mini-progress-track {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.mini-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+/* ---- View toggle ---- */
+.mini-view-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--s5);
+}
+.mini-view-label {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--dim);
+}
+.mini-view-btn {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.mini-view-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.mini-view-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ---- Category groups ---- */
+.mini-group {
+  margin-bottom: var(--s7);
+}
+.mini-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid var(--border);
+}
+.mini-group-label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.mini-group-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+}
+
+/* ---- Exercise grid ---- */
 .mini-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  margin-top: 8px;
+  gap: 12px;
 }
 
+/* ---- Cards ---- */
 .mini-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 16px 18px;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--r2);
   background: var(--bg);
   text-decoration: none;
   color: var(--text);
+  border-left: 3px solid transparent;
   transition:
-    border-color 0.1s,
-    background 0.1s,
-    transform 0.1s;
+    border-color 0.12s,
+    background 0.12s,
+    transform 0.12s,
+    box-shadow 0.12s;
 }
 .mini-card:hover {
   border-color: var(--accent);
+  border-left-color: var(--accent);
   background: var(--accent-bg);
   color: var(--text);
   text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: var(--sh2);
+}
+.mini-card-done {
+  border-left-color: #3a8a3d;
+  background: var(--bg);
+}
+.mini-card-done:hover {
+  border-left-color: #4caf50;
 }
 
 .mini-card-head {
@@ -33,24 +143,45 @@
   gap: 10px;
 }
 
-.mini-card-concept {
+.mini-card-check {
   font-family: var(--sans);
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4caf50;
+  margin-left: auto;
 }
 
 .mini-card-title {
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
 }
 
 .mini-card-prompt {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--muted);
   line-height: 1.55;
+  font-family: var(--sans);
+}
+
+/* ---- Staggered entrance ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .mini-group {
+    animation: fade-up 0.35s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+  }
+  .mini-group:nth-child(1) { animation-delay: 0ms; }
+  .mini-group:nth-child(2) { animation-delay: 60ms; }
+  .mini-group:nth-child(3) { animation-delay: 120ms; }
+  .mini-group:nth-child(4) { animation-delay: 180ms; }
+  .mini-group:nth-child(5) { animation-delay: 240ms; }
+  .mini-group:nth-child(6) { animation-delay: 300ms; }
+  .mini-group:nth-child(7) { animation-delay: 360ms; }
+  .mini-group:nth-child(8) { animation-delay: 420ms; }
+}
+
+/* ---- Dark mode ---- */
+[data-theme='dark'] .mini-card-done {
+  background: rgba(46, 125, 50, 0.06);
 }

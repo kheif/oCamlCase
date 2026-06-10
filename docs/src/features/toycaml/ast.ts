@@ -81,7 +81,8 @@ export type Exp =
   | { kind: 'OApp'; op: Op; left: Exp; right: Exp }
   | { kind: 'FApp'; fn: Exp; arg: Exp }
   | { kind: 'If'; cond: Exp; then: Exp; else: Exp }
-  | { kind: 'Fun'; param: Var; paramTy: Ty; body: Exp };
+  | { kind: 'Fun'; param: Var; paramTy: Ty; body: Exp }
+  | { kind: 'RFun'; fnName: Var; param: Var; paramTy: Ty; retTy: Ty; body: Exp };
 
 // Concrete-syntax rendering — what a learner would type to produce this `exp`.
 // Always parenthesizes operator/application/if/fun subterms so the structure
@@ -101,11 +102,15 @@ export function showExp(e: Exp): string {
       return `if ${showExp(e.cond)} then ${showExp(e.then)} else ${showExp(e.else)}`;
     case 'Fun':
       return `fun (${e.param}:${showTy(e.paramTy)}) -> ${showExp(e.body)}`;
+    case 'RFun':
+      return `rfun ${e.fnName} (${e.param}:${showTy(e.paramTy)}) : ${showTy(e.retTy)} -> ${showExp(e.body)}`;
   }
 }
 
 function maybeParens(e: Exp): string {
-  return e.kind === 'OApp' || e.kind === 'If' || e.kind === 'Fun' ? `(${showExp(e)})` : showExp(e);
+  return e.kind === 'OApp' || e.kind === 'If' || e.kind === 'Fun' || e.kind === 'RFun'
+    ? `(${showExp(e)})`
+    : showExp(e);
 }
 
 // Abstract-syntax rendering: `Fun ("y", Int, OApp (Leq, Var "x", Var "y"))` —
@@ -125,6 +130,8 @@ export function showExpAst(e: Exp): string {
       return `If (${showExpAst(e.cond)}, ${showExpAst(e.then)}, ${showExpAst(e.else)})`;
     case 'Fun':
       return `Fun ("${e.param}", ${showTyAst(e.paramTy)}, ${showExpAst(e.body)})`;
+    case 'RFun':
+      return `RFun ("${e.fnName}", "${e.param}", ${showTyAst(e.paramTy)}, ${showTyAst(e.retTy)}, ${showExpAst(e.body)})`;
   }
 }
 
@@ -149,5 +156,8 @@ export function free(e: Exp): Var[] {
       return [...free(e.cond), ...free(e.then), ...free(e.else)];
     case 'Fun':
       return free(e.body).filter((y) => y !== e.param);
+    case 'RFun':
+      // Both the recursive name and the parameter are bound in the body.
+      return free(e.body).filter((y) => y !== e.param && y !== e.fnName);
   }
 }

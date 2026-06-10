@@ -184,21 +184,21 @@ const PRESETS: Preset[] = [
       { name: 'b', tyText: 'bool' },
     ],
     expr: 'fun (b:bool) -> if b then x else 2 * x',
-    note: 'The lecture’s worked example — its full derivation has type bool -> int.',
+    note: 'The lecture’s worked example; its full derivation has type bool -> int.',
     expectTy: 'bool -> int',
   },
   {
     label: 'fun (y:int) -> x <= y',
     env: [{ name: 'x', tyText: 'int' }],
     expr: 'fun (y:int) -> x <= y',
-    note: 'A second walk-through from the slides — elaborates to int -> bool.',
+    note: 'A second walk-through from the slides; elaborates to int -> bool.',
     expectTy: 'int -> bool',
   },
   {
     label: '⚠ unbound identifier',
     env: [{ name: 'x', tyText: 'int' }],
     expr: 'x + z',
-    note: '"z" is not in T — Sid fails with Unbound "z", and the whole derivation fails with it.',
+    note: '"z" is not in T, so Sid fails with Unbound "z", and the whole derivation fails with it.',
     expectTy: null,
   },
   {
@@ -208,7 +208,7 @@ const PRESETS: Preset[] = [
       { name: 'b', tyText: 'bool' },
     ],
     expr: 'if b then x else b',
-    note: 'Sif requires both branches to have the same type — here int vs. bool.',
+    note: 'Sif requires both branches to have the same type; here they are int vs. bool.',
     expectTy: null,
   },
   {
@@ -451,7 +451,7 @@ export default function Toycaml() {
     const names = funs.map((i) => `"${i.name}"`).join(', ');
     return `Run is unavailable: the free identifier${funs.length > 1 ? 's' : ''} ${names} ${
       funs.length > 1 ? 'have' : 'has'
-    } a function type — this widget can only supply integer/boolean sample values, not functions.`;
+    } a function type, and this widget can only supply integer/boolean sample values, not functions.`;
   }, [freeIdInfos]);
 
   const canRun = derivation !== null && derivation.ty !== null && runBlockedReason === null;
@@ -514,13 +514,13 @@ export default function Toycaml() {
         <div className="page-label">Concepts</div>
         <h1 className="page-title">Static Semantics</h1>
         <p className="page-intro">
-          How do we decide whether an expression is well-typed — and what type does it have? ToyCaml
+          How do we decide whether an expression is well-typed, and what type does it have? ToyCaml
           (a tiny language with booleans, integers, conditionals, and functions) answers both at
           once: a handful of <strong>inference rules</strong> define a typing judgement{' '}
           <code>T ⊢ e : t</code> ("under environment T, expression e has type t"), and{' '}
-          <code>elab</code> is an algorithm that searches for — or fails to find — a derivation of
+          <code>elab</code> is an algorithm that searches for (or fails to find) a derivation of
           that judgement. Type your own expressions below and watch the derivation get built rule by
-          rule, exactly as you would by hand — then run the result and see why a well-typed program
+          rule, exactly as you would by hand, then run the result and see why a well-typed program
           never gets stuck.
         </p>
       </div>
@@ -529,7 +529,7 @@ export default function Toycaml() {
       <p>
         ToyCaml expressions are variables, constants, binary operators, function application,
         conditionals, and (typed) lambda abstractions. Every elaboration rule below corresponds to
-        exactly one of these six shapes. The abstract grammar names the syntactic categories — each
+        exactly one of these six shapes. The abstract grammar names the syntactic categories, where each
         metavariable (<code>c</code>, <code>e</code>, <code>t</code>) ranges over one level of the
         language:
       </p>
@@ -569,7 +569,7 @@ export default function Toycaml() {
       <p>
         An identifier occurs <em>free</em> in <code>e</code> if it is used but not bound by an
         enclosing <code>fun</code>. <code>free</code> walks the syntax tree, collecting variable
-        occurrences and removing a name once <code>Fun (x, _, e)</code> binds it — this is precisely
+        occurrences and removing a name once <code>Fun (x, _, e)</code> binds it; this is precisely
         what the typing environment needs to cover. The widget below runs this exact function on
         whatever you type: see the <strong>Free identifiers</strong> panel.
       </p>
@@ -577,7 +577,7 @@ export default function Toycaml() {
 
       <h2>The Typing Judgement</h2>
       <p>
-        A typing environment <code>T</code> records the types of free identifiers — the lecture
+        A typing environment <code>T</code> records the types of free identifiers; the lecture
         writes it as a finite list like <code>[x:=int, b:=bool]</code>, and represents it abstractly
         as a function <code>var -&gt; ty</code> that raises <code>Unbound x</code> when asked about
         a name it doesn't cover. <code>update env x v</code> extends the environment, shadowing any
@@ -586,9 +586,9 @@ export default function Toycaml() {
       <CodeBlock fname="env.ml" code={ENV_CODE} />
       <p>
         The judgement <code>T ⊢ e : t</code> reads "under environment <code>T</code>, expression{' '}
-        <code>e</code> elaborates to type <code>t</code>". Six inference rules — one per syntactic
-        shape — define exactly when this judgement holds.{' '}
-        <strong>Premises sit above the bar, conclusion below</strong> — the same shape the
+        <code>e</code> elaborates to type <code>t</code>". Six inference rules, one per syntactic
+        shape, define exactly when this judgement holds.{' '}
+        <strong>Premises sit above the bar, conclusion below</strong>, the same shape the
         derivation tree below builds in:
       </p>
 
@@ -637,7 +637,7 @@ export default function Toycaml() {
         <p>
           For any typing environment <code>T</code> and expression <code>e</code>, there is{' '}
           <strong>at most one</strong> type <code>t</code> such that <code>T ⊢ e : t</code>. Each
-          syntactic shape maps to exactly one rule — no ambiguity, no choice. The elaborator above
+          syntactic shape maps to exactly one rule, with no ambiguity and no choice. The elaborator above
           never returns two types for the same input; verify by typing anything below.
         </p>
       </div>
@@ -646,7 +646,7 @@ export default function Toycaml() {
         <div className="callout-title">Pattern</div>
         <p>
           <code>elab</code> below is exactly these six rules turned into an algorithm: one branch
-          per shape, each computing — or failing to compute — the type its rule's conclusion
+          per shape, each computing (or failing to compute) the type its rule's conclusion
           promises, from the types its premises recursively establish. <code>Sabs</code> is the only
           rule that changes the environment: typing a function body happens under{' '}
           <code>T[x:=t₁]</code>, which is why the derivation tree below shows <code>T</code> growing
@@ -655,14 +655,14 @@ export default function Toycaml() {
       </div>
       <CodeBlock fname="elab.ml" code={ELAB_CODE} />
 
-      <h2>Try the Elaborator — and Run It</h2>
+      <h2>Try the Elaborator, and Run It</h2>
       <p>
         Pick a preset or write your own ToyCaml expression and environment below. Everything updates
         live: the <strong>free identifiers</strong> panel runs <code>free</code> on your expression
         and checks each one against <code>T</code>; the elaborator builds a derivation tree you can
         step through (or autoplay) rule by rule, with the active rule, binding, and judgement
         lighting up together; and once an expression type-checks, a <strong>Run</strong> tab
-        evaluates it — proof that a well-typed ToyCaml program never gets stuck. The last three
+        evaluates it, proof that a well-typed ToyCaml program never gets stuck. The last three
         presets are deliberately ill-typed: a real strength of having an algorithm (rather than just
         rules on paper) is that it tells you precisely <em>where</em> and <em>why</em> a derivation
         is impossible.
@@ -739,10 +739,10 @@ export default function Toycaml() {
 
           {/* B3/B5: free(e) against T, live — also where Run gets its sample values (C1) */}
           <div className="tc-field tc-free-panel">
-            <span className="tc-field-label">Free identifiers in e — free(e)</span>
+            <span className="tc-field-label">Free identifiers in e: free(e)</span>
             {freeIdInfos.length === 0 ? (
               <span className="tc-free-empty">
-                e has no free identifiers — it type-checks under any T.
+                e has no free identifiers, so it type-checks under any T.
               </span>
             ) : (
               <div className="tc-free-chips">
@@ -828,7 +828,7 @@ export default function Toycaml() {
                     </>
                   ) : (
                     <>
-                      no derivation of {showEnv(parsedEnv.value)} ⊢ e : t exists — type error below
+                      no derivation of {showEnv(parsedEnv.value)} ⊢ e : t exists; type error below
                     </>
                   )}
                 </div>
@@ -915,7 +915,7 @@ export default function Toycaml() {
                         </div>
                         <p className="tc-run-note">
                           Evaluated with <code>eval</code> (below) under the sample values from the
-                          free-identifiers panel — edit them and watch the result change. A
+                          free-identifiers panel; edit them and watch the result change. A
                           well-typed expression always reaches a value: that's exactly what Sop's
                           and Sif's and Sapp's premises guarantee at the type level, so{' '}
                           <code>eval</code> never needs a "stuck" case for it.
@@ -932,16 +932,16 @@ export default function Toycaml() {
         )}
       </div>
 
-      <h2>Dynamic Semantics — Running What Type-Checks</h2>
+      <h2>Dynamic Semantics: Running What Type-Checks</h2>
       <p>
         Typing isn't an end in itself: it's a guarantee about <em>running</em> the program. The
-        lecture's evaluator below is a big-step interpreter — <code>eval env e</code> reduces{' '}
+        lecture's evaluator below is a big-step interpreter: <code>eval env e</code> reduces{' '}
         <code>e</code> to a <code>value</code> (a boolean, an integer, or a closure) directly,
         without naming the intermediate steps. Compare its shape to <code>elab</code>: every case
-        lines up, because <strong>type soundness</strong> is exactly the claim that they agree —
+        lines up, because <strong>type soundness</strong> is exactly the claim that they agree:{' '}
         <code>elab</code>'s <code>Sop</code>/<code>Sif</code>/<code>Sapp</code> premises are
         precisely the runtime checks <code>eval</code> would otherwise have to perform (and could
-        fail). A well-typed expression provably never hits the <code>failwith "stuck"</code> cases —
+        fail). A well-typed expression provably never hits the <code>failwith "stuck"</code> cases,
         which is what the <strong>Run</strong> tab above demonstrates on whatever you type.
       </p>
       <CodeBlock fname="eval.ml" code={EVAL_CODE} />

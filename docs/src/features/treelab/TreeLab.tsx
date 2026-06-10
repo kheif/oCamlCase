@@ -369,7 +369,7 @@ export default function TreeLab() {
     <div className="article">
       <PageMeta
         title="Tree Lab | oCamlCase"
-        description="Interactive rose-tree explorer: animated standard tour, live pre/post linearizations and projections, and the depthb balance check — all computed on your own tree."
+        description="Interactive rose-tree explorer: animated standard tour, live pre/post linearizations and projections, and the depthb balance check, all computed on your own tree."
       />
 
       <div className="page-header">
@@ -377,7 +377,7 @@ export default function TreeLab() {
         <h1 className="page-title">Tree Lab</h1>
         <p className="page-intro">
           Explore the standard tour, pre/post numbering, linearizations, projections, and
-          balanced trees — computed live on any tree you choose. Every output list grows in
+          balanced trees, computed live on any tree you choose. Every output list grows in
           lockstep with the tour cursor so you can see exactly <em>why</em> pre-order and
           post-order differ.
         </p>
@@ -412,13 +412,13 @@ export default function TreeLab() {
             className={`tl-submode-btn ${linSub === 'pre' ? 'is-active' : ''}`}
             onClick={() => setLinSub('pre')}
           >
-            pre — arity :: concat (map pre ts)
+            pre = arity :: concat (map pre ts)
           </button>
           <button
             className={`tl-submode-btn ${linSub === 'post' ? 'is-active' : ''}`}
             onClick={() => setLinSub('post')}
           >
-            post — concat (map post ts) @ [arity]
+            post = concat (map post ts) @ [arity]
           </button>
         </div>
       )}
@@ -428,13 +428,13 @@ export default function TreeLab() {
             className={`tl-submode-btn ${projSub === 'prep' ? 'is-active' : ''}`}
             onClick={() => setProjSub('prep')}
           >
-            prep — [x] @ concat (map prep ts)
+            prep = [x] @ concat (map prep ts)
           </button>
           <button
             className={`tl-submode-btn ${projSub === 'pop' ? 'is-active' : ''}`}
             onClick={() => setProjSub('pop')}
           >
-            pop — concat (map pop ts) @ [x]
+            pop = concat (map pop ts) @ [x]
           </button>
         </div>
       )}
@@ -464,7 +464,7 @@ export default function TreeLab() {
               className="tl-toolbar-btn"
               disabled={selectedId === null || treeIsTooDeep}
               onClick={handleAddChild}
-              title={treeIsTooDeep ? 'Tree too deep — max depth 4' : 'Add a leaf child to the selected node'}
+              title={treeIsTooDeep ? 'Tree too deep (max depth 4)' : 'Add a leaf child to the selected node'}
             >
               + Add child
             </button>
@@ -591,8 +591,8 @@ export default function TreeLab() {
           {mode === 'balance' && balStep >= balEvents.length && balEvents.length > 0 && (
             <div className={`tl-balance-result ${balEvents[balEvents.length - 1].kind === 'fail' ? 'is-fail' : 'is-ok'}`}>
               {balEvents[balEvents.length - 1].kind === 'fail'
-                ? '⚠ balanced t = false — Unbalanced was raised'
-                : `✓ balanced t = true — depthb returned ${(balEvents[balEvents.length - 1] as { depth: number }).depth}`}
+                ? '⚠ balanced t = false: Unbalanced was raised'
+                : `✓ balanced t = true: depthb returned ${(balEvents[balEvents.length - 1] as { depth: number }).depth}`}
             </div>
           )}
         </div>
@@ -671,7 +671,7 @@ export default function TreeLab() {
             {mode === 'tour' && (
               <>
                 <strong>Standard tour</strong> (Lecture 7, p.3): starts and ends at the root; each edge
-                traversed exactly twice — first ↓ from above, then ↑ from below; successor trees
+                traversed exactly twice: first ↓ from above, then ↑ from below; successor trees
                 visited left to right. The <em>pre-numbering</em> assigns numbers at first visit;{' '}
                 the <em>post-numbering</em> assigns them at last visit.
               </>
@@ -680,7 +680,7 @@ export default function TreeLab() {
               <>
                 <strong>Linearization</strong> (Lecture 7, p.5-6): <code>pre</code> emits each node's
                 arity <em>before</em> its children; <code>post</code> emits it <em>after</em>. The
-                output list grows exactly when a visit event fires — watch the list and the tour cursor
+                output list grows exactly when a visit event fires; watch the list and the tour cursor
                 stay in lockstep.
               </>
             )}
@@ -688,7 +688,7 @@ export default function TreeLab() {
               <>
                 <strong>Projections</strong> (Lecture 7, p.8): <code>'a ltree</code> attaches a label
                 to every node. <code>prep</code>/<code>pop</code> use the same traversal order as{' '}
-                <code>pre</code>/<code>post</code> — only what is collected (a label vs. an arity)
+                <code>pre</code>/<code>post</code>; only what is collected (a label vs. an arity)
                 changes. Double-click a selected node to edit its label.
               </>
             )}
@@ -696,7 +696,7 @@ export default function TreeLab() {
               <>
                 <strong>Balancedness</strong> (Lecture 7, p.9-10): a tree is balanced when all leaves
                 have the same address length. <code>depthb</code> uses <code>check</code> inside a{' '}
-                <code>fold_left</code> — the first mismatch raises <code>Unbalanced</code> and
+                <code>fold_left</code>; the first mismatch raises <code>Unbalanced</code> and
                 short-circuits the entire fold. Green badges = computed depth; red badge = exception.
               </>
             )}

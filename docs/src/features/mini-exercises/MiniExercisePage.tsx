@@ -7,6 +7,7 @@ import { highlightOcaml } from '../../lib/highlightOcaml';
 import { topbarLinks } from '../../content/nav';
 import { useMiniProgress } from '../../hooks/useMiniProgress';
 import { useTheme } from '../../hooks/useTheme';
+import ConfettiBurst from './ConfettiBurst';
 import './MiniExercisePage.css';
 
 type SlotResult = 'correct' | 'wrong' | null;
@@ -71,6 +72,9 @@ function MiniExerciseInner({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null);
   const [output, setOutput] = useState<{ kind: 'ok' | 'err'; lines: string[] } | null>(null);
+  const [celebrating, setCelebrating] = useState(false);
+  const [confettiOrigin, setConfettiOrigin] = useState<{ x: number; y: number } | null>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
 
   const [transitioning, setTransitioning] = useState(false);
   const prevIdRef = useRef(exercise.id);
@@ -85,6 +89,8 @@ function MiniExerciseInner({
         setSelectedId(null);
         setStatusMsg(null);
         setOutput(null);
+        setCelebrating(false);
+        setConfettiOrigin(null);
         prevIdRef.current = exercise.id;
         requestAnimationFrame(() => setTransitioning(false));
       }, 180);
@@ -102,6 +108,8 @@ function MiniExerciseInner({
     setResults((prev) => (prev.some((r) => r !== null) ? new Array(slotCount).fill(null) : prev));
     setStatusMsg(null);
     setOutput(null);
+    setCelebrating(false);
+    setConfettiOrigin(null);
   }, [slotCount]);
 
   function reset() {
@@ -111,6 +119,8 @@ function MiniExerciseInner({
     setSelectedId(null);
     setStatusMsg(null);
     setOutput(null);
+    setCelebrating(false);
+    setConfettiOrigin(null);
   }
 
   function fillFromSolution() {
@@ -154,6 +164,13 @@ function MiniExerciseInner({
         kind: 'ok',
         lines: [`$ ocaml ${exercise.filename}`, exercise.expectedOutput],
       });
+      setCelebrating(true);
+      const rect = actionsRef.current?.getBoundingClientRect();
+      setConfettiOrigin(
+        rect
+          ? { x: rect.left + rect.width / 2, y: rect.top + 20 }
+          : { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+      );
     } else {
       const firstWrong = r.findIndex((x) => x === 'wrong');
       const lineNo = exercise.prefixCode.split('\n').length + firstWrong + 1;
@@ -277,11 +294,13 @@ function MiniExerciseInner({
           filled ? 'me-row-filled' : 'me-row-empty',
           result === 'correct' ? 'me-row-correct' : '',
           result === 'wrong' ? 'me-row-wrong' : '',
+          celebrating ? 'me-row-celebrate' : '',
           dragOver ? 'me-row-dragover' : '',
           selectedId && !filled ? 'me-row-targetable' : '',
         ]
           .filter(Boolean)
           .join(' ')}
+        style={celebrating ? ({ '--me-i': s } as React.CSSProperties) : undefined}
         onDragOver={(e) => {
           e.preventDefault();
           setOverSlot(s);
@@ -389,6 +408,7 @@ function MiniExerciseInner({
                 className={[
                   'me-dot',
                   i === idx ? 'me-dot-current' : '',
+                  i === idx && celebrating ? 'me-dot-celebrate' : '',
                   completed.has(m.id) && i !== idx ? 'me-dot-done' : '',
                 ]
                   .filter(Boolean)
@@ -513,7 +533,7 @@ function MiniExerciseInner({
             )}
           </div>
 
-          <div className="me-actions">
+          <div className="me-actions" ref={actionsRef}>
             <button className="me-btn me-btn-primary" onClick={runCheck}>
               Run &amp; Check
             </button>
@@ -526,7 +546,25 @@ function MiniExerciseInner({
               </button>
             </div>
             {statusMsg && (
-              <div className={`me-status me-status-${statusMsg.kind}`}>{statusMsg.text}</div>
+              <div
+                className={`me-status me-status-${statusMsg.kind}${
+                  celebrating && statusMsg.kind === 'ok' ? ' me-status-celebrate' : ''
+                }`}
+              >
+                {celebrating && statusMsg.kind === 'ok' && (
+                  <svg className="me-check" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                    <path
+                      d="M4 12.5 9.5 18 20 6.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+                {statusMsg.text}
+              </div>
             )}
             {isSolved && nextExercise.id !== exercise.id && (
               <Link
@@ -547,6 +585,10 @@ function MiniExerciseInner({
           </div>
         </aside>
       </div>
+
+      {celebrating && confettiOrigin && (
+        <ConfettiBurst origin={confettiOrigin} onDone={() => setConfettiOrigin(null)} />
+      )}
     </div>
   );
 }

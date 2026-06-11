@@ -8,7 +8,10 @@ import { useEffect, useState } from 'react';
 //
 // Used by the interpreter feature (LexerView, ParserView) and intended to
 // replace the inline copies in TreeLab/Toycaml in a later pass.
-export function useStepper(totalSteps: number, intervalMs = 700) {
+export function useStepper(
+  totalSteps: number,
+  intervalMs: number | ((nextStepIdx: number) => number) = 700,
+) {
   const [stepIdx, setStepIdx] = useState(totalSteps);
   const [playing, setPlaying] = useState(false);
 
@@ -23,7 +26,10 @@ export function useStepper(totalSteps: number, intervalMs = 700) {
 
   useEffect(() => {
     if (!playing || stepIdx >= totalSteps) return;
-    const id = setTimeout(() => setStepIdx((s) => Math.min(totalSteps, s + 1)), intervalMs);
+    // Variable cadence: a function gets the upcoming step index so choreographed
+    // demos can give big moments more time than transitional ones.
+    const delay = typeof intervalMs === 'function' ? intervalMs(stepIdx + 1) : intervalMs;
+    const id = setTimeout(() => setStepIdx((s) => Math.min(totalSteps, s + 1)), delay);
     return () => clearTimeout(id);
   }, [playing, stepIdx, totalSteps, intervalMs]);
 

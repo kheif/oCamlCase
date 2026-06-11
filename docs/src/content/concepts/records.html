@@ -1,0 +1,122 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 18 of 20</div>
+        <h1 class="page-title">Records</h1>
+        <p class="page-intro">A record bundles named fields into a single value. Where tuples identify components by position, records identify them by name, which makes larger data shapes self-documenting.</p>
+      </div>
+
+      <h2>Defining a record</h2>
+      <p>A record type lists its fields and their types between braces. Building a value uses the same brace syntax with <code>=</code> instead of <code>:</code>. Every field must be given; there are no optional or default fields.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>Field names live in the type definition, so OCaml infers the record type from the field names you use. If two record types share a field name, the most recently defined one wins, which is why field names are usually kept distinct per module.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p>Records are immutable by default, just like bindings. "Changing" a field means building a new record, the original is untouched.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">account.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">type</span> account = {
+  owner : <span class="ty">string</span>;
+  balance : <span class="ty">int</span>;
+  active : <span class="ty">bool</span>;
+}
+
+<span class="kw">let</span> acct = { owner = <span class="str">"alice"</span>; balance = <span class="num">100</span>; active = <span class="kw">true</span> }
+<span class="cmt">(* acct : account *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Accessing fields</h2>
+      <p>There are two ways to read a record: dot access for a single field, and pattern matching to destructure several at once. When the binding you want has the same name as the field, you can use <em>punning</em> and write the field name alone.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">access.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* Dot access *)</span>
+acct.balance                  <span class="cmt">(* 100 *)</span>
+
+<span class="cmt">(* Pattern matching with explicit names *)</span>
+<span class="kw">let</span> <span class="fn">describe</span> { owner = o; balance = b; _ } =
+  o ^ <span class="str">" has "</span> ^ <span class="fn">string_of_int</span> b
+
+<span class="cmt">(* Punning: field name doubles as the binding *)</span>
+<span class="kw">let</span> <span class="fn">describe'</span> { owner; balance; _ } =
+  owner ^ <span class="str">" has "</span> ^ <span class="fn">string_of_int</span> balance</pre>
+      </div>
+
+      <p>The trailing <code>_</code> in the pattern tells the compiler you are deliberately ignoring the remaining fields; without it, OCaml warns that the pattern does not mention <code>active</code>.</p>
+
+      <h2>Functional update</h2>
+      <p>The expression <code>{ r with field = v }</code> builds a <em>new</em> record that copies every field of <code>r</code> except the ones you override. This is the record analogue of shadowing: nothing is mutated, you just construct the next state.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>This pattern is the heart of state-as-values programming: a function takes the old record and returns a new one. The <a href="/exercises/bank">Bank Account exercise</a> is built entirely on this shape: every deposit or withdrawal produces a fresh <code>account</code>.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Pattern</div>
+            <p><code>{ acct with balance = ... }</code> reads as "an account like <code>acct</code>, except for its balance". Fields you do not name are copied unchanged.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">update.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="fn">deposit</span> amount acct =
+  { acct <span class="kw">with</span> balance = acct.balance + amount }
+
+<span class="kw">let</span> <span class="fn">close</span> acct =
+  { acct <span class="kw">with</span> active = <span class="kw">false</span> }
+
+<span class="kw">let</span> acct2 = <span class="fn">deposit</span> <span class="num">50</span> acct
+acct2.balance   <span class="cmt">(* 150 *)</span>
+acct.balance    <span class="cmt">(* still 100: the original is unchanged *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Mutable fields</h2>
+      <p>A field declared with the <code>mutable</code> keyword can be updated in place with <code>&lt;-</code>. This is the record-level version of <code>ref</code>; in fact, <code>'a ref</code> is defined in the standard library as a record with one mutable field.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">mutable_field.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">type</span> counter = { <span class="kw">mutable</span> count : <span class="ty">int</span> }
+
+<span class="kw">let</span> c = { count = <span class="num">0</span> }
+c.count &lt;- c.count + <span class="num">1</span>
+c.count          <span class="cmt">(* 1: same record, contents changed *)</span>
+
+<span class="cmt">(* type 'a ref = { mutable contents : 'a } *)</span></pre>
+      </div>
+
+      <p>Imperative features like this come with sharing and equality pitfalls. The <a href="/concepts/mutability">Mutability</a> page covers them in depth.</p>
+
+      <h2>Records or tuples?</h2>
+      <div class="callout callout-tip">
+        <div class="callout-title">Rule of thumb</div>
+        <p>Tuples are fine for two or three components whose meaning is obvious from context, like the pair returned by <code>List.split</code>. The moment a reader could mix up the components, or you find yourself writing a comment to explain the positions, switch to a record and let the field names do the explaining.</p>
+      </div>
+
+      <div class="page-nav">
+        <p class="page-nav-label">Continue learning</p>
+        <div class="page-nav-links">
+          <a href="/concepts/options-result" class="page-nav-prev">Options and Result</a>
+          <a href="/concepts/trees" class="page-nav-next">Next: Trees</a>
+          <a href="/exercises/bank" class="page-nav-practice">Practice: Bank Account</a>
+        </div>
+      </div>
+    </div>

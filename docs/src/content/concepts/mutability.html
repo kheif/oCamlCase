@@ -1,0 +1,147 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 20 of 20</div>
+        <h1 class="page-title">Mutability: Refs and Arrays</h1>
+        <p class="page-intro">OCaml is immutable by default, but it is not a pure language. Refs, arrays, and loops are there when in-place state is genuinely the right tool, and they come with sharing and equality pitfalls worth knowing.</p>
+      </div>
+
+      <h2>Refs revisited</h2>
+      <p>A <code>ref</code> is a single mutable cell, introduced briefly in <a href="/concepts/bindings">Bindings</a>. The binding to the cell never changes; the cell's contents do. You write with <code>:=</code>, read with <code>!</code>, and for integer cells <code>incr</code> and <code>decr</code> abbreviate the common cases.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>The type makes mutation visible: <code>int ref</code> is a different type from <code>int</code>. You can never accidentally treat a cell as its contents, the <code>!</code> is always explicit.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p>Assignment <code>:=</code> returns <code>unit</code>, the type with the single value <code>()</code>. Expressions executed only for their effect have type <code>unit</code>, and the semicolon <code>;</code> sequences them: <code>e1; e2</code> runs <code>e1</code> for its effect, then evaluates to <code>e2</code>.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">refs.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> counter = <span class="kw">ref</span> <span class="num">0</span>
+<span class="cmt">(* counter : int ref *)</span>
+
+counter := !counter + <span class="num">5</span>
+<span class="fn">incr</span> counter
+!counter            <span class="cmt">(* 6 *)</span>
+
+<span class="cmt">(* := has type 'a ref -> 'a -> unit *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Arrays</h2>
+      <p>An array is a fixed-size block of mutable cells with constant-time indexed access. Where a list is built for structural recursion, an array is built for random access and in-place update.</p>
+
+      <div class="two-col lean">
+        <div>
+          <ul>
+            <li>Literal syntax uses <code>[| ... |]</code> with semicolons.</li>
+            <li><code>arr.(i)</code> reads index <code>i</code>; <code>arr.(i) &lt;- v</code> writes it. Both are bounds-checked and raise <code>Invalid_argument</code> when out of range.</li>
+            <li><code>Array.make n x</code> builds an array of <code>n</code> copies of <code>x</code>; <code>Array.length</code>, <code>Array.map</code>, and <code>Array.iter</code> mirror their <code>List</code> counterparts.</li>
+          </ul>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">arrays.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> a = [| <span class="num">10</span>; <span class="num">20</span>; <span class="num">30</span> |]
+<span class="cmt">(* a : int array *)</span>
+
+a.(<span class="num">1</span>)               <span class="cmt">(* 20 *)</span>
+a.(<span class="num">1</span>) &lt;- <span class="num">25</span>
+a.(<span class="num">1</span>)               <span class="cmt">(* 25 *)</span>
+
+<span class="kw">let</span> zeros = <span class="ty">Array</span>.<span class="fn">make</span> <span class="num">4</span> <span class="num">0</span>
+<span class="cmt">(* [| 0; 0; 0; 0 |] *)</span>
+
+<span class="ty">Array</span>.<span class="fn">length</span> a     <span class="cmt">(* 3 *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>while and for loops</h2>
+      <p>With mutable state available, OCaml's loops become useful. Both are expressions of type <code>unit</code>: they exist purely for their effects, which is why they only make sense together with refs or arrays.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>A <code>for</code> loop walks a fixed integer range; a <code>while</code> loop runs as long as its condition reads true, so the condition must mention something mutable or it will never change.</p>
+          <p>Notice the shape of the sum below: the loop variable does the walking and a ref does the accumulating. The same computation written functionally is <code>Array.fold_left (+) 0 a</code>, the idiomatic version.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">loops.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="fn">sum_array</span> a =
+  <span class="kw">let</span> total = <span class="kw">ref</span> <span class="num">0</span> <span class="kw">in</span>
+  <span class="kw">for</span> i = <span class="num">0</span> <span class="kw">to</span> <span class="ty">Array</span>.<span class="fn">length</span> a - <span class="num">1</span> <span class="kw">do</span>
+    total := !total + a.(i)
+  <span class="kw">done</span>;
+  !total
+
+<span class="kw">let</span> <span class="fn">countdown</span> n =
+  <span class="kw">let</span> i = <span class="kw">ref</span> n <span class="kw">in</span>
+  <span class="kw">while</span> !i &gt; <span class="num">0</span> <span class="kw">do</span>
+    <span class="fn">print_int</span> !i; <span class="fn">print_newline</span> ();
+    <span class="fn">decr</span> i
+  <span class="kw">done</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Sharing and equality</h2>
+      <p>Mutation introduces a question immutable code never asks: are these two values <em>the same cell</em>, or merely equal in content? OCaml has an operator for each.</p>
+
+      <div class="two-col lean">
+        <div>
+          <ul>
+            <li><code>=</code> is <strong>structural equality</strong>: do the contents match?</li>
+            <li><code>==</code> is <strong>physical equality</strong>: is this literally the same object in memory?</li>
+          </ul>
+          <div class="callout callout-key">
+            <div class="callout-title">Pitfall</div>
+            <p>Two refs holding equal contents are <code>=</code> but not <code>==</code>. And when two names share one cell, writing through either is visible through both. Use <code>=</code> for comparisons unless you specifically need to detect sharing.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">sharing.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> r = <span class="kw">ref</span> <span class="num">1</span>
+<span class="kw">let</span> s = <span class="kw">ref</span> <span class="num">1</span>
+<span class="kw">let</span> alias = r      <span class="cmt">(* alias shares r's cell *)</span>
+
+r = s              <span class="cmt">(* true: equal contents *)</span>
+r == s             <span class="cmt">(* false: different cells *)</span>
+r == alias         <span class="cmt">(* true: same cell *)</span>
+
+alias := <span class="num">99</span>
+!r                 <span class="cmt">(* 99: the write is visible through r *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Good practice</div>
+        <p>Default to immutability. Reach for refs and arrays when an algorithm genuinely calls for in-place state, tight numeric loops, memo tables, counters observed across calls, and keep the mutable part small and local so the rest of the program stays easy to reason about.</p>
+      </div>
+
+      <div class="page-nav">
+        <p class="page-nav-label">Continue learning</p>
+        <div class="page-nav-links">
+          <a href="/concepts/trees" class="page-nav-prev">Trees</a>
+          <a href="/interpreter/lexing" class="page-nav-next">Next: Building an Interpreter</a>
+          <a href="/exercises/mini/ref-counter" class="page-nav-practice">Practice: Ref Counter</a>
+        </div>
+      </div>
+    </div>

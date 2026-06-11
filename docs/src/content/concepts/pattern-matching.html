@@ -1,6 +1,6 @@
 <div class="article">
       <div class="page-header">
-        <div class="page-label">Concept 8 of 14</div>
+        <div class="page-label">Concept 8 of 20</div>
         <h1 class="page-title">Pattern Matching</h1>
         <p class="page-intro">Pattern matching is how OCaml inspects and destructures values. It is more than a switch statement: the compiler verifies that every possible case is handled, eliminating a whole class of bugs at compile time.</p>
       </div>
@@ -185,6 +185,35 @@
   | x :: _ <span class="kw">when</span> x > <span class="num">0</span> -> <span class="ty">Some</span> x
   | _ -> <span class="ty">None</span></pre>
       </div>
+
+      <h2>Or-patterns and as-patterns</h2>
+      <p>Two small pattern forms remove a lot of duplication. An <strong>or-pattern</strong> <code>p1 | p2</code> matches if either side matches, letting several cases share one branch. An <strong>as-pattern</strong> <code>p as name</code> matches <code>p</code> and additionally binds the <em>whole</em> matched value to <code>name</code>, so you can destructure and keep the original at the same time.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">or_as.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* Or-pattern: several cases, one branch *)</span>
+<span class="kw">type</span> day = Mon | Tue | Wed | Thu | Fri | Saturday | Sunday
+
+<span class="kw">let</span> <span class="fn">is_weekend</span> = <span class="kw">function</span>
+  | Saturday | Sunday -> <span class="kw">true</span>
+  | _ -> <span class="kw">false</span>
+
+<span class="kw">let</span> <span class="fn">small</span> = <span class="kw">function</span>
+  | <span class="num">0</span> | <span class="num">1</span> | <span class="num">2</span> -> <span class="kw">true</span>
+  | _ -> <span class="kw">false</span>
+
+<span class="cmt">(* As-pattern: destructure AND keep the whole value *)</span>
+<span class="kw">let</span> <span class="fn">dedup_head</span> = <span class="kw">function</span>
+  | x :: (y :: _ <span class="kw">as</span> rest) <span class="kw">when</span> x = y -> rest
+  | xs -> xs
+<span class="cmt">(* rest names the entire tail y :: _,
+   no need to rebuild it on the right side *)</span></pre>
+      </div>
+
+      <p>Both sides of an or-pattern must bind exactly the same names with the same types, otherwise the branch body would have unbound variables on one of the paths. And as the example shows, both forms combine freely with guards.</p>
 
       <h2>Nested patterns</h2>
       <p>Patterns can be nested to any depth. You can match on the structure of a tuple whose elements are themselves option values, or on a list whose head is a specific variant. The compiler still verifies that all combinations are covered.</p>

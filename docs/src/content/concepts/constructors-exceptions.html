@@ -1,6 +1,6 @@
 <div class="article">
       <div class="page-header">
-        <div class="page-label">Concept 16 of 17</div>
+        <div class="page-label">Concept 16 of 20</div>
         <h1 class="page-title">Constructors and Exceptions</h1>
         <p class="page-intro">Constructor types let you define custom types with multiple alternatives, serving as the foundation for complex data structures and error handling in OCaml.</p>
       </div>
@@ -279,24 +279,8 @@
       <p>This declares a type constructor <code>my_list</code> that produces a concrete type for every type <code>'a</code>. The constructors <code>Nil</code> and <code>Cons</code> are polymorphic.</p>
 
       <h2>Options</h2>
-      <p>The built in <code>option</code> type is a parameterized type.</p>
-      <p>Options are an alternative to exceptions for handling partial functions. Instead of raising an error, you return <code>None</code> for failure and <code>Some value</code> for success.</p>
-
-      <div class="code-block inline">
-        <div class="code-top">
-          <span class="code-fname">options.ml</span>
-          <button class="copy-btn" onclick="copyCode(this)">copy</button>
-        </div>
-<pre><span class="cmt">(* type 'a option = None | Some of 'a *)</span>
-
-<span class="kw">let rec</span> <span class="fn">nth_opt</span> xs n =
-  <span class="kw">if</span> n &lt; <span class="num">0</span> || xs = [] <span class="kw">then</span> None
-  <span class="kw">else if</span> n = <span class="num">0</span> <span class="kw">then</span> Some (<span class="ty">List</span>.<span class="fn">hd</span> xs)
-  <span class="kw">else</span> <span class="fn">nth_opt</span> (<span class="ty">List</span>.<span class="fn">tl</span> xs) (n - <span class="num">1</span>)
-
-<span class="fn">nth_opt</span> [<span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>] <span class="num">3</span>
-<span class="cmt">(* Returns None instead of crashing *)</span></pre>
-      </div>
+      <p>The built in <code>option</code> type is the most important parameterized type: a variant with just <code>None</code> and <code>Some</code>, used to handle partial functions without exceptions. It is important enough to deserve its own page, together with its sibling <code>result</code>.</p>
+      <p>Continue with <a href="/concepts/options-result">Options and Result</a>.</p>
 
       <style>
         #ps-1:checked ~ .demo-timeline label[for="ps-1"],
@@ -416,7 +400,7 @@
   <p class="page-nav-label">Continue learning</p>
   <div class="page-nav-links">
     <a href="/concepts/sorting" class="page-nav-prev">Sorting</a>
-    <a href="/concepts/trees" class="page-nav-next">Next: Trees</a>
+    <a href="/concepts/options-result" class="page-nav-next">Next: Options and Result</a>
     <a href="/exercises/bank" class="page-nav-practice">Practice: Bank Account</a>
   </div>
 </div>

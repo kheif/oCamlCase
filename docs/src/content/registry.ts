@@ -18,7 +18,10 @@ import iteration from './concepts/iteration.html?raw';
 import derivedForms from './concepts/derived-forms.html?raw';
 import sorting from './concepts/sorting.html?raw';
 import constructorsExceptions from './concepts/constructors-exceptions.html?raw';
+import optionsResult from './concepts/options-result.html?raw';
+import records from './concepts/records.html?raw';
 import trees from './concepts/trees.html?raw';
+import mutability from './concepts/mutability.html?raw';
 import bank from './exercises/bank.html?raw';
 import playlist from './exercises/playlist.html?raw';
 import search from './exercises/search.html?raw';
@@ -172,8 +175,24 @@ export const contentRoutes: ContentPageDef[] = [
     html: constructorsExceptions,
     title: 'OCaml Variant Types and Exceptions | oCamlCase',
     description:
-      'Understand variant types, structural recursion, exceptions, and option types for handling alternative data shapes and control flow.',
+      'Understand variant types, structural recursion, and exceptions for handling alternative data shapes and control flow.',
     nav: { group: 'Concepts', num: '16.', label: 'Constructors and Exceptions' },
+  },
+  {
+    path: '/concepts/options-result',
+    html: optionsResult,
+    title: 'OCaml Option and Result Types | oCamlCase',
+    description:
+      'Handle failure in the type system with OCaml option and result: pattern matching on None and Some, Option.map and Option.bind chains, Ok and Error, and when to prefer each over exceptions.',
+    nav: { group: 'Concepts', num: '17.', label: 'Options and Result' },
+  },
+  {
+    path: '/concepts/records',
+    html: records,
+    title: 'OCaml Records | oCamlCase',
+    description:
+      'Learn OCaml records: defining named fields, dot access and record patterns, field punning, functional update with { r with ... }, and mutable fields.',
+    nav: { group: 'Concepts', num: '18.', label: 'Records' },
   },
   {
     path: '/concepts/trees',
@@ -181,7 +200,15 @@ export const contentRoutes: ContentPageDef[] = [
     title: 'OCaml Trees and Structural Recursion | oCamlCase',
     description:
       'Explore rose trees, structural terminology, and computing properties of tree data structures recursively.',
-    nav: { group: 'Concepts', num: '17.', label: 'Trees' },
+    nav: { group: 'Concepts', num: '19.', label: 'Trees' },
+  },
+  {
+    path: '/concepts/mutability',
+    html: mutability,
+    title: 'OCaml Refs, Arrays, and Mutability | oCamlCase',
+    description:
+      'Imperative OCaml when you need it: ref cells with := and !, arrays with in-place update, while and for loops, unit and sequencing, and physical vs structural equality.',
+    nav: { group: 'Concepts', num: '20.', label: 'Mutability' },
   },
   {
     path: '/exercises/bank',

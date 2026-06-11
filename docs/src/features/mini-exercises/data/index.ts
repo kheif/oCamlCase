@@ -25,6 +25,13 @@ import { data as matchNested } from './match-nested';
 import { data as desugarBool } from './desugar-bool';
 import { data as insertSorted } from './insert-sorted';
 import { data as treeSize } from './tree-size';
+import { data as safeDiv } from './safe-div';
+import { data as optChain } from './opt-chain';
+import { data as resultValidate } from './result-validate';
+import { data as recordMake } from './record-make';
+import { data as recordUpdate } from './record-update';
+import { data as refCounter } from './ref-counter';
+import { data as arraySum } from './array-sum';
 
 export const miniExercises: MiniExercise[] = [
   shadowing,
@@ -38,6 +45,11 @@ export const miniExercises: MiniExercise[] = [
   matchList,
   matchNested,
   matchShape,
+  safeDiv,
+  optChain,
+  resultValidate,
+  recordMake,
+  recordUpdate,
   listCons,
   listLength,
   mapImpl,
@@ -53,6 +65,8 @@ export const miniExercises: MiniExercise[] = [
   gcd,
   countDigits,
   treeSize,
+  refCounter,
+  arraySum,
 ];
 
 export const miniExerciseById: Record<string, MiniExercise> = Object.fromEntries(

@@ -18,11 +18,14 @@ const CATEGORY_ORDER = [
   'list-ops',
   'higher-order',
   'variants',
+  'options',
+  'records',
   'derived-forms',
   'sorting',
   'iteration',
   'recursion',
   'trees',
+  'mutability',
 ];
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -38,11 +41,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   'list-ops': 'List Operations',
   'higher-order': 'Higher-Order Functions',
   variants: 'Variant Types',
+  options: 'Options and Result',
+  records: 'Records',
   'derived-forms': 'Derived Forms',
   sorting: 'Sorting',
   iteration: 'Iteration',
   recursion: 'Recursion',
   trees: 'Trees',
+  mutability: 'Mutability',
 };
 
 const DIFFICULTY_ORDER = ['easy', 'medium', 'hard'] as const;
@@ -91,14 +97,14 @@ export default function MiniExerciseIndex() {
     <div className="article">
       <PageMeta
         title="Mini Exercises | oCamlCase"
-        description="26 short OCaml drag-and-drop exercises covering all 17 concepts: bindings, closures, pattern matching, polymorphism, type inference, trees, and more."
+        description="33 short OCaml drag-and-drop exercises covering all 20 concepts: bindings, closures, pattern matching, options, records, mutability, trees, and more."
       />
       <div className="page-header">
         <div className="page-label">Mini Exercises</div>
         <h1 className="page-title">Drag the lines into order</h1>
         <p className="page-intro">
           Short, focused exercises: lines of a correct OCaml solution, shuffled. Drag them into
-          the right order. Covers 17 concepts from bindings to trees.
+          the right order. Covers 20 concepts from bindings to mutability.
         </p>
       </div>
 

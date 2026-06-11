@@ -1,0 +1,146 @@
+<div class="article">
+      <div class="page-header">
+        <div class="page-label">Concept 17 of 20</div>
+        <h1 class="page-title">Options and Result</h1>
+        <p class="page-intro">Options and results make failure visible in the type. Instead of raising an exception, a function returns <code>None</code> or <code>Error</code>, and the caller is forced by the type checker to handle both outcomes.</p>
+      </div>
+
+      <h2>The option type</h2>
+      <p>The built in <code>option</code> type is a parameterized type with exactly two constructors.</p>
+      <p>Options are an alternative to exceptions for handling partial functions. Instead of raising an error, you return <code>None</code> for failure and <code>Some value</code> for success.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">options.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* type 'a option = None | Some of 'a *)</span>
+
+<span class="kw">let rec</span> <span class="fn">nth_opt</span> xs n =
+  <span class="kw">if</span> n &lt; <span class="num">0</span> || xs = [] <span class="kw">then</span> None
+  <span class="kw">else if</span> n = <span class="num">0</span> <span class="kw">then</span> Some (<span class="ty">List</span>.<span class="fn">hd</span> xs)
+  <span class="kw">else</span> <span class="fn">nth_opt</span> (<span class="ty">List</span>.<span class="fn">tl</span> xs) (n - <span class="num">1</span>)
+
+<span class="fn">nth_opt</span> [<span class="num">3</span>; <span class="num">4</span>; <span class="num">5</span>] <span class="num">3</span>
+<span class="cmt">(* Returns None instead of crashing *)</span></pre>
+      </div>
+
+      <h2>Pattern matching on options</h2>
+      <p>An option is just a variant, so the natural way to consume one is a <code>match</code> with two branches. The exhaustiveness checker guarantees you never forget the failure case.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>Compare this to a language where the failure case is a <code>null</code> you can silently dereference. Here, the only way to get at the <code>x</code> inside <code>Some x</code> is to go through a pattern that also names what happens for <code>None</code>.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Key point</div>
+            <p>The payload of <code>Some</code> has a different type than the option itself. <code>int option</code> is not <code>int</code>: the type system stops you from using a maybe-missing value as if it were definitely there.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">safe_div.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="fn">safe_div</span> a b =
+  <span class="kw">if</span> b = <span class="num">0</span> <span class="kw">then</span> None <span class="kw">else</span> Some (a / b)
+
+<span class="kw">let</span> <span class="fn">describe</span> r =
+  <span class="kw">match</span> r <span class="kw">with</span>
+  | None -&gt; <span class="str">"undefined"</span>
+  | Some q -&gt; <span class="fn">string_of_int</span> q
+
+<span class="fn">describe</span> (<span class="fn">safe_div</span> <span class="num">10</span> <span class="num">2</span>)  <span class="cmt">(* "5" *)</span>
+<span class="fn">describe</span> (<span class="fn">safe_div</span> <span class="num">10</span> <span class="num">0</span>)  <span class="cmt">(* "undefined" *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>The Option module</h2>
+      <p>Matching every option by hand gets verbose when a computation has several maybe-failing steps. The standard library's <code>Option</code> module provides combinators that thread the <code>None</code> case for you.</p>
+
+      <div class="two-col lean">
+        <div>
+          <ul>
+            <li><code>Option.value o ~default</code> unwraps with a fallback.</li>
+            <li><code>Option.map f o</code> applies <code>f</code> inside the <code>Some</code>, leaving <code>None</code> untouched.</li>
+            <li><code>Option.bind o f</code> chains a function that itself returns an option, flattening the result.</li>
+          </ul>
+          <div class="callout callout-key">
+            <div class="callout-title">Pattern</div>
+            <p>A chain of <code>Option.bind</code> calls reads as a pipeline where any failing step short-circuits the rest, the same control flow exceptions give you, but visible in the types.</p>
+          </div>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">option_chain.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* Look up a user's age, double it, fall back to 0 *)</span>
+<span class="kw">let</span> <span class="fn">age_of</span> name =
+  <span class="kw">match</span> name <span class="kw">with</span>
+  | <span class="str">"alice"</span> -&gt; Some <span class="num">30</span>
+  | _ -&gt; None
+
+<span class="kw">let</span> <span class="fn">doubled_age</span> name =
+  <span class="fn">age_of</span> name
+  |&gt; <span class="ty">Option</span>.<span class="fn">map</span> (<span class="kw">fun</span> a -&gt; a * <span class="num">2</span>)
+  |&gt; <span class="ty">Option</span>.<span class="fn">value</span> ~default:<span class="num">0</span>
+
+<span class="fn">doubled_age</span> <span class="str">"alice"</span>  <span class="cmt">(* 60 *)</span>
+<span class="fn">doubled_age</span> <span class="str">"bob"</span>    <span class="cmt">(* 0 *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>The result type</h2>
+      <p>An option tells you <em>that</em> something failed, but not <em>why</em>. The built in <code>result</code> type carries a payload in both the success and the failure case.</p>
+
+      <div class="two-col lean">
+        <div>
+          <p>Use <code>result</code> when the caller needs to distinguish failure modes or report a message. <code>Ok</code> wraps the success value; <code>Error</code> wraps a description of what went wrong, often a string or a custom variant.</p>
+          <p>Like options, results are ordinary variants: you consume them with pattern matching, and the exhaustiveness checker keeps both arms honest.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">result.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* type ('a, 'e) result = Ok of 'a | Error of 'e *)</span>
+
+<span class="kw">let</span> <span class="fn">validate_age</span> n =
+  <span class="kw">if</span> n &lt; <span class="num">0</span> <span class="kw">then</span> Error <span class="str">"age cannot be negative"</span>
+  <span class="kw">else if</span> n &gt; <span class="num">150</span> <span class="kw">then</span> Error <span class="str">"age is implausible"</span>
+  <span class="kw">else</span> Ok n
+
+<span class="kw">match</span> <span class="fn">validate_age</span> (<span class="num">-3</span>) <span class="kw">with</span>
+| Ok n -&gt; <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"age: %d\n"</span> n
+| Error msg -&gt; <span class="ty">Printf</span>.<span class="fn">printf</span> <span class="str">"invalid: %s\n"</span> msg</pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Exception, option, or result?</h2>
+      <p>All three express "this computation can fail". They differ in who is forced to deal with the failure, and what information travels with it.</p>
+      <ul>
+        <li><strong>Exception:</strong> failure is invisible in the type. Good for truly exceptional situations and deep early exits (see <a href="/concepts/constructors-exceptions">Constructors and Exceptions</a>), but the compiler will not remind callers to handle it.</li>
+        <li><strong>Option:</strong> failure is in the type, with no explanation attached. Good for lookups and partial functions where "not found" is self-explanatory.</li>
+        <li><strong>Result:</strong> failure is in the type, with a payload explaining it. Good for validation and parsing, where the caller needs to know what went wrong.</li>
+      </ul>
+
+      <div class="callout callout-key">
+        <div class="callout-title">Rule of thumb</div>
+        <p>Reach for <code>option</code> first. Upgrade to <code>result</code> when the caller needs a reason. Reserve exceptions for invariant violations and non-local exits where threading a value through every return type would obscure the code.</p>
+      </div>
+
+      <div class="page-nav">
+        <p class="page-nav-label">Continue learning</p>
+        <div class="page-nav-links">
+          <a href="/concepts/constructors-exceptions" class="page-nav-prev">Constructors and Exceptions</a>
+          <a href="/concepts/records" class="page-nav-next">Next: Records</a>
+          <a href="/exercises/mini/safe-div" class="page-nav-practice">Practice: Safe Division</a>
+        </div>
+      </div>
+    </div>

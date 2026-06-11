@@ -27,6 +27,39 @@ function upsertLink(rel: string, href: string) {
   el.href = href;
 }
 
+const JSONLD_ID = 'page-jsonld';
+
+// Per-page Article/LearningResource schema for concept and exercise routes,
+// mirroring the global Course JSON-LD in index.html.
+function upsertPageJsonLd(pathname: string, title: string, desc: string, url: string) {
+  const existing = document.getElementById(JSONLD_ID);
+  const isContent = pathname.startsWith('/concepts/') || pathname.startsWith('/exercises/');
+  if (!isContent) {
+    existing?.remove();
+    return;
+  }
+  const payload = {
+    '@context': 'https://schema.org',
+    '@type': ['Article', 'LearningResource'],
+    headline: title.replace(/ \| oCamlCase$/, ''),
+    description: desc,
+    url,
+    inLanguage: 'en',
+    learningResourceType: pathname.startsWith('/exercises/') ? 'Exercise' : 'Article',
+    isPartOf: { '@type': 'Course', name: 'Learn OCaml by Example', url: BASE_URL },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: BASE_URL },
+    isAccessibleForFree: true,
+  };
+  let el = existing as HTMLScriptElement | null;
+  if (!el) {
+    el = document.createElement('script');
+    el.id = JSONLD_ID;
+    el.type = 'application/ld+json';
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(payload);
+}
+
 export default function PageMeta({ title, description }: Props) {
   const { pathname } = useLocation();
 
@@ -50,6 +83,7 @@ export default function PageMeta({ title, description }: Props) {
     upsertMeta('name', 'twitter:image', OG_IMAGE);
 
     upsertLink('canonical', url);
+    upsertPageJsonLd(pathname, title, desc, url);
   }, [title, description, pathname]);
 
   return null;

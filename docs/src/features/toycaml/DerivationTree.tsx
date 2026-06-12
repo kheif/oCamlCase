@@ -5,17 +5,17 @@ import { showExp, showTy } from './ast';
 
 type Props = {
   root: DerivationNode;
-  /** How many nodes (in post-order — premises before conclusions) are revealed so far. */
+  /** How many nodes (in post-order - premises before conclusions) are revealed so far. */
   revealedCount: number;
 };
 
 // Renders the derivation in the textbook's natural-deduction layout: a node's
-// premises (its children — the sub-derivations `elab` recursed into) sit
+// premises (its children - the sub-derivations `elab` recursed into) sit
 // ABOVE a horizontal inference bar, with the rule name beside the bar and the
-// conclusion (`T ⊢ e : t`) below it. Axioms (Sconst/Sid — no premises) skip
+// conclusion (`T ⊢ e : t`) below it. Axioms (Sconst/Sid - no premises) skip
 // the bar and show their rule name as a small badge on the judgement itself.
-// The step cursor reveals nodes bottom-up in post-order — leaves (axioms)
-// first, root last — exactly the order a learner fills one in by hand, and
+// The step cursor reveals nodes bottom-up in post-order - leaves (axioms)
+// first, root last - exactly the order a learner fills one in by hand, and
 // the most-recently-revealed node is highlighted as "active".
 export default function DerivationTree({ root, revealedCount }: Props) {
   // Identity-keyed: a fresh `elaborate` call produces a fresh tree of plain

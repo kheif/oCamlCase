@@ -84,10 +84,10 @@ export type Exp =
   | { kind: 'Fun'; param: Var; paramTy: Ty; body: Exp }
   | { kind: 'RFun'; fnName: Var; param: Var; paramTy: Ty; retTy: Ty; body: Exp };
 
-// Concrete-syntax rendering — what a learner would type to produce this `exp`.
+// Concrete-syntax rendering - what a learner would type to produce this `exp`.
 // Always parenthesizes operator/application/if/fun subterms so the structure
 // stays unambiguous (the elaborator's own pretty-printing concern, not the
-// parser's — the parser accepts the looser, precedence-driven surface syntax).
+// parser's - the parser accepts the looser, precedence-driven surface syntax).
 export function showExp(e: Exp): string {
   switch (e.kind) {
     case 'Var':
@@ -113,7 +113,7 @@ function maybeParens(e: Exp): string {
     : showExp(e);
 }
 
-// Abstract-syntax rendering: `Fun ("y", Int, OApp (Leq, Var "x", Var "y"))` —
+// Abstract-syntax rendering: `Fun ("y", Int, OApp (Leq, Var "x", Var "y"))` -
 // the form the lecture writes expressions in before elaboration. Driven by the
 // "show abstract syntax" toggle in the elaborator widget.
 export function showExpAst(e: Exp): string {

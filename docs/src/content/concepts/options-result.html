@@ -1,6 +1,5 @@
 <div class="article">
       <div class="page-header">
-        <div class="page-label">Concept 17 of 20</div>
         <h1 class="page-title">Options and Result</h1>
         <p class="page-intro">Options and results make failure visible in the type. Instead of raising an exception, a function returns <code>None</code> or <code>Error</code>, and the caller is forced by the type checker to handle both outcomes.</p>
       </div>
@@ -125,7 +124,7 @@
       <h2>Exception, option, or result?</h2>
       <p>All three express "this computation can fail". They differ in who is forced to deal with the failure, and what information travels with it.</p>
       <ul>
-        <li><strong>Exception:</strong> failure is invisible in the type. Good for truly exceptional situations and deep early exits (see <a href="/concepts/constructors-exceptions">Constructors and Exceptions</a>), but the compiler will not remind callers to handle it.</li>
+        <li><strong>Exception:</strong> failure is invisible in the type. Good for truly exceptional situations and deep early exits (see <a href="/concepts/exceptions">Exceptions</a>), but the compiler will not remind callers to handle it.</li>
         <li><strong>Option:</strong> failure is in the type, with no explanation attached. Good for lookups and partial functions where "not found" is self-explanatory.</li>
         <li><strong>Result:</strong> failure is in the type, with a payload explaining it. Good for validation and parsing, where the caller needs to know what went wrong.</li>
       </ul>
@@ -135,12 +134,4 @@
         <p>Reach for <code>option</code> first. Upgrade to <code>result</code> when the caller needs a reason. Reserve exceptions for invariant violations and non-local exits where threading a value through every return type would obscure the code.</p>
       </div>
 
-      <div class="page-nav">
-        <p class="page-nav-label">Continue learning</p>
-        <div class="page-nav-links">
-          <a href="/concepts/constructors-exceptions" class="page-nav-prev">Constructors and Exceptions</a>
-          <a href="/concepts/records" class="page-nav-next">Next: Records</a>
-          <a href="/exercises/mini/safe-div" class="page-nav-practice">Practice: Safe Division</a>
-        </div>
-      </div>
     </div>

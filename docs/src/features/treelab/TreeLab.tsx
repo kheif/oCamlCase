@@ -1,10 +1,10 @@
-// Tree Lab — interactive rose-tree explorer for Lecture 7.
+// Tree Lab - interactive rose-tree explorer for Lecture 7.
 //
 // Four stepper modes share one tree (or labeled tree for projections):
-//   Tour         — animated standard tour, builds pre/post numbering live
-//   Linearize    — same tour, output list grows in lockstep (pre or post)
-//   Project      — labeled tour, builds prep / pop lists
-//   Balance      — animated depthb fold, shows check/Unbalanced
+//   Tour         - animated standard tour, builds pre/post numbering live
+//   Linearize    - same tour, output list grows in lockstep (pre or post)
+//   Project      - labeled tour, builds prep / pop lists
+//   Balance      - animated depthb fold, shows check/Unbalanced
 //
 // Architecture mirrors Toycaml.tsx: pure engine (.ts files) + React UI.
 // Stepper pattern (seenSteps reset, autoplay setTimeout, activeNode) is
@@ -143,7 +143,7 @@ function useStepper(totalSteps: number) {
   const [playing, setPlaying] = useState(false);
 
   // Adjust-on-identity-change: when the step array changes (new tree or new
-  // mode), reset to fully-revealed — the result should never feel "stuck".
+  // mode), reset to fully-revealed - the result should never feel "stuck".
   const [seen, setSeen] = useState(totalSteps);
   if (totalSteps !== seen) {
     setSeen(totalSteps);

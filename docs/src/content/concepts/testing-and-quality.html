@@ -1,0 +1,86 @@
+<div class="article">
+      <div class="page-header">
+        <h1 class="page-title">Testing and Code Quality</h1>
+        <p class="page-intro">The type system catches a whole class of bugs, but not wrong logic. Tests cover the rest, ocamlformat ends style debates, and a few conventions keep a growing project readable.</p>
+      </div>
+
+      <h2>What the types don't catch</h2>
+      <p><code>let add x y = x - y</code> has exactly the type you wanted and is still wrong. Types prove that pieces fit together; tests check that they do the right thing. In OCaml the two are complementary: because the compiler already rules out shape errors, your tests can focus purely on behavior.</p>
+
+      <h2>Inline tests with ppx_expect</h2>
+      <div class="two-col lean">
+        <div>
+          <p>The lightest workflow is <em>expect tests</em>: a test prints something, and the expected output lives in the source next to it.</p>
+          <p>Run <code>dune test</code>. If output and expectation differ, dune shows a diff; <code>dune promote</code> updates the expectation when the new output is the correct one. This loop makes tests cheap to write and cheap to update.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">lib/greet.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> <span class="fn">hello</span> name = <span class="str">"Hello, "</span> ^ name ^ <span class="str">"!"</span>
+
+<span class="kw">let</span>%expect_test <span class="str">"greeting"</span> =
+  print_string (<span class="fn">hello</span> <span class="str">"world"</span>);
+  [%expect {| Hello, world! |}]</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">lib/dune</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre>(library
+ (name greet)
+ (inline_tests)
+ (preprocess (pps ppx_expect)))</pre>
+      </div>
+
+      <h2>Test executables with alcotest</h2>
+      <p>For a classic assertion-style suite in <code>test/</code>, <a href="https://github.com/mirage/alcotest" target="_blank" rel="noopener">alcotest</a> is the common choice. Each test is just a function; the runner gives readable, colored output.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">test/test_greet.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let</span> <span class="fn">test_hello</span> () =
+  <span class="ty">Alcotest</span>.(check <span class="fn">string</span>) <span class="str">"greets by name"</span>
+    <span class="str">"Hello, world!"</span> (<span class="ty">Greet</span>.<span class="fn">hello</span> <span class="str">"world"</span>)
+
+<span class="kw">let</span> () =
+  <span class="ty">Alcotest</span>.run <span class="str">"greet"</span>
+    [ (<span class="str">"hello"</span>, [ <span class="ty">Alcotest</span>.test_case <span class="str">"basic"</span> `Quick test_hello ]) ]</pre>
+      </div>
+
+      <div class="callout callout-key">
+        <div class="callout-title">What to test in OCaml</div>
+        <p>Spend tests where the types are weakest: boundary cases of your logic (empty list, zero, equal elements), properties that must hold for all inputs (sorting twice equals sorting once), and every function whose signature mentions <code>option</code> or <code>result</code>, because each <code>None</code> and <code>Error</code> branch is a documented failure path that deserves a test.</p>
+      </div>
+
+      <h2>Formatting: ocamlformat</h2>
+      <p>One dotfile ends all formatting discussion. Put a <code>.ocamlformat</code> file at the project root, then <code>dune fmt</code> rewrites every file canonically.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">.ocamlformat</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre>version = 0.26.2
+profile = default</pre>
+      </div>
+      <p>Pinning the version matters: ocamlformat output changes between releases, and the pin keeps every contributor (and CI) byte-identical.</p>
+
+      <h2>Conventions that scale</h2>
+      <ul>
+        <li><strong>One concept per file.</strong> A file named <code>invoice.ml</code> that defines <code>type t</code> and functions over it reads naturally as <code>Invoice.create</code>, <code>Invoice.total</code>.</li>
+        <li><strong>Write the .mli for any file with an invariant.</strong> Abstract types (see <a href="/concepts/modules">Modules and Signatures</a>) make invariants unbreakable; tests then only need to cover the exported functions.</li>
+        <li><strong>Make illegal states unrepresentable first, test second.</strong> A variant that cannot express the invalid case (see <a href="/concepts/variants">Variants and Constructors</a>) is cheaper than any number of tests for it.</li>
+        <li><strong>Keep <code>dune test</code> green and fast.</strong> A test suite that runs in seconds gets run; one that takes minutes gets skipped.</li>
+      </ul>
+
+      <p>This page closes the guided path. From here, good next steps are the <a href="/interpreter/lexing">Building an Interpreter</a> series and the larger <a href="/exercises">exercises</a>, both of which exercise everything the path covered.</p>
+    </div>

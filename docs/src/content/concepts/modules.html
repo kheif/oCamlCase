@@ -1,0 +1,89 @@
+<div class="article">
+      <div class="page-header">
+        <h1 class="page-title">Modules and Signatures</h1>
+        <p class="page-intro">Modules group related types and functions into named units; signatures describe what a module exposes. Together they are OCaml's main tool for organizing programs and hiding implementation details.</p>
+      </div>
+
+      <h2>You have been using modules all along</h2>
+      <p><code>List.map</code>, <code>Float.sqrt</code>, <code>Option.bind</code>: the capitalized name before the dot is a module, and the dot reaches inside it. Every <code>.ml</code> file is itself a module, named after the file: code in <code>utils.ml</code> is reachable from other files as <code>Utils.whatever</code>.</p>
+
+      <h2>Defining a module</h2>
+      <div class="two-col lean">
+        <div>
+          <p><code>module ... = struct ... end</code> creates a module by hand. Anything defined between <code>struct</code> and <code>end</code> becomes a member: types, values, functions, even other modules.</p>
+          <p>Outside the module, members are reached with the dot, or brought into scope with <code>open</code>. Prefer the dot or a local <code>let open ... in</code>; a file-wide <code>open</code> makes it hard to see where names come from.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">counter.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">module</span> <span class="ty">Counter</span> = <span class="kw">struct</span>
+  <span class="kw">type</span> t = <span class="ty">int</span>
+  <span class="kw">let</span> zero : t = <span class="num">0</span>
+  <span class="kw">let</span> <span class="fn">incr</span> (c : t) : t = c + <span class="num">1</span>
+  <span class="kw">let</span> <span class="fn">value</span> (c : t) : <span class="ty">int</span> = c
+<span class="kw">end</span>
+
+<span class="kw">let</span> c = <span class="ty">Counter</span>.<span class="fn">incr</span> (<span class="ty">Counter</span>.<span class="fn">incr</span> <span class="ty">Counter</span>.zero)
+<span class="cmt">(* Counter.value c = 2 *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Signatures: the public face</h2>
+      <p>A signature (<code>sig ... end</code>, or an <code>.mli</code> file for a file-module) lists what the outside world may see. Everything not listed is invisible.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">counter_sig.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">module</span> <span class="ty">Counter</span> : <span class="kw">sig</span>
+  <span class="kw">type</span> t                    <span class="cmt">(* abstract: no "= int" *)</span>
+  <span class="kw">val</span> zero : t
+  <span class="kw">val</span> incr : t -&gt; t
+  <span class="kw">val</span> value : t -&gt; <span class="ty">int</span>
+<span class="kw">end</span> = <span class="kw">struct</span>
+  <span class="kw">type</span> t = <span class="ty">int</span>
+  <span class="kw">let</span> zero = <span class="num">0</span>
+  <span class="kw">let</span> <span class="fn">incr</span> c = c + <span class="num">1</span>
+  <span class="kw">let</span> <span class="fn">value</span> c = c
+<span class="kw">end</span></pre>
+      </div>
+
+      <div class="callout callout-key">
+        <div class="callout-title">Key insight</div>
+        <p>Writing <code>type t</code> in the signature without its definition makes the type <em>abstract</em>: callers can hold a <code>Counter.t</code> and pass it around, but they cannot do <code>c + 1</code> themselves or forge one from an <code>int</code>. The only ways to make or change a counter are the functions the signature exports. Invariants enforced this way cannot be broken by any caller.</p>
+      </div>
+
+      <h2>Files as modules: .ml and .mli</h2>
+      <p>In a real project you rarely write <code>module ... = struct</code> at the top level. Instead each file is a module, and a sibling <code>.mli</code> file is its signature:</p>
+      <ul>
+        <li><code>stack.ml</code> defines the implementation.</li>
+        <li><code>stack.mli</code> declares the interface; only what it lists is visible to other files.</li>
+      </ul>
+      <p>An <code>.mli</code> doubles as documentation: a reader learns the whole API of a file from one short page of <code>val</code> declarations.</p>
+
+      <h2>Nested access and local opens</h2>
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">opens.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* dot access: always unambiguous *)</span>
+<span class="kw">let</span> total = <span class="ty">List</span>.<span class="fn">fold_left</span> (+) <span class="num">0</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">3</span>]
+
+<span class="cmt">(* local open: scope limited to one expression *)</span>
+<span class="kw">let</span> mean xs =
+  <span class="kw">let open</span> <span class="ty">List</span> <span class="kw">in</span>
+  <span class="fn">fold_left</span> (+.) <span class="num">0.</span> xs /. float_of_int (<span class="fn">length</span> xs)
+
+<span class="cmt">(* even shorter: M.(...) *)</span>
+<span class="kw">let</span> shout s = <span class="ty">String</span>.(uppercase_ascii (trim s))</pre>
+      </div>
+
+      <h2>Where this leads</h2>
+      <p>Signatures also make modules <em>interchangeable</em>: any module matching the signature can stand in for another. Taking that idea one step further, a module can be parameterized over another module. That is a functor, covered next in <a href="/concepts/functors">Functors</a>. The build tool that compiles multi-file module hierarchies is covered in <a href="/concepts/projects-dune-opam">Projects with dune and opam</a>.</p>
+    </div>

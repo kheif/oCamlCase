@@ -6,7 +6,7 @@ import { parse, ParseError, activeNode, consumedCount, type Cst } from './parse'
 
 // Interactive recursive-descent parser for the lecture's fragment. Lex the
 // source, then step through the parse: the token cursor advances as terminals
-// are consumed, and the concrete syntax tree grows top-down — choose a
+// are consumed, and the concrete syntax tree grows top-down - choose a
 // production for `exp`, then descend into its parts. The abstract syntax tree
 // the parser returns is shown once parsing completes.
 

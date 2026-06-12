@@ -1,0 +1,100 @@
+<div class="article">
+      <div class="page-header">
+        <h1 class="page-title">Functors</h1>
+        <p class="page-intro">A functor is a module that takes another module as an argument. Where ordinary polymorphism abstracts over a type, a functor abstracts over a type <em>plus the operations that come with it</em>.</p>
+      </div>
+
+      <h2>The problem functors solve</h2>
+      <p>Suppose you build a set data structure. To keep elements sorted you need a comparison. For <code>int</code> sets you want integer comparison; for case-insensitive string sets you want a different one. Passing the comparison to every call invites inconsistency: two calls with different comparisons would silently corrupt one set.</p>
+      <p>The set implementation really depends on a <em>package</em>: a type <code>t</code> together with a <code>compare</code> for that type. Modules are exactly such packages, so the set should be parameterized by a module.</p>
+
+      <h2>Defining and applying a functor</h2>
+      <div class="two-col lean">
+        <div>
+          <p>A functor is written like a function whose parameter is a module constrained by a signature.</p>
+          <p>Applying it with <code>MySet (IntOrd)</code> produces a brand-new module. Each application is a separate module with its own abstract types, so a set of ints and a set of strings can never be mixed up.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">my_set.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">module type</span> <span class="ty">ORDERED</span> = <span class="kw">sig</span>
+  <span class="kw">type</span> t
+  <span class="kw">val</span> compare : t -&gt; t -&gt; <span class="ty">int</span>
+<span class="kw">end</span>
+
+<span class="kw">module</span> <span class="ty">MySet</span> (<span class="ty">Ord</span> : <span class="ty">ORDERED</span>) = <span class="kw">struct</span>
+  <span class="kw">type</span> elt = <span class="ty">Ord</span>.t
+  <span class="kw">type</span> t = elt <span class="ty">list</span>          <span class="cmt">(* sorted, no dups *)</span>
+
+  <span class="kw">let</span> empty : t = []
+
+  <span class="kw">let rec</span> <span class="fn">add</span> x = <span class="kw">function</span>
+    | [] -&gt; [x]
+    | y :: ys <span class="kw">as</span> s -&gt;
+        <span class="kw">match</span> <span class="ty">Ord</span>.compare x y <span class="kw">with</span>
+        | <span class="num">0</span> -&gt; s
+        | n <span class="kw">when</span> n &lt; <span class="num">0</span> -&gt; x :: s
+        | _ -&gt; y :: <span class="fn">add</span> x ys
+
+  <span class="kw">let</span> <span class="fn">mem</span> x s = <span class="ty">List</span>.<span class="fn">exists</span> (<span class="kw">fun</span> y -&gt; <span class="ty">Ord</span>.compare x y = <span class="num">0</span>) s
+<span class="kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">use_set.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">module</span> <span class="ty">IntOrd</span> = <span class="kw">struct</span>
+  <span class="kw">type</span> t = <span class="ty">int</span>
+  <span class="kw">let</span> compare = <span class="ty">Int</span>.compare
+<span class="kw">end</span>
+
+<span class="kw">module</span> <span class="ty">CiStr</span> = <span class="kw">struct</span>
+  <span class="kw">type</span> t = <span class="ty">string</span>
+  <span class="kw">let</span> <span class="fn">compare</span> a b =
+    <span class="ty">String</span>.compare (<span class="ty">String</span>.lowercase_ascii a) (<span class="ty">String</span>.lowercase_ascii b)
+<span class="kw">end</span>
+
+<span class="kw">module</span> <span class="ty">IntSet</span> = <span class="ty">MySet</span> (<span class="ty">IntOrd</span>)
+<span class="kw">module</span> <span class="ty">NameSet</span> = <span class="ty">MySet</span> (<span class="ty">CiStr</span>)
+
+<span class="kw">let</span> s = <span class="ty">IntSet</span>.<span class="fn">add</span> <span class="num">3</span> (<span class="ty">IntSet</span>.<span class="fn">add</span> <span class="num">1</span> <span class="ty">IntSet</span>.empty)
+<span class="kw">let</span> has = <span class="ty">NameSet</span>.<span class="fn">mem</span> <span class="str">"Ada"</span> (<span class="ty">NameSet</span>.<span class="fn">add</span> <span class="str">"ada"</span> <span class="ty">NameSet</span>.empty)
+<span class="cmt">(* has = true: comparison is case-insensitive *)</span></pre>
+      </div>
+
+      <div class="callout callout-key">
+        <div class="callout-title">Key insight</div>
+        <p>The comparison is fixed once, at the moment the module is created, instead of being re-supplied at every call. The functor turns "a set library that hopes everyone passes the same compare" into "a set type that physically cannot be used with two different compares".</p>
+      </div>
+
+      <h2>The standard library does exactly this</h2>
+      <p>This is not a toy pattern: the real <code>Set</code> and <code>Map</code> in the standard library are functors with the same shape.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">stdlib_set.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">module</span> <span class="ty">IntSet</span> = <span class="ty">Set</span>.<span class="ty">Make</span> (<span class="ty">Int</span>)
+<span class="kw">module</span> <span class="ty">StrMap</span> = <span class="ty">Map</span>.<span class="ty">Make</span> (<span class="ty">String</span>)
+
+<span class="kw">let</span> squares =
+  <span class="ty">StrMap</span>.(empty |&gt; add <span class="str">"two"</span> <span class="num">4</span> |&gt; add <span class="str">"three"</span> <span class="num">9</span>)</pre>
+      </div>
+      <p><code>Set.Make</code> works on any module providing <code>type t</code> and <code>val compare : t -&gt; t -&gt; int</code>; <code>Int</code> and <code>String</code> happen to provide exactly that.</p>
+
+      <h2>When to reach for a functor</h2>
+      <ul>
+        <li>A data structure or algorithm needs <em>operations</em> on its element type, not just the type (compare, hash, equality, printing).</li>
+        <li>You want two instantiations to be distinct types so they cannot be confused.</li>
+        <li>You want to swap an implementation (a real clock vs a fake clock in tests) without touching the code that uses it.</li>
+      </ul>
+      <p>For abstracting over a single value or function, an ordinary higher-order function is simpler; reach for functors when a whole interface travels together. Functors shine in code organized as in <a href="/concepts/projects-dune-opam">Projects with dune and opam</a>, where module boundaries are already doing work.</p>
+    </div>

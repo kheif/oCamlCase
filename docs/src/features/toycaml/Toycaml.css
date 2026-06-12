@@ -1,8 +1,8 @@
-/* ToyCaml interactive elaborator — widget, rule bars, and derivation tree.
+/* ToyCaml interactive elaborator - widget, rule bars, and derivation tree.
    Reuses index.css tokens (--accent, --border, --bg-warm, --mono, --syn-*) so
    the feature reads as part of the same site, not a bolted-on app.
 
-   Theming note: --bg-code (#1d1f21) and --text (#1a1917) are BOTH near-black —
+   Theming note: --bg-code (#1d1f21) and --text (#1a1917) are BOTH near-black -
    --bg-code is the dark *terminal* surface that the site's `pre` blocks pair
    with a hardcoded light foreground (#e1e4e8), never with --text. Every panel
    below either stays on the page's light surfaces (#fff / --bg-warm with
@@ -33,7 +33,7 @@
     background 0.3s ease;
 }
 
-/* Lit up while the elaborator's current step applies this rule (B2) — ties
+/* Lit up while the elaborator's current step applies this rule (B2) - ties
    the abstract rule list to the live derivation being built below. */
 .tc-rule.is-active {
   border-color: var(--accent);
@@ -110,7 +110,7 @@
   color: var(--muted);
 }
 
-/* Light surfaces throughout — these sit on --bg-warm, so white panels with
+/* Light surfaces throughout - these sit on --bg-warm, so white panels with
    --text foreground give the strongest, most legible contrast (the inverse
    of the v1 bug). */
 .tc-widget select,
@@ -155,7 +155,7 @@
 }
 
 /* The binding the current derivation step is reading (Sid) or introducing
-   (Sabs extending T[x:=t]) — part of the B2 cross-panel highlight. */
+   (Sabs extending T[x:=t]) - part of the B2 cross-panel highlight. */
 .tc-env-row.is-active {
   border-color: var(--accent);
   background: var(--accent-bg);
@@ -292,7 +292,7 @@
   text-align: center;
 }
 
-/* ---- abstract syntax readout — deliberately code-styled (dark, light text),
+/* ---- abstract syntax readout - deliberately code-styled (dark, light text),
    matching the site's `pre`/`.code-block`, NOT the page's light --text/--bg-warm */
 
 .tc-ast {
@@ -321,7 +321,7 @@
   color: #e1e4e8;
 }
 
-/* ---- error / result banners — light surfaces, --accent for emphasis ------ */
+/* ---- error / result banners - light surfaces, --accent for emphasis ------ */
 
 .tc-error {
   margin-top: 1rem;
@@ -491,7 +491,7 @@
   vertical-align: bottom;
 }
 
-/* Premises above, inference bar + rule name, conclusion below — the
+/* Premises above, inference bar + rule name, conclusion below - the
    textbook natural-deduction layout (A2; v1 had this upside down). */
 .dt-children {
   display: flex;
@@ -574,7 +574,7 @@
   border-color: var(--accent);
 }
 
-/* The step the cursor is currently on — the focal point of the whole
+/* The step the cursor is currently on - the focal point of the whole
    "watch it build" experience (B2). */
 .dt-node.is-active > .dt-judgement {
   border-color: var(--accent);

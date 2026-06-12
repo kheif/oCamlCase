@@ -1,4 +1,4 @@
-// Dynamic semantics — the lecture's slide-33 tease, completing the static half
+// Dynamic semantics - the lecture's slide-33 tease, completing the static half
 // in elab.ts. A big-step evaluator over the same `Exp`, ported from the shape
 // the lecture sketches:
 //
@@ -21,7 +21,7 @@
 //
 // Why this belongs next to the elaborator: a well-typed ToyCaml expression
 // never gets stuck (Sop/Sapp/Sif's premises are exactly the runtime checks
-// `eval` would otherwise need) — "Run" is the payoff the lecture's static
+// `eval` would otherwise need) - "Run" is the payoff the lecture's static
 // semantics promises. The widget only offers this tab once `elab` succeeds.
 
 import { showOp, type Exp, type Op, type Var } from './ast';
@@ -64,7 +64,7 @@ export type EvalResult = { ok: true; value: Value } | { ok: false; error: string
 
 function applyOp(op: Op, l: Value, r: Value): EvalResult {
   if (l.kind !== 'VInt' || r.kind !== 'VInt') {
-    // Unreachable for a well-typed expression — Sop guarantees both operands
+    // Unreachable for a well-typed expression - Sop guarantees both operands
     // are `int`. Reported anyway so a bug in the type-checker can't crash silently.
     return { ok: false, error: `"${showOp(op)}" expects two integers at runtime` };
   }
@@ -81,7 +81,7 @@ function applyOp(op: Op, l: Value, r: Value): EvalResult {
 }
 
 /**
- * `eval env e` — instrumented like `elaborate`: never throws, always returns
+ * `eval env e` - instrumented like `elaborate`: never throws, always returns
  * an `EvalResult`. For a well-typed `e` under a `T`-respecting `env`, this
  * always succeeds (that is precisely what type soundness buys you); the
  * `error` branches exist only to fail loudly, not silently, if that promise

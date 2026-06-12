@@ -1,0 +1,72 @@
+<div class="article">
+      <div class="page-header">
+        <h1 class="page-title">Tuples</h1>
+        <p class="page-intro">A tuple bundles a fixed number of values, possibly of different types, into one value. It is the simplest way to shape data, and the first step toward modeling with types.</p>
+      </div>
+
+      <h2>Constructing tuples</h2>
+      <div class="two-col lean">
+        <div>
+          <p>A tuple is written with commas. Parentheses are conventional but it is the commas that build the tuple.</p>
+          <p>The type of a tuple uses <code>*</code> between the component types: <code>(3, "three")</code> has type <code>int * string</code>. The order matters and so does the length: <code>int * string</code>, <code>string * int</code>, and <code>int * string * bool</code> are three unrelated types.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">tuples.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="kw">let</span> p = (<span class="num">3</span>, <span class="str">"three"</span>)        <span class="cmt">(* int * string *)</span>
+<span class="kw">let</span> q = (<span class="num">1</span>, <span class="num">2.5</span>, <span class="num">true</span>)     <span class="cmt">(* int * float * bool *)</span>
+<span class="kw">let</span> origin = (<span class="num">0.0</span>, <span class="num">0.0</span>)     <span class="cmt">(* float * float *)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h2>Taking tuples apart: patterns</h2>
+      <p>You rarely access tuple components with functions. Instead you <em>destructure</em> with a pattern that mirrors the construction.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">destructure.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let</span> (x, y) = origin           <span class="cmt">(* x = 0.0, y = 0.0 *)</span>
+
+<span class="kw">let</span> <span class="fn">dist</span> (x1, y1) (x2, y2) =
+  <span class="ty">Float</span>.<span class="fn">sqrt</span> ((x2 -. x1) ** <span class="num">2.</span> +. (y2 -. y1) ** <span class="num">2.</span>)
+
+<span class="kw">let</span> <span class="fn">swap</span> (a, b) = (b, a)      <span class="cmt">(* 'a * 'b -&gt; 'b * 'a *)</span></pre>
+      </div>
+
+      <p>For pairs only, the standard library offers <code>fst</code> and <code>snd</code>, but a pattern is clearer in almost every case and works for any tuple size.</p>
+
+      <div class="callout callout-key">
+        <div class="callout-title">Key insight</div>
+        <p>Construction and destructuring are mirror images: <code>(x, y)</code> builds a pair on the right of <code>=</code> and takes one apart on the left. This symmetry between making data and matching data runs through the whole language, and pattern matching generalizes it from tuples to every data shape.</p>
+      </div>
+
+      <h2>Tuples are not lists</h2>
+      <ul>
+        <li>A <strong>tuple</strong> has a fixed length known in the type, and components may have different types: <code>int * string</code>.</li>
+        <li>A <strong>list</strong> has any length, and every element has the same type: <code>int list</code>.</li>
+      </ul>
+      <p>Use a tuple when the positions <em>mean</em> something (a coordinate, a key-value pair); use a list when you have many of the same thing.</p>
+
+      <h2>One argument that looks like several</h2>
+      <p>A function can take one tuple instead of several curried arguments. The types tell the two styles apart.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">styles.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="kw">let</span> <span class="fn">add_c</span> x y = x + y      <span class="cmt">(* int -&gt; int -&gt; int    : curried *)</span>
+<span class="kw">let</span> <span class="fn">add_t</span> (x, y) = x + y   <span class="cmt">(* int * int -&gt; int     : tupled  *)</span></pre>
+      </div>
+
+      <p>The curried style supports partial application (see <a href="/concepts/currying">Currying</a>) and is the OCaml default. The tupled style appears when the pair is itself a meaningful value, like a coordinate passed around as a unit. Constructors carrying several values, such as <code>Triangle of float * float * float</code>, take exactly one tuple argument; that is where tuples and variants meet (see <a href="/concepts/variants">Variants and Constructors</a>).</p>
+
+      <h2>When tuples stop scaling</h2>
+      <p>By the time a tuple has three or four components, position alone no longer documents meaning: was the third <code>float</code> the price or the weight? At that point you want named fields, which is exactly what <a href="/concepts/records">Records</a> provide. A good rule: pairs almost always, triples sometimes, anything longer wants a record.</p>
+    </div>

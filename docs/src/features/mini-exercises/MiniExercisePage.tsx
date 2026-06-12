@@ -4,9 +4,10 @@ import PageMeta from '../../components/PageMeta';
 import { miniExerciseById, miniExercises } from './data';
 import type { LineOrderItem, MiniExercise } from './data/types';
 import { highlightOcaml } from '../../lib/highlightOcaml';
-import { topbarLinks } from '../../content/nav';
+import { getTopbarLinks } from '../../content/nav';
 import { useMiniProgress } from '../../hooks/useMiniProgress';
 import { useTheme } from '../../hooks/useTheme';
+import { useLearnMode } from '../../learn/learn-mode-context';
 import ConfettiBurst from './ConfettiBurst';
 import './MiniExercisePage.css';
 
@@ -55,6 +56,7 @@ function MiniExerciseInner({
   markComplete: (id: string) => void;
 }) {
   const { theme, toggle } = useTheme();
+  const { mode } = useLearnMode();
   const total = miniExercises.length;
   const idx = miniExercises.findIndex((m) => m.id === exercise.id);
 
@@ -357,7 +359,7 @@ function MiniExerciseInner({
           </span>
         </Link>
         <nav className="me-topnav">
-          {topbarLinks.map((link) =>
+          {getTopbarLinks(mode).map((link) =>
             link.path.startsWith('/playground') ? (
               <a key={link.label} href={link.path}>
                 {link.label}
@@ -482,7 +484,7 @@ function MiniExerciseInner({
           </div>
         </section>
 
-        {/* Right panel — stable structure, content transitions */}
+        {/* Right panel - stable structure, content transitions */}
         <aside className="me-side">
           <div className="me-side-head">
             <span className="me-side-title">{exercise.title}</span>

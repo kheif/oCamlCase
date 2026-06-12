@@ -1,9 +1,9 @@
 // Standard tour traversal, linearizations, projections, and balanced-depth check.
 //
-// Every function returns an array of "step" events — each event is one stepper
+// Every function returns an array of "step" events - each event is one stepper
 // tick in the UI, corresponding to a meaningful action in the algorithm:
-//   firstVisit / lastVisit — a node is numbered (pre or post)
-//   edgeDown  / edgeUp    — the tour moves along an edge (each edge is visited twice)
+//   firstVisit / lastVisit - a node is numbered (pre or post)
+//   edgeDown  / edgeUp    - the tour moves along an edge (each edge is visited twice)
 //
 // This makes the causal chain visible: the output list grows exactly when a
 // visit event fires, so learners can see WHY pre/post-order differ.
@@ -23,7 +23,7 @@ export type TourEvent =
  *
  * Lecture 7 p.3 definition:
  *   "The standard tour starts and ends at the root. Each edge is traversed
- *    exactly twice — first from above to below, later from below to above.
+ *    exactly twice - first from above to below, later from below to above.
  *    Successor trees are visited from left to right."
  *
  * Pre-numbering: node numbered on firstVisit.
@@ -94,7 +94,7 @@ export type BalEvent =
  *   let balanced t = try (let _ = depthb t in true) with Unbalanced -> false
  *
  * Events are post-order (children before parent).
- * On the first mismatch, a `fail` event fires and traversal stops — matching
+ * On the first mismatch, a `fail` event fires and traversal stops - matching
  * the fact that `check` raises and unwinds the stack immediately.
  */
 export function balanceSteps(t: Tree): BalEvent[] {

@@ -108,7 +108,7 @@ function CodeBlock({ fname, code }: { fname: string; code: string }) {
   );
 }
 
-// ---- 2a: interpreter phases pipeline — live, wired to widget state -----------
+// ---- 2a: interpreter phases pipeline - live, wired to widget state -----------
 
 type PhaseStatus = 'pass' | 'fail' | 'pending';
 
@@ -232,7 +232,7 @@ function describeParseError(e: unknown): string {
 }
 
 // Pulled out of the component so the `useMemo`s below wrap plain function
-// calls — the React Compiler can't preserve manual memoization around a
+// calls - the React Compiler can't preserve manual memoization around a
 // closure with early `return`s inside a loop, but it preserves a call to a
 // pure helper fine.
 function parseEnvRows(rows: readonly EnvRow[]): Parsed<Env> {
@@ -308,7 +308,7 @@ function buildRunEnv(
   return { ok: true, value: entries };
 }
 
-// D1 — preset self-check: in dev builds, assert each preset elaborates to the
+// D1 - preset self-check: in dev builds, assert each preset elaborates to the
 // type the lecture states (or fails, for the ill-typed ones). A silent
 // regression here would mean the page is teaching something wrong.
 if (import.meta.env.DEV) {
@@ -366,7 +366,7 @@ export default function Toycaml() {
     setEnvRows((rows) => rows.filter((_, j) => j !== i));
   }
 
-  // Parse the environment rows into a `T : env` (an ordered association list —
+  // Parse the environment rows into a `T : env` (an ordered association list -
   // see elab.ts for why that's the *faithful* representation here, not a cop-out).
   const parsedEnv = useMemo<Parsed<Env>>(() => parseEnvRows(envRows), [envRows]);
 
@@ -385,8 +385,8 @@ export default function Toycaml() {
 
   const steps = useMemo(() => (derivation ? flattenPostOrder(derivation) : []), [derivation]);
 
-  // Re-derivations (new preset, edited env/expression) start fully revealed —
-  // the result should never feel "stuck" — but the stepper can replay the build.
+  // Re-derivations (new preset, edited env/expression) start fully revealed -
+  // the result should never feel "stuck" - but the stepper can replay the build.
   // Resetting on a new `steps` identity *during render* (React's documented
   // "adjusting state when a prop changes" pattern) avoids the cascading-render
   // effect the linter flags for `setState` inside `useEffect`.
@@ -397,7 +397,7 @@ export default function Toycaml() {
     if (playing) setPlaying(false);
   }
 
-  // ---- B1: autoplay — schedules its own next tick; the pending setState lives
+  // ---- B1: autoplay - schedules its own next tick; the pending setState lives
   // inside the timer callback (async), not the effect body, so this is the
   // "subscribe to an external clock" shape the set-state-in-effect lint allows. ----
   useEffect(() => {
@@ -416,12 +416,12 @@ export default function Toycaml() {
     }
   }
 
-  // ---- B2: the node the cursor is currently on — drives cross-panel highlight
+  // ---- B2: the node the cursor is currently on - drives cross-panel highlight
   const activeNode: DerivationNode | null =
     stepIdx > 0 && stepIdx <= steps.length ? steps[stepIdx - 1] : null;
 
   // The binding the active step is reading (Sid) or introducing (Sabs extends
-  // T[x:=t]) — only lights up a row when the name matches one the learner
+  // T[x:=t]) - only lights up a row when the name matches one the learner
   // actually wrote (a freshly-introduced parameter like `y` won't, since it
   // isn't in T; the judgement card itself shows the extended environment).
   const activeBindingName: string | null = useMemo(() => {
@@ -737,7 +737,7 @@ export default function Toycaml() {
             </button>
           </div>
 
-          {/* B3/B5: free(e) against T, live — also where Run gets its sample values (C1) */}
+          {/* B3/B5: free(e) against T, live - also where Run gets its sample values (C1) */}
           <div className="tc-field tc-free-panel">
             <span className="tc-field-label">Free identifiers in e: free(e)</span>
             {freeIdInfos.length === 0 ? (

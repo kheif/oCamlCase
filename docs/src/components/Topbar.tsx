@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { topbarLinks } from '../content/nav';
+import { getTopbarLinks } from '../content/nav';
 import { isTopbarActive } from '../lib/route-utils';
 import { useTheme } from '../hooks/useTheme';
+import { useLearnMode } from '../learn/learn-mode-context';
 
 // Playground is a separate, script-tag-driven app; linking to or from it always
 // triggers a full page load so its module-scope globals never collide.
@@ -40,6 +41,8 @@ type Props = { onMenuClick?: () => void };
 export default function Topbar({ onMenuClick = () => {} }: Props) {
   const { pathname } = useLocation();
   const { theme, toggle } = useTheme();
+  const { mode } = useLearnMode();
+  const topbarLinks = getTopbarLinks(mode);
 
   const fromPlayground = pathname === '/playground' || pathname === '/playground.html';
 

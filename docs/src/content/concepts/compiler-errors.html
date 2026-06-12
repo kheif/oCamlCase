@@ -1,0 +1,96 @@
+<div class="article">
+      <div class="page-header">
+        <h1 class="page-title">Reading Compiler Errors</h1>
+        <p class="page-intro">The OCaml compiler is the best teacher you have. Its error messages follow a small number of patterns; once you can read them, most "mystery" errors become one-line fixes.</p>
+      </div>
+
+      <h2>The anatomy of a type error</h2>
+      <p>Almost every type error has the same shape: a location, the type the expression <em>has</em>, and the type the context <em>expected</em>.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">terminal</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">let x = 1 + 2.5;;</span>
+
+Error: This expression has type <span class="ty">float</span> but an expression was expected of type <span class="ty">int</span></pre>
+      </div>
+
+      <p>Read it backwards: the context (<code>+</code>, integer addition) expected an <code>int</code>; the highlighted expression (<code>2.5</code>) has type <code>float</code>. Two valid fixes, depending on intent: <code>1 + int_of_float 2.5</code> or <code>1.0 +. 2.5</code>. OCaml never converts numbers silently, and <code>+</code> and <code>+.</code> are different operators.</p>
+
+      <div class="callout callout-key">
+        <div class="callout-title">Key habit</div>
+        <p>Do not ask "why is the compiler wrong". Ask "which of the two types in this message is the one I actually meant". The error names both sides of the disagreement; you only have to pick the side that matches your intent and change the other.</p>
+      </div>
+
+      <h2>The five errors you will meet first</h2>
+
+      <h3>1. Arithmetic operators</h3>
+      <p><code>This expression has type float but an expression was expected of type int</code>: you mixed <code>+</code> with floats or <code>+.</code> with ints. Integer math uses <code>+ - * /</code>, float math uses <code>+. -. *. /.</code>.</p>
+
+      <h3>2. Too few arguments, no error at all</h3>
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">terminal</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">let add x y = x + y
+let r = add 3;;</span>
+
+val r : <span class="ty">int -&gt; int</span> = &lt;fun&gt;</pre>
+      </div>
+      <p>Because of currying, forgetting an argument is not an error: you get a function back. The error appears later, when you try to use <code>r</code> as an <code>int</code>: <code>This expression has type int -&gt; int but an expression was expected of type int</code>. Whenever you see a function type where you expected a value, look for a missing argument upstream.</p>
+
+      <h3>3. Branches that disagree</h3>
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">terminal</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">let f b = if b then 1 else "one";;</span>
+
+Error: This expression has type <span class="ty">string</span> but an expression was expected of type <span class="ty">int</span></pre>
+      </div>
+      <p>Both arms of an <code>if</code>, and all branches of a <code>match</code>, must have the same type. The compiler types the first branch, then holds every later branch to it. The location always points at the later branch, but the bug may be in the first one.</p>
+
+      <h3>4. Non-exhaustive match</h3>
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">terminal</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">let head = function x :: _ -&gt; x;;</span>
+
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched: []</pre>
+      </div>
+      <p>This is a warning, not an error, and it is a gift: the compiler constructs a concrete value your code will crash on. Treat warning 8 as an error; either handle the case or make the failure explicit with an <code>option</code> (see <a href="/concepts/options-result">Options and Result</a>).</p>
+
+      <h3>5. The mysterious <code>'a</code> in a reported type</h3>
+      <p>When a message mentions <code>'a list</code> or <code>'a -&gt; 'b</code>, the compiler has not yet learned the concrete type; it is telling you the expression is polymorphic (see <a href="/concepts/polymorphism">Polymorphism</a>). The mismatch is usually between a generic function and a concrete use site.</p>
+
+      <h2>When the error location looks wrong</h2>
+      <p>Type inference flows through your whole program, so a mistake in one place can surface as an error somewhere else, often <em>later</em> in the file. Two tools for pinning it down:</p>
+      <div class="two-col lean">
+        <div>
+          <p><strong>Add annotations.</strong> Writing the type you believe a binding has turns a far-away error into a local one. The annotation acts as a checkpoint: inference cannot drift past it.</p>
+          <p>Once the code compiles, you can delete the annotations again, or keep the ones that read as documentation.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">annotate.ml</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre><span class="cmt">(* the error now appears HERE, not 30 lines later *)</span>
+<span class="kw">let</span> <span class="fn">parse_age</span> (s : <span class="ty">string</span>) : <span class="ty">int</span> =
+  int_of_string s</pre>
+          </div>
+        </div>
+      </div>
+      <p><strong>Shrink the expression.</strong> Paste the failing expression alone into the <a href="/playground">Playground</a> and rebuild it piece by piece, checking the inferred type of each piece. The piece whose type surprises you is the bug.</p>
+
+      <h2>Reading <code>val</code> lines as a habit</h2>
+      <p>The toplevel prints the inferred type of every binding. Before moving on, check that each <code>val</code> line matches what you intended. A function that compiles with the type <code>'a -&gt; 'b -&gt; 'a</code> when you meant <code>int -&gt; int -&gt; int</code> compiles all the same; the type is the earliest place a logic error becomes visible.</p>
+    </div>

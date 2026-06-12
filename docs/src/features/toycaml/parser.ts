@@ -4,7 +4,7 @@
 // expression the grammar allows and see it elaborated live.
 //
 // Grammar (standard arithmetic precedence; application binds tightest, `<=`
-// loosest among operators — matching how `2 * x <= y` is read intuitively):
+// loosest among operators - matching how `2 * x <= y` is read intuitively):
 //
 //   expr   := "if" expr "then" expr "else" expr
 //           | "fun" "(" ident ":" ty ")" "->" expr

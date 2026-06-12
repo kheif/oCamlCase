@@ -9,14 +9,14 @@
 //   ty  ::= bool | int
 //
 // As on page 46, this fragment deliberately omits operators and function types
-// — it is the slice the lecture's parser actually covers, kept verbatim so the
+// - it is the slice the lecture's parser actually covers, kept verbatim so the
 // code panel and the live widget are the same parser.
 //
 // Two outputs, built together:
 //   - the abstract syntax tree (`Exp`/`Ty`) the parser returns, and
 //   - a *concrete* syntax tree (`Cst`) carrying reveal `order` stamps and a
 //     human caption per node, so ParserView can animate the parse top-down
-//     (choose a production, then descend into its parts) — the same shape as
+//     (choose a production, then descend into its parts) - the same shape as
 //     the derivation sequence on page 39.
 
 import { Bool, Int, type Con, type Exp, type Ty } from '../toycaml/ast';
@@ -161,14 +161,14 @@ class Tracer {
   }
 }
 
-/** `parse toks` — recursive-descent parse, returning the CST, AST, and step count. */
+/** `parse toks` - recursive-descent parse, returning the CST, AST, and step count. */
 export function parse(toks: Token[]): ParseResult {
   const tr = new Tracer(toks);
   const start = tr.expr();
   return tr.finish(start);
 }
 
-/** Count of terminal leaves revealed at `stepIdx` — i.e. tokens consumed so far. */
+/** Count of terminal leaves revealed at `stepIdx` - i.e. tokens consumed so far. */
 export function consumedCount(cst: Cst, stepIdx: number): number {
   let n = 0;
   const walk = (node: Cst) => {

@@ -68,7 +68,7 @@ export default function ExercisesHub() {
     '@type': 'ItemList',
     name: 'OCaml Exercises',
     description:
-      'Practice OCaml with drag-and-drop mini exercises and full-length coding challenges covering all 20 concepts.',
+      'Practice OCaml with drag-and-drop mini exercises and full-length coding challenges covering the core concepts.',
     numberOfItems: fullExercises.length + miniTotal,
     itemListElement: fullExercises.map((ex, i) => ({
       '@type': 'ListItem',
@@ -83,7 +83,7 @@ export default function ExercisesHub() {
     <div className="article">
       <PageMeta
         title="Exercises | oCamlCase"
-        description="Practice OCaml with drag-and-drop mini exercises and full-length coding challenges covering all 20 concepts."
+        description="Practice OCaml with drag-and-drop mini exercises and full-length coding challenges covering the core concepts."
       />
       <script
         type="application/ld+json"

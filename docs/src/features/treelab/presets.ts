@@ -14,7 +14,7 @@ export type Preset = {
   label: string;
   tree: Tree;
   ltree: LTree;
-  /** pre(tree) — expected output from Lecture 7 slides. */
+  /** pre(tree) - expected output from Lecture 7 slides. */
   expectedPre: number[];
   /** post(tree). */
   expectedPost: number[];
@@ -25,7 +25,7 @@ export type Preset = {
 };
 
 // Reset the ID counter once before building all presets so IDs are small and
-// deterministic across hot-reloads (development convenience only — the
+// deterministic across hot-reloads (development convenience only - the
 // engine never depends on specific ID values).
 resetIds();
 

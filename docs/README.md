@@ -14,7 +14,7 @@ Every concept includes worked examples, and the interactive labs let you see eva
 
 ## Features
 
-**20 Concept Pages** covering bindings, currying, closures, type inference, polymorphism, pattern matching, lists, higher-order functions, tail recursion, sorting, variant types, options and result, records, trees, mutability, and more.
+**27 Concept Pages** covering bindings, currying, closures, type inference, polymorphism, tuples, variants, pattern matching, lists, higher-order functions, tail recursion, sorting, options and result, records, trees, mutability, modules, functors, dune and opam, testing, and more.
 
 **Interactive Labs:**
 - **Animated concept demos** - Auto-playing, scrubbable visualizations inside concept pages (e.g. watch the call stack grow and unwind on the tail recursion page).
@@ -52,13 +52,17 @@ Every concept includes worked examples, and the interactive labs let you see eva
 
 ## Learning Path
 
-The concepts follow a deliberate progression:
+The site offers two reading orders, switchable from the home page:
 
-1. **Foundations** (1-5): Bindings, currying, abstractions, lexical scope, closures
-2. **Type System** (6-7): Type inference, parametric polymorphism
-3. **Data** (8-11): Pattern matching, lists, list operations, higher-order functions
-4. **Recursion** (12-13): Tail recursion, iteration patterns
-5. **Advanced** (14-20): Derived forms, sorting, variant types, options and result, records, trees, mutability
+- **Reference** (default): a flat topic list in the classic order, for readers who want to jump straight to a page.
+- **Guided Path**: a phased sequence for learning from scratch:
+  0. **Orientation**: how to learn on this site
+  1. **Values & Bindings**: bindings
+  2. **Functions as Values**: abstractions, lexical scope, closures, currying
+  3. **Types**: type inference, polymorphism, reading compiler errors
+  4. **Data Modeling**: tuples, variants, pattern matching, options and result, records, exceptions
+  5. **Recursion & Collections**: lists, list operations, higher-order functions, tail recursion, iteration, derived forms, trees, sorting (capstone)
+  6. **Practical OCaml**: mutability, modules and signatures, functors, dune and opam, testing and code quality
 
 After concepts, the Interactive Labs connect theory to practice with live visualizations.
 
@@ -75,10 +79,9 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ## Roadmap
 
-- [x] Structured data (JSON-LD) for search engines — global Course schema + per-page Article/LearningResource
-- [x] More mini exercises — 33 covering all 20 concepts
+- [x] Structured data (JSON-LD) for search engines - global Course schema + per-page Article/LearningResource
+- [x] More mini exercises - 33 covering the core concepts
 - [ ] Pre-rendering for improved SEO
 - [ ] Dedicated 1200x630 OG banner image
 - [ ] Additional interpreter pipeline stages (REPL capstone)
-- [ ] Modules & signatures concept page
 - [ ] Roll out animated React-island demos to more concept pages (exception unwind, insertion sort, closures)

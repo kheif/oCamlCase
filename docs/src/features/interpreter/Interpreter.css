@@ -1,4 +1,4 @@
-/* Building an Interpreter feature — scoped styles (lx- = lexer slice). All
+/* Building an Interpreter feature - scoped styles (lx- = lexer slice). All
    colors/spacing come from the global design tokens in index.css. */
 
 .lx-widget {
@@ -323,7 +323,7 @@
 .vd-canvas {
   margin-top: var(--s2);
   /* Full-bleed: break out of the article's side padding so the tree gets the
-     whole content width, then re-pad the sides. No border — the extra width
+     whole content width, then re-pad the sides. No border - the extra width
      plus shrunk nodes lets most derivations fit without horizontal scroll. */
   margin-inline: calc(-1 * var(--s8));
   padding: var(--s4) var(--s8);

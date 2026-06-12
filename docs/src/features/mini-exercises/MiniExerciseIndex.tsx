@@ -40,7 +40,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   lists: 'Lists',
   'list-ops': 'List Operations',
   'higher-order': 'Higher-Order Functions',
-  variants: 'Variant Types',
+  variants: 'Variants and Constructors',
   options: 'Options and Result',
   records: 'Records',
   'derived-forms': 'Derived Forms',
@@ -97,14 +97,14 @@ export default function MiniExerciseIndex() {
     <div className="article">
       <PageMeta
         title="Mini Exercises | oCamlCase"
-        description="33 short OCaml drag-and-drop exercises covering all 20 concepts: bindings, closures, pattern matching, options, records, mutability, trees, and more."
+        description="33 short OCaml drag-and-drop exercises covering the core concepts: bindings, closures, pattern matching, options, records, mutability, trees, and more."
       />
       <div className="page-header">
         <div className="page-label">Mini Exercises</div>
         <h1 className="page-title">Drag the lines into order</h1>
         <p className="page-intro">
           Short, focused exercises: lines of a correct OCaml solution, shuffled. Drag them into
-          the right order. Covers 20 concepts from bindings to mutability.
+          the right order. Covers the core concepts from bindings to mutability.
         </p>
       </div>
 

@@ -1,4 +1,4 @@
-// Dynamic semantics as a *derivation* — the runtime twin of elab.ts's typing
+// Dynamic semantics as a *derivation* - the runtime twin of elab.ts's typing
 // derivation. Where the evaluator in toycaml/eval.ts returns just a value, this
 // builds the value-judgement tree `V ⊢ e ⇒ v` recording every rule the lecture
 // gives (Lecture 8, pages 13–16):
@@ -11,7 +11,7 @@
 //
 // It is a thin wrapper over the same logic as `evaluate`: the tree's root value
 // always equals `evaluate env e` for a well-typed `e` (asserted in the page's
-// dev self-check). Building the tree — rather than reusing `evaluate` — is only
+// dev self-check). Building the tree - rather than reusing `evaluate` - is only
 // so each premise becomes a visible, steppable node, and so Dapp's environment
 // extension V'[x:=v2] shows up as its own sub-derivation.
 
@@ -104,7 +104,7 @@ const DEFAULT_BUDGET = 400;
 const DIVERGES = 'evaluation did not terminate within the step budget (this expression diverges)';
 
 /**
- * `evalDerivation env e` — the big-step evaluation of `e` under `env`, as a tree.
+ * `evalDerivation env e` - the big-step evaluation of `e` under `env`, as a tree.
  *
  * `budget` caps the total number of derivation nodes, so a divergent recursive
  * function (such as `rfun loop (x:int):int -> loop x`) can be visualized safely
@@ -235,7 +235,7 @@ function go(env: VEnv, exp: Exp, st: { fuel: number }): EvalNode {
   }
 }
 
-/** Post-order flatten (premises before conclusion) — drives the step reveal. */
+/** Post-order flatten (premises before conclusion) - drives the step reveal. */
 export function flattenEvalPostOrder(root: EvalNode): EvalNode[] {
   const out: EvalNode[] = [];
   const visit = (n: EvalNode) => {

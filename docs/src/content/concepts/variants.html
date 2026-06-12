@@ -1,8 +1,7 @@
 <div class="article">
       <div class="page-header">
-        <div class="page-label">Concept 16 of 20</div>
-        <h1 class="page-title">Constructors and Exceptions</h1>
-        <p class="page-intro">Constructor types let you define custom types with multiple alternatives, serving as the foundation for complex data structures and error handling in OCaml.</p>
+        <h1 class="page-title">Variants and Constructors</h1>
+        <p class="page-intro">Variant types let you define custom types with multiple alternatives. They are how you describe the shape of your data, and the foundation pattern matching is built on.</p>
       </div>
 
       <h2>Constructor Types (Variant Types)</h2>
@@ -65,7 +64,7 @@
               <div><span class="ty">Float</span>.<span class="fn">sqrt</span> ...</div>
             </div>
           </div>
-          
+
           <div class="pat-visual">
             <div class="pat-value">
               <div class="pat-tag">Triangle</div>
@@ -75,7 +74,7 @@
                 <div class="pat-val pv-3">5.0</div>
               </div>
             </div>
-            
+
             <div class="pat-env">
               <div class="pat-env-title">Local Bindings</div>
               <div class="pat-bind p-bind-1"><span class="kw">let</span> a = <span class="num">3.0</span></div>
@@ -154,7 +153,7 @@
       </div>
 
       <h2>Environments</h2>
-      <p>An environment maps variable names to values. In OCaml, this is modeled as a function.</p>
+      <p>An environment maps variable names to values. In OCaml, this is modeled as a function. The <code>raise Unbound</code> fallback uses an exception, covered in <a href="/concepts/exceptions">Exceptions</a>.</p>
 
       <div class="code-block inline">
         <div class="code-top">
@@ -169,101 +168,6 @@
   | <span class="str">"x"</span> -&gt; <span class="num">0</span>
   | <span class="str">"y"</span> -&gt; <span class="num">3</span>
   | _ -&gt; <span class="kw">raise</span> Unbound</pre>
-      </div>
-
-      <h2>Exceptions</h2>
-      <p>Exceptions in OCaml are values of the built in extensible constructor type <code>exn</code>.</p>
-
-      <div class="two-col lean">
-        <div>
-          <p>The <code>exn</code> type can be extended at any time with new exception constructors. Exception constructors work like normal constructors and can be used in pattern matching.</p>
-          <p>A <code>raise</code> expression can have any type because it never returns a value.</p>
-        </div>
-        <div class="sticky">
-          <div class="code-block">
-            <div class="code-top">
-              <span class="code-fname">exceptions.ml</span>
-              <button class="copy-btn" onclick="copyCode(this)">copy</button>
-            </div>
-<pre><span class="kw">exception</span> New              <span class="cmt">(* nullary *)</span>
-<span class="kw">exception</span> Newer <span class="kw">of</span> <span class="ty">int</span>     <span class="cmt">(* with payload *)</span>
-
-<span class="kw">let</span> <span class="fn">test</span> f = <span class="kw">try</span> f () <span class="kw">with</span>
-  | Newer x -&gt; x
-  | Failure _ -&gt; <span class="num">-1</span></pre>
-          </div>
-        </div>
-      </div>
-
-      <h2>Execution Order</h2>
-      <p>OCaml uses a right to left evaluation order for arguments.</p>
-      <p>Example: <code>(failwith "left", (failwith "mid" + 4) + failwith "right")</code> raises <code>Failure "right"</code> because the rightmost expression is evaluated first.</p>
-
-      <h2>Practical Example: Test for Duplicates</h2>
-      <p>Exceptions can be used as a control flow mechanism. Sorting can be used to detect duplicates efficiently by throwing an exception when an equality is found.</p>
-
-      <div class="code-block inline">
-        <div class="code-top">
-          <span class="code-fname">duplicate.ml</span>
-          <button class="copy-btn" onclick="copyCode(this)">copy</button>
-        </div>
-<pre><span class="kw">exception</span> Duplicate
-
-<span class="kw">let</span> <span class="fn">mask</span> cmp p q =
-  <span class="kw">match</span> cmp p q <span class="kw">with</span>
-  | <span class="num">0</span> -&gt; <span class="kw">raise</span> Duplicate
-  | v -&gt; v
-
-<span class="kw">let</span> <span class="fn">test_duplicate</span> cmp xs =
-  <span class="kw">try</span>
-    <span class="kw">let</span> _ = <span class="ty">List</span>.<span class="fn">sort</span> (<span class="fn">mask</span> cmp) xs <span class="kw">in</span>
-    <span class="num">false</span>
-  <span class="kw">with</span> Duplicate -&gt; <span class="num">true</span></pre>
-      </div>
-
-      <div class="demo-box exn-demo">
-        <input type="radio" name="exn-step" id="es-1" checked>
-        <input type="radio" name="exn-step" id="es-2">
-        <input type="radio" name="exn-step" id="es-3">
-        <input type="radio" name="exn-step" id="es-4">
-
-        <div class="demo-timeline">
-          <label for="es-1">1. Try Block</label>
-          <label for="es-2">2. Deep Recursion</label>
-          <label for="es-3">3. Raise!</label>
-          <label for="es-4">4. Unwind</label>
-        </div>
-
-        <div class="demo-stage exn-stage">
-          <div class="exn-left">
-            <div class="exn-try-block">
-              <div><span class="kw">try</span></div>
-              <div class="exn-sort-call"><span class="ty">List</span>.<span class="fn">sort</span> (<span class="fn">mask</span> cmp) [<span class="num">1</span>; <span class="num">2</span>; <span class="num">1</span>]</div>
-              <div class="exn-ret-false">  <span class="num">false</span></div>
-              <div class="exn-catch-block"><span class="kw">with</span> Duplicate -&gt; <span class="num">true</span></div>
-            </div>
-          </div>
-          
-          <div class="exn-right">
-            <div class="exn-stack">
-              <div class="exn-frame ef-1">
-                <div><span class="fn">mask</span> cmp <span class="num">1</span> <span class="num">1</span></div>
-                <div class="exn-cmp-result">cmp 1 1 = 0</div>
-                <div class="exn-raise-text"><span class="kw">raise</span> Duplicate</div>
-              </div>
-              <div class="exn-frame ef-2"><span class="fn">merge</span> [<span class="num">1</span>] [<span class="num">1</span>; <span class="num">2</span>]</div>
-              <div class="exn-frame ef-3"><span class="fn">sort</span> [<span class="num">1</span>; <span class="num">2</span>; <span class="num">1</span>]</div>
-            </div>
-            <div class="exn-bomb">💥</div>
-          </div>
-        </div>
-
-        <div class="demo-caption">
-          <div class="cap cap-1"><strong>Step 1.</strong> We establish an exception handler with <code>try ... with</code> and call the standard library sorting function.</div>
-          <div class="cap cap-2"><strong>Step 2.</strong> <code>List.sort</code> builds a deep call stack of recursive <code>sort</code> and <code>merge</code> frames. It calls our <code>mask</code> function to compare <code>1</code> and <code>1</code>.</div>
-          <div class="cap cap-3"><strong>Step 3.</strong> <code>cmp 1 1</code> returns <code>0</code>. The <code>mask</code> function triggers <code>raise Duplicate</code>.</div>
-          <div class="cap cap-4"><strong>Step 4.</strong> Control immediately leaps out of the deep stack, destroying all intermediate frames. It bypasses <code>false</code> and lands in the <code>with</code> block, returning <code>true</code>.</div>
-        </div>
       </div>
 
       <h2>Type Constructors (Parameterized Types)</h2>
@@ -286,11 +190,7 @@
         #ps-1:checked ~ .demo-timeline label[for="ps-1"],
         #ps-2:checked ~ .demo-timeline label[for="ps-2"],
         #ps-3:checked ~ .demo-timeline label[for="ps-3"],
-        #ps-4:checked ~ .demo-timeline label[for="ps-4"],
-        #es-1:checked ~ .demo-timeline label[for="es-1"],
-        #es-2:checked ~ .demo-timeline label[for="es-2"],
-        #es-3:checked ~ .demo-timeline label[for="es-3"],
-        #es-4:checked ~ .demo-timeline label[for="es-4"] {
+        #ps-4:checked ~ .demo-timeline label[for="ps-4"] {
           background: var(--accent); color: #fff; border-color: var(--accent);
         }
 
@@ -304,15 +204,15 @@
         .pat-match { opacity: 0.5; transition: opacity .3s ease; }
         .pat-branch { padding-left: 12px; opacity: 0.4; transition: opacity .3s ease, color .3s ease; }
         .pat-eval { padding-left: 24px; opacity: 0; transform: translateY(10px); transition: all .4s ease; color: #c4a76a; }
-        
+
         #ps-2:checked ~ .pat-stage .pat-match,
         #ps-3:checked ~ .pat-stage .pat-match,
         #ps-4:checked ~ .pat-stage .pat-match { opacity: 1; }
-        
+
         #ps-2:checked ~ .pat-stage .pb-3,
         #ps-3:checked ~ .pat-stage .pb-3,
         #ps-4:checked ~ .pat-stage .pb-3 { opacity: 1; color: #6ac48a; }
-        
+
         #ps-4:checked ~ .pat-stage .pat-eval { opacity: 1; transform: translateY(0); }
 
         .pat-visual {
@@ -330,7 +230,7 @@
           padding: 4px 8px; font-family: var(--mono); font-size: 12px; color: #343a40;
           transition: all .5s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative;
         }
-        
+
         .pat-env {
           background: var(--bg-warm); border: 1px dashed var(--border-dk); border-radius: 6px;
           padding: 12px; width: 100%; display: flex; flex-direction: column; gap: 6px;
@@ -339,68 +239,21 @@
         .pat-env-title { font-family: var(--sans); font-size: 11px; text-transform: uppercase; color: var(--muted); text-align: center; margin-bottom: 4px; }
         .pat-bind { font-family: var(--mono); font-size: 13px; color: #2f6a30; background: #d4ecd4; padding: 4px 8px; border-radius: 4px; opacity: 0; transform: translateY(-10px); transition: all .4s ease; }
         .pat-res { font-family: var(--sans); font-weight: bold; font-size: 15px; color: #343a40; opacity: 0; transition: opacity .4s ease; margin-top: auto; }
-        
+
         #ps-3:checked ~ .pat-stage .pat-env, #ps-4:checked ~ .pat-stage .pat-env { opacity: 1; transform: scale(1); }
         #ps-3:checked ~ .pat-stage .p-bind-1, #ps-4:checked ~ .pat-stage .p-bind-1 { opacity: 1; transform: translateY(0); transition-delay: .1s; }
         #ps-3:checked ~ .pat-stage .p-bind-2, #ps-4:checked ~ .pat-stage .p-bind-2 { opacity: 1; transform: translateY(0); transition-delay: .2s; }
         #ps-3:checked ~ .pat-stage .p-bind-3, #ps-4:checked ~ .pat-stage .p-bind-3 { opacity: 1; transform: translateY(0); transition-delay: .3s; }
-        
+
         #ps-4:checked ~ .pat-stage .pat-res { opacity: 1; transition-delay: .4s; }
-
-        /* Exception Demo */
-        .exn-stage { grid-template-columns: 1fr 1fr; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px; overflow: hidden; }
-        .exn-left { font-family: var(--mono); font-size: 13px; color: #343a40; line-height: 1.8; display: flex; align-items: center; }
-        .exn-try-block { background: var(--bg-warm); padding: 16px; border-radius: 6px; border-left: 3px solid #6a8cc4; width: 100%; }
-        .exn-sort-call { padding-left: 16px; color: var(--text); }
-        .exn-ret-false { opacity: 0.5; }
-        .exn-catch-block { color: #8a3030; font-weight: bold; padding-left: 16px; border: 1px solid transparent; transition: all .3s ease; border-radius: 4px; }
-        
-        #es-4:checked ~ .exn-stage .exn-catch-block { background: #f4d4d4; border-color: #8a3030; padding: 4px 16px; }
-        #es-4:checked ~ .exn-stage .exn-sort-call,
-        #es-4:checked ~ .exn-stage .exn-ret-false { opacity: 0.2; text-decoration: line-through; }
-
-        .exn-right { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; height: 180px; }
-        .exn-stack { display: flex; flex-direction: column; gap: 4px; width: 100%; transition: all .3s ease; }
-        .exn-frame { background: var(--bg-code); color: #e6e6e6; padding: 8px 12px; border-radius: 4px; font-family: var(--mono); font-size: 12px; opacity: 0; transform: translateY(20px); transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .exn-cmp-result { color: #c4a76a; font-size: 11px; margin-top: 4px; opacity: 0; height: 0; overflow: hidden; transition: all .3s ease; }
-        .exn-raise-text { color: #f4d4d4; background: #8a3030; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin-top: 4px; font-weight: bold; opacity: 0; height: 0; overflow: hidden; transition: all .3s ease; }
-        
-        #es-2:checked ~ .exn-stage .ef-3, #es-3:checked ~ .exn-stage .ef-3 { opacity: 1; transform: translateY(0); }
-        #es-2:checked ~ .exn-stage .ef-2, #es-3:checked ~ .exn-stage .ef-2 { opacity: 1; transform: translateY(0); transition-delay: .1s; }
-        #es-2:checked ~ .exn-stage .ef-1, #es-3:checked ~ .exn-stage .ef-1 { opacity: 1; transform: translateY(0); transition-delay: .2s; }
-        
-        #es-3:checked ~ .exn-stage .exn-cmp-result { opacity: 1; height: 16px; transition-delay: .4s; }
-        #es-3:checked ~ .exn-stage .exn-raise-text { opacity: 1; height: 18px; margin-top: 6px; transition-delay: .6s; }
-        
-        .exn-bomb { position: absolute; font-size: 40px; top: 30px; opacity: 0; transform: scale(0); transition: all .2s ease; }
-        #es-4:checked ~ .exn-stage .exn-bomb { opacity: 1; transform: scale(2); transition-delay: .1s; }
-        
-        #es-4:checked ~ .exn-stage .ef-1,
-        #es-4:checked ~ .exn-stage .ef-2,
-        #es-4:checked ~ .exn-stage .ef-3 {
-          opacity: 0; transform: translateY(40px) scale(0.9);
-          background: #8a3030;
-        }
 
         #ps-1:checked ~ .demo-caption .cap-1,
         #ps-2:checked ~ .demo-caption .cap-2,
         #ps-3:checked ~ .demo-caption .cap-3,
-        #ps-4:checked ~ .demo-caption .cap-4,
-        #es-1:checked ~ .demo-caption .cap-1,
-        #es-2:checked ~ .demo-caption .cap-2,
-        #es-3:checked ~ .demo-caption .cap-3,
-        #es-4:checked ~ .demo-caption .cap-4 { display: block; }
-        
+        #ps-4:checked ~ .demo-caption .cap-4 { display: block; }
+
         @media (max-width: 720px) {
-          .pat-stage, .exn-stage { grid-template-columns: 1fr; }
+          .pat-stage { grid-template-columns: 1fr; }
         }
       </style>
     </div>
-<div class="page-nav">
-  <p class="page-nav-label">Continue learning</p>
-  <div class="page-nav-links">
-    <a href="/concepts/sorting" class="page-nav-prev">Sorting</a>
-    <a href="/concepts/options-result" class="page-nav-next">Next: Options and Result</a>
-    <a href="/exercises/bank" class="page-nav-practice">Practice: Bank Account</a>
-  </div>
-</div>

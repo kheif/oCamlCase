@@ -1,0 +1,40 @@
+<div class="article">
+      <div class="page-header">
+        <h1 class="page-title">How to Learn OCaml on This Site</h1>
+        <p class="page-intro">Before the first concept: how this site is organized, where to run code, and the study loop that makes the material stick.</p>
+      </div>
+
+      <h2>Two ways through the material</h2>
+      <p>The same pages can be read in two orders. Pick the one that matches you on the home page:</p>
+      <ul>
+        <li><strong>Guided Path</strong>: a phased sequence for learning from scratch. Each phase builds only on earlier phases, so nothing arrives before its prerequisites. If OCaml or functional programming is new to you, use this.</li>
+        <li><strong>Reference</strong>: a flat topic list for readers who already know the ideas and want to jump straight to a page. The <a href="/cheatsheet">Cheat Sheet</a> is the fastest entry point in this mode.</li>
+      </ul>
+      <p>The sidebar, the numbering on each page, and the Next links at the bottom of every concept all follow whichever mode you picked. Switching is instant and keeps your place.</p>
+
+      <h2>Where to run code</h2>
+      <p>Every code block has a <em>copy</em> button. Paste the code into the <a href="/playground">Playground</a>, which runs OCaml directly in your browser. Nothing to install.</p>
+      <p>Use the Playground constantly, not just when a page tells you to. Reading OCaml and writing OCaml are different skills; only the second one makes the first one easy.</p>
+
+      <div class="callout callout-key">
+        <div class="callout-title">The study loop</div>
+        <p>On every example: <strong>read</strong> the code, <strong>predict</strong> what it evaluates to, <strong>run</strong> it in the Playground, then <strong>modify</strong> it until it breaks or surprises you. Repeat. A prediction that turns out wrong teaches more than ten pages that read smoothly.</p>
+      </div>
+
+      <h2>Error messages are guides, not enemies</h2>
+      <p>OCaml's compiler rejects a lot of programs that other languages happily run and then crash. That is the deal: the compiler does the crashing up front, with a message, before your program ever runs.</p>
+      <p>So when you see an error, do not retreat to the previous working version. Read the message. It almost always names the exact expression, the type it has, and the type it was expected to have. Learning to decode these messages is a core OCaml skill, and it has its own page: <a href="/concepts/compiler-errors">Reading Compiler Errors</a>.</p>
+
+      <h2>How the pieces fit</h2>
+      <ul>
+        <li><strong>Concepts</strong> are the main path: each page is one idea, with examples and (often) an animated demo.</li>
+        <li><strong>Mini exercises</strong> are short drag-and-drop drills linked from concept pages. Do them right after the page they belong to.</li>
+        <li><strong>Exercises</strong> are larger coding challenges that combine several concepts. Attempt them at phase boundaries.</li>
+        <li><strong>Interactive Labs</strong> (TreeLab, Static Semantics, the Interpreter series) go deeper into how the language itself works. They reward a second visit after you finish the path.</li>
+      </ul>
+
+      <h2>One sentence to keep</h2>
+      <p>Writing OCaml is mostly two activities: <strong>designing the shape of your data</strong>, and <strong>writing total functions over that shape</strong>. Every phase of the guided path serves one of those two activities. When a page feels abstract, ask which of the two it is sharpening.</p>
+
+      <p>Ready? Start with <a href="/concepts/bindings">Bindings</a>.</p>
+    </div>

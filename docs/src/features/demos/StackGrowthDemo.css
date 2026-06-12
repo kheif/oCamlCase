@@ -1,4 +1,4 @@
-/* StackGrowthDemo — React island replacing the CSS radio demo on the
+/* StackGrowthDemo - React island replacing the CSS radio demo on the
    tail-recursion page. Base declarations carry every FINAL visual state;
    keyframes only add motion on top, so the global reduced-motion rule
    (animation: none) leaves each step rendering its correct end state. */
@@ -113,7 +113,7 @@
   min-width: 0;
 }
 .sg-frame-cd .sg-call {
-  min-width: 92px; /* widest label "countdown 4" — swaps don't shift layout */
+  min-width: 92px; /* widest label "countdown 4" - swaps don't shift layout */
 }
 /* Currently-executing frame (top of stack) */
 .sg-frame.is-top {
@@ -142,7 +142,7 @@
   font-weight: 600;
 }
 
-/* Result chip — final state: visible, settled */
+/* Result chip - final state: visible, settled */
 .sg-result {
   margin: 10px auto 0;
   width: fit-content;
@@ -156,7 +156,7 @@
   background: var(--accent-bg, rgba(212, 98, 26, 0.08));
 }
 
-/* Run progress under the stage — fills as the story advances */
+/* Run progress under the stage - fills as the story advances */
 .sg-track {
   height: 3px;
   margin-top: 14px;
@@ -214,7 +214,7 @@
     }
   }
 
-  /* Frames below a landing frame absorb the impact — a brief press.
+  /* Frames below a landing frame absorb the impact - a brief press.
      Two identical keyframes alternated by step parity so the animation
      retriggers on every push. */
   @keyframes sg-press-a {
@@ -241,7 +241,7 @@
   }
 
   /* Pop: accent flash while the equation resolves, then lift off with a
-     little spin and fade fully out — the unmount on the next step is
+     little spin and fade fully out - the unmount on the next step is
      invisible because the frame already ended at opacity 0 */
   @keyframes sg-pop {
     0% {
@@ -276,7 +276,7 @@
     }
   }
 
-  /* Frame below the pop receives the value — pending text flashes */
+  /* Frame below the pop receives the value - pending text flashes */
   @keyframes sg-receive {
     0%,
     100% {

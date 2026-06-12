@@ -1,6 +1,6 @@
 # Lessons
 
-## 2026-06-11 — Demo UI redesign rejected
+## 2026-06-11 - Demo UI redesign rejected
 - **What happened:** Upgraded stack-demo MOTION (accepted), then did an unrequested-scope
   visual redesign (memory wells, heat overlay, LED depth gauges, filled-Play controls).
   User: "no okay revert last changes back."

@@ -1,4 +1,4 @@
-// Lexical analysis for full ToyCaml — a faithful TypeScript port of the
+// Lexical analysis for full ToyCaml - a faithful TypeScript port of the
 // lecture's OCaml lexer (Lecture 8, pages 33–37):
 //
 //   type token =
@@ -54,7 +54,7 @@ export function showToken(tok: Token): string {
   }
 }
 
-// Surface form of a token — what it looks like in the source text (`(`, `->`,
+// Surface form of a token - what it looks like in the source text (`(`, `->`,
 // `if`, the identifier itself, the literal). Distinct from `showToken`, which
 // prints the constructor (`LP`, `ARR`, `VAR "x"`). Used as concrete-syntax-tree
 // leaf labels in the parser slice.
@@ -97,7 +97,7 @@ export function tokenText(tok: Token): string {
 
 // One unit of lexer progress: the half-open source span [start, end) that was
 // consumed, and the token emitted (or `null` for skipped whitespace). Maximal
-// munch shows up directly — a number or identifier is a single step whose span
+// munch shows up directly - a number or identifier is a single step whose span
 // covers every character it greedily consumed.
 export type LexStep = { start: number; end: number; token: Token | null };
 
@@ -131,7 +131,7 @@ const KEYWORDS: Record<string, Token> = {
 };
 
 /**
- * `lex src` — translate a source string into a token list, recording each step.
+ * `lex src` - translate a source string into a token list, recording each step.
  * Throws `LexError` on a character that begins no token ("lexically inadmissible"
  * in the slides). Never partially returns: either the whole input lexes or it
  * throws.
@@ -154,7 +154,7 @@ export function lex(src: string): LexResult {
       continue;
     }
 
-    // Two-character tokens first — maximal munch means "->" must beat "-".
+    // Two-character tokens first - maximal munch means "->" must beat "-".
     if (c === '-' && src[i + 1] === '>') {
       emit({ t: 'ARR' }, i, i + 2);
       i += 2;
@@ -193,7 +193,7 @@ export function lex(src: string): LexResult {
       continue;
     }
 
-    // lex_var: greedily read the identifier, THEN classify — keywords are only
+    // lex_var: greedily read the identifier, THEN classify - keywords are only
     // recognised once the whole word is read, so `internal` stays a VAR.
     if (isLetter(c)) {
       let j = i;

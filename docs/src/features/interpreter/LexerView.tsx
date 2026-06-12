@@ -5,7 +5,7 @@ import { lex, showToken, LexError, type LexStep, type Token } from './lex';
 // Interactive lexer: type a source string and watch `lex` consume it one token
 // at a time. The character strip shows what has been read (done), what is being
 // read right now (active), and what is still ahead (future); the token strip
-// grows in lockstep. Maximal munch is visible directly — a multi-character
+// grows in lockstep. Maximal munch is visible directly - a multi-character
 // number or identifier lights up as one active span.
 
 const PRESETS = [

@@ -2,13 +2,13 @@ import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { useStepper } from '../../hooks/useStepper';
 import './StackGrowthDemo.css';
 
-// "Watch the stack grow" — factorial 4 (stack grows, then unwinds frame by
+// "Watch the stack grow" - factorial 4 (stack grows, then unwinds frame by
 // frame) vs countdown 4 (single frame reused on every tail call). React island
 // mounted from tail-recursion.html via `data-island="stack-growth"`.
 //
 // Every visual derives purely from stepIdx so prev/next scrubbing always lands
 // on a correct state; entry/pop animations are mount/class-keyed keyframes.
-// Final states live in base CSS — under prefers-reduced-motion the keyframes
+// Final states live in base CSS - under prefers-reduced-motion the keyframes
 // are globally disabled and each step renders its end state instantly.
 
 type FactFrame = {
@@ -211,7 +211,7 @@ export default function StackGrowthDemo() {
     return () => io.disconnect();
   }, []);
 
-  // Loop: hold the finale for a beat, then replay from the top — forever,
+  // Loop: hold the finale for a beat, then replay from the top - forever,
   // until the user presses any control (or the demo is off-screen).
   useEffect(() => {
     if (!stepper.atEnd || !autoStartedRef.current || interactedRef.current) return;

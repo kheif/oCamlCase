@@ -1,6 +1,6 @@
 // Shared active-link logic for Sidebar and Topbar. Both treat a path and its
 // `.html` counterpart as the same destination (the app auto-redirects
-// `*.html` -> clean URL — see App.tsx), and treat `/` specially because
+// `*.html` -> clean URL - see App.tsx), and treat `/` specially because
 // `/index.html` also redirects to it.
 
 /** Is `pathname` the (possibly `.html`-suffixed) route for `path`? */

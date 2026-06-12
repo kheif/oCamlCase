@@ -48,7 +48,7 @@
   --r2: 6px;
   --r3: 10px;
 
-  /* Shadows — warm-tinted, low opacity */
+  /* Shadows - warm-tinted, low opacity */
   --sh1: 0 1px 3px rgba(26, 25, 23, 0.06), 0 1px 2px rgba(26, 25, 23, 0.04);
   --sh2: 0 4px 12px rgba(26, 25, 23, 0.08);
   --sh3: 0 8px 24px rgba(26, 25, 23, 0.12);
@@ -559,7 +559,7 @@ hr {
 .callout-warn .callout-title {
   color: #9a7308;
 }
-/* Tree Lab cross-link callout — appears in trees.html where CSS-only demos
+/* Tree Lab cross-link callout - appears in trees.html where CSS-only demos
    were removed; points learners to the live interactive feature. */
 .callout-lab {
   border-color: var(--accent);
@@ -963,6 +963,15 @@ pre {
   }
 }
 
+@keyframes mode-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Content pages: soft overall settle */
 @media (prefers-reduced-motion: no-preference) {
   .article {
@@ -981,6 +990,11 @@ pre {
   .page-header > .page-intro {
     animation: fade-up 0.4s var(--ease) both;
     animation-delay: 140ms;
+  }
+
+  /* Learn-mode switch: label/footer content crossfades in place */
+  .mode-crossfade {
+    animation: mode-fade-in 0.15s ease both;
   }
 
   /* Home hero stagger */
@@ -1145,6 +1159,47 @@ html {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--dim);
+}
+/* Learn-mode toggle: quiet pill pair, mirrors the mini-exercise view toggle */
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.mode-toggle-btn {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.mode-toggle-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.mode-toggle-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+/* Guided-path phase groups on the home TOC */
+.toc-phase {
+  margin-bottom: var(--s4);
+}
+.toc-phase-head {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: var(--s3) 0;
 }
 .toc-items {
   display: flex;

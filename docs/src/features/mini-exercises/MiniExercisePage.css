@@ -454,7 +454,7 @@
   padding: 0 16px 0 0;
 }
 
-/* OCaml syntax — inherit from site */
+/* OCaml syntax - inherit from site */
 .me-line .kw { color: var(--syn-kw); }
 .me-line .fn { color: var(--syn-fn); }
 .me-line .str { color: var(--syn-str); }
@@ -645,7 +645,7 @@
   border-color: var(--accent);
 }
 
-/* Chip syntax colors — same as code lines */
+/* Chip syntax colors - same as code lines */
 .me-chip .kw { color: #c75500; }
 .me-chip .fn { color: #0062a3; }
 .me-chip .str { color: #1a7a2a; }

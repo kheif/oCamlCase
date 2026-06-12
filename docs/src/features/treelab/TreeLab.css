@@ -1,13 +1,13 @@
-/* Tree Lab — styles for the interactive rose-tree explorer.
+/* Tree Lab - styles for the interactive rose-tree explorer.
    All values reference src/index.css design tokens so the feature matches
    the site's light/dark theme automatically.
    Class prefix: tl-                                                         */
 
 /* ---- colour tokens for the badge colours (not in the base palette) -------- */
 :root {
-  --pre-badge:   #4a90d9;   /* blue — first visit */
-  --post-badge:  #e8a317;   /* amber — last visit */
-  --depth-badge: #2ecc71;   /* green — computed depth */
+  --pre-badge:   #4a90d9;   /* blue - first visit */
+  --post-badge:  #e8a317;   /* amber - last visit */
+  --depth-badge: #2ecc71;   /* green - computed depth */
   --error:       #c0392b;
   --error-bg:    #fff0ee;
 }

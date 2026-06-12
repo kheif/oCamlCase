@@ -1,15 +1,22 @@
+import { useMemo, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { navGroups } from '../content/nav';
+import { getNavGroups } from '../content/nav';
 import { isActive } from '../lib/route-utils';
+import { useLearnMode } from '../learn/learn-mode-context';
+import { useFlip } from '../hooks/useFlip';
 
 type Props = { open: boolean; onClose: () => void };
 
 export default function Sidebar({ open, onClose }: Props) {
   const { pathname } = useLocation();
+  const { mode } = useLearnMode();
+  const navGroups = useMemo(() => getNavGroups(mode), [mode]);
+  const navRef = useRef<HTMLElement>(null);
+  useFlip(navRef, mode);
 
   return (
     <aside className={`sidebar${open ? ' open' : ''}`} id="sidebar">
-      <nav>
+      <nav ref={navRef}>
         {navGroups.map((group) => (
           <div className="nav-group" key={group.label}>
             <span className="nav-label">{group.label}</span>
@@ -22,6 +29,7 @@ export default function Sidebar({ open, onClose }: Props) {
                 <Link
                   key={link.path + link.label}
                   to={link.path}
+                  data-flip-key={group.label === 'Interactive Labs' ? undefined : link.path}
                   className={`nav-link${isActive(pathname, link.path) ? ' active' : ''}`}
                   onClick={onClose}
                 >

@@ -9,7 +9,7 @@
 
 let _nextId = 0;
 
-/** Monotone counter — each tree node gets a unique int at creation. */
+/** Monotone counter - each tree node gets a unique int at creation. */
 export function freshId(): number {
   return _nextId++;
 }
@@ -33,7 +33,7 @@ export function makeTree(children: Tree[] = []): Tree {
 
 /**
  * Add a new leaf child to the node with `targetId`.
- * Returns a new tree value (structurally persistent — unchanged nodes keep
+ * Returns a new tree value (structurally persistent - unchanged nodes keep
  * the same identity, so React diffs stay minimal).
  */
 export function addChild(t: Tree, targetId: number): Tree {

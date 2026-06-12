@@ -5,7 +5,7 @@
 // centres of those slots; vertical positions are levels (depth × LEVEL_H).
 //
 // Styling mirrors the site's design tokens (--accent, --bg-warm, --border …)
-// via `currentColor` and inline `fill/stroke` that reference CSS variables —
+// via `currentColor` and inline `fill/stroke` that reference CSS variables -
 // the SVG inherits the page's light/dark theme without extra class toggling.
 
 import type { Tree } from './tree';

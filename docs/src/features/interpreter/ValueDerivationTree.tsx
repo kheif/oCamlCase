@@ -3,7 +3,7 @@ import { highlightOcaml } from '../../lib/highlightOcaml';
 import { showExp } from '../toycaml/ast';
 import { showValueShort, showVEnvShort, type EvalNode } from './evalTrace';
 
-// Natural-deduction layout for value judgements `V ⊢ e ⇒ v` — the runtime
+// Natural-deduction layout for value judgements `V ⊢ e ⇒ v` - the runtime
 // counterpart of toycaml/DerivationTree. Premises sit above an inference bar
 // with the rule name (Dconst/Did/Dop/Diftrue/Diffalse/Dabs/Dapp); axioms show
 // the rule as a badge on the judgement. Reveal is post-order (premises first,

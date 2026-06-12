@@ -1,6 +1,5 @@
 <div class="article">
       <div class="page-header">
-        <div class="page-label">Concept 4 of 20</div>
         <h1 class="page-title">Lexical Scope</h1>
         <p class="page-intro">A precise vocabulary for talking about names in a program: which occurrences introduce a name, which use it, which are bound to a definition, and which are free. This is the foundation for safely substituting and transforming code.</p>
       </div>
@@ -152,13 +151,6 @@ a + b</pre>
         <p>Sanitization is what makes program transformations safe: substituting an argument, beta-reducing, inlining a function, or renaming a variable. If an expression isn't sanitized, alpha-rename the inner binders first. Otherwise an outer name can be accidentally captured by an inner one, and the program quietly changes meaning.</p>
       </div>
 
-      <div class="page-nav">
-        <p class="page-nav-label">Continue learning</p>
-        <div class="page-nav-links">
-          <a href="/concepts/abstractions" class="page-nav-prev">Abstractions</a>
-          <a href="/concepts/closures" class="page-nav-next">Next: Closures</a>
-        </div>
-      </div>
 
       <style>
         .san-rules {

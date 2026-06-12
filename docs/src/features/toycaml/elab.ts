@@ -21,13 +21,13 @@
 //
 // 1. `env: var -> ty` becomes an ordered association list. Functions are
 //    opaque in TS (can't be pretty-printed), but `T = [x:=int, b:=bool]` is
-//    exactly what the lecture's slides display — so a list *is* the faithful
+//    exactly what the lecture's slides display - so a list *is* the faithful
 //    representation for a tool whose job is to show T to a learner. `update`
 //    still has the lecture's "most recent binding shadows" semantics.
 //
-// 2. `elab` doesn't just return a `ty` or raise — it builds a `DerivationNode`
+// 2. `elab` doesn't just return a `ty` or raise - it builds a `DerivationNode`
 //    tree recording every rule application (Sconst/Sid/Sop/Sapp/Sabs/Sif), the
-//    judgement at each step, and — when typing fails — exactly which premise
+//    judgement at each step, and - when typing fails - exactly which premise
 //    broke and why. That tree is both the result *and* the animation data for
 //    <DerivationTree>.
 
@@ -102,7 +102,7 @@ export type DerivationNode = {
   /** The type derived for `exp`, or `null` if no derivation exists at this node. */
   ty: Ty | null;
   children: DerivationNode[];
-  /** Set on the node where elaboration first fails — explains *why* in plain language. */
+  /** Set on the node where elaboration first fails - explains *why* in plain language. */
   error?: string;
 };
 
@@ -118,10 +118,10 @@ function node(
 }
 
 /**
- * `elab env e` — but instead of returning `ty` (or raising, as the lecture's
+ * `elab env e` - but instead of returning `ty` (or raising, as the lecture's
  * version does on a type error), it always returns a `DerivationNode`: the
  * rule that applies to `e`'s shape, the judgement `env ⊢ e : ty`, the premises
- * (recursive sub-derivations) it depends on, and — if typing fails here — a
+ * (recursive sub-derivations) it depends on, and - if typing fails here - a
  * plain-language `error` pinpointing the mismatch.
  */
 export function elaborate(env: Env, exp: Exp): DerivationNode {

@@ -4,7 +4,7 @@ export const data: MiniExercise = {
   id: 'match-shape',
   title: 'Area of shapes',
   difficulty: 'hard',
-  conceptLink: { label: 'Constructors and Exceptions', href: '/concepts/constructors-exceptions' },
+  conceptLink: { label: 'Variants and Constructors', href: '/concepts/variants' },
   category: 'variants',
   filename: 'shape_exercise.ml',
   prompt:

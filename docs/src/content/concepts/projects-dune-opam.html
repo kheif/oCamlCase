@@ -1,0 +1,134 @@
+<div class="article">
+      <div class="page-header">
+        <h1 class="page-title">Projects with dune and opam</h1>
+        <p class="page-intro">Leaving the Playground: opam installs the compiler and libraries, dune builds multi-file projects. A minimal project needs about ten lines of configuration.</p>
+      </div>
+
+      <h2>The two tools</h2>
+      <ul>
+        <li><strong>opam</strong> is the package manager: it installs OCaml itself, libraries, and developer tools, in isolated environments called <em>switches</em>.</li>
+        <li><strong>dune</strong> is the build system: it compiles your files in dependency order, handles <code>.mli</code> interfaces, runs tests, and produces executables and libraries.</li>
+      </ul>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">terminal</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt"># one-time setup</span>
+opam init
+opam switch create 5.2.0       <span class="cmt"># a fresh compiler environment</span>
+opam install dune utop ocaml-lsp-server ocamlformat</pre>
+      </div>
+
+      <h2>A minimal project</h2>
+      <div class="two-col lean">
+        <div>
+          <p>dune reads small declarative files, each named <code>dune</code>, that say what lives in each directory. The layout on the right is the conventional split:</p>
+          <ul>
+            <li><code>bin/</code> the executable entry point</li>
+            <li><code>lib/</code> the actual logic, as a library</li>
+            <li><code>test/</code> tests against the library</li>
+          </ul>
+          <p>Keeping logic in <code>lib/</code> rather than <code>bin/</code> matters: libraries can be used by both the executable and the tests.</p>
+        </div>
+        <div class="sticky">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-fname">project layout</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+<pre>hello/
+├── dune-project
+├── bin/
+│   ├── dune
+│   └── main.ml
+├── lib/
+│   ├── dune
+│   └── greet.ml
+└── test/
+    ├── dune
+    └── test_greet.ml</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">dune-project</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre>(lang dune 3.0)</pre>
+      </div>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">lib/dune</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre>(library
+ (name greet))</pre>
+      </div>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">bin/dune</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre>(executable
+ (name main)
+ (libraries greet))</pre>
+      </div>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">lib/greet.ml + bin/main.ml</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre><span class="cmt">(* lib/greet.ml *)</span>
+<span class="kw">let</span> <span class="fn">hello</span> name = <span class="str">"Hello, "</span> ^ name ^ <span class="str">"!"</span>
+
+<span class="cmt">(* bin/main.ml: file Greet.ml becomes module Greet *)</span>
+<span class="kw">let</span> () = print_endline (<span class="ty">Greet</span>.<span class="fn">hello</span> <span class="str">"world"</span>)</pre>
+      </div>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">terminal</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre>dune build          <span class="cmt"># compile everything</span>
+dune exec bin/main.exe
+<span class="cmt"># Hello, world!</span>
+dune test           <span class="cmt"># build and run the test directory</span></pre>
+      </div>
+
+      <div class="callout callout-key">
+        <div class="callout-title">Key insight</div>
+        <p>Notice what is absent: no file lists, no compile flags, no dependency ordering. dune discovers the <code>.ml</code> files in each directory, computes the module dependency graph itself, and rebuilds only what changed. Each file is a module (see <a href="/concepts/modules">Modules and Signatures</a>); the build system and the module system are two views of the same structure.</p>
+      </div>
+
+      <h2>Using a library from opam</h2>
+      <p>Two steps, always the same: install with opam, declare in the dune file.</p>
+
+      <div class="code-block inline">
+        <div class="code-top">
+          <span class="code-fname">terminal + lib/dune</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre>opam install yojson
+
+<span class="cmt">; lib/dune</span>
+(library
+ (name greet)
+ (libraries yojson))</pre>
+      </div>
+
+      <h2>The day-to-day loop</h2>
+      <ul>
+        <li><code>dune build -w</code> rebuilds on every save (watch mode); type errors appear in the terminal as you edit.</li>
+        <li><code>dune utop lib</code> opens a REPL with your library loaded, the project-sized version of the Playground.</li>
+        <li><code>dune fmt</code> formats the whole project (see <a href="/concepts/testing-and-quality">Testing and Code Quality</a>).</li>
+      </ul>
+      <p>With an editor running ocaml-lsp-server you also get inferred types on hover, the fastest way to apply the type-reading habits from <a href="/concepts/compiler-errors">Reading Compiler Errors</a>.</p>
+    </div>

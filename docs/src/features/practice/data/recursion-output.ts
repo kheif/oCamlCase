@@ -5,7 +5,7 @@ export const data: PredictOutputExercise = {
   id: 'recursion-output',
   title: 'Countdown',
   difficulty: 'medium',
-  conceptLink: { label: 'Recursion', href: '/concepts/recursion' },
+  conceptLink: { label: 'Recursion', href: '/concepts/tail-recursion' },
   prompt:
     'Trace through `count 3` step by step. ' +
     'What does this print? (Include the trailing space.)',

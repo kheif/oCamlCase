@@ -5,7 +5,7 @@ export const data: FixErrorExercise = {
   id: 'rec-fix',
   title: 'Missing rec keyword',
   difficulty: 'easy',
-  conceptLink: { label: 'Recursion', href: '/concepts/recursion' },
+  conceptLink: { label: 'Recursion', href: '/concepts/tail-recursion' },
   prompt:
     'In OCaml, a function must be declared with `let rec` to call itself. ' +
     'This factorial function is missing `rec`. Fix it.',

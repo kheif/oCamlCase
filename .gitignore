@@ -4,4 +4,6 @@ docs/.vite/
 docs/*.tsbuildinfo
 docs/vite.config.d.ts
 docs/vite.config.js
+docs/.claude/
+docs/graphify-out/
 .DS_Store

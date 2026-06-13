@@ -1,87 +1,1209 @@
-/* ---- Section layout ---- */
-.hub-section {
-  margin-bottom: var(--s8);
+/* ================================================================
+   ExercisesHub: type-selector cards with looping CSS demos
+   ================================================================ */
+
+/* ── Type-selector cards ─────────────────────────────────────────── */
+
+.hub-type-card {
+  margin-bottom: var(--s6);
+  border: 1px solid var(--border);
+  border-radius: var(--r3);
+  background: var(--bg);
+  box-shadow: var(--sh1);
+  overflow: hidden;
 }
-.hub-section-head {
+
+.hub-type-head {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: flex-start;
   gap: var(--s4);
-  margin-bottom: var(--s5);
-  padding-bottom: var(--s3);
+  padding: var(--s5) var(--s6);
   border-bottom: 1px solid var(--border);
+  background: var(--bg-warm);
 }
-.hub-section-title {
+
+.hub-type-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r2);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.hub-type-icon-challenges { background: rgba(212,98,26,.12); color: var(--accent); }
+.hub-type-icon-drag       { background: rgba(79,130,230,.1);  color: #4f82e6; }
+.hub-type-icon-practice   { background: rgba(46,125,50,.1);   color: var(--ok); }
+
+[data-theme='dark'] .hub-type-icon-drag { background: rgba(79,130,230,.15); }
+
+.hub-type-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.hub-type-title {
   font-family: var(--serif);
   font-size: 20px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--text);
-}
-.hub-section-sub {
-  font-family: var(--sans);
-  font-size: 13px;
-  color: var(--dim);
-  margin-left: var(--s3);
+  margin: 0 0 4px;
 }
 
-/* ---- Challenge cards ---- */
-.hub-challenges {
+.hub-type-desc {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.hub-type-meta {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: flex-end;
+  gap: var(--s2);
 }
+
+.hub-type-count {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+.hub-type-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.hub-type-progress-track {
+  width: 72px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.hub-type-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.5s var(--ease);
+}
+
+.hub-type-progress-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+.hub-type-body {
+  display: flex;
+  align-items: center;
+  gap: var(--s6);
+  padding: var(--s5) var(--s6);
+}
+
+.hub-type-cta {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hub-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 10px 20px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--r2);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity var(--t-fast), transform var(--t-fast);
+}
+
+.hub-cta-btn:hover {
+  opacity: 0.88;
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.hub-cta-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.hub-cta-btn svg {
+  transition: transform var(--t-fast);
+}
+
+.hub-cta-btn:hover svg {
+  transform: translateX(2px);
+}
+
+/* ── Shared demo shell ───────────────────────────────────────────── */
+
+.hub-demo {
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--r2);
+  border: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 12px;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Challenges demo clips its dark bg; drag + practice need visible overflow for shadow */
+.hub-demo-challenges { overflow: hidden; }
+
+/* ── Demo 1: Challenges ──────────────────────────────────────────── */
+
+.hub-demo-challenges {
+  display: flex;
+  background: #1a1c1f;
+  min-height: 160px;
+}
+
+.hdc-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,.07);
+}
+
+.hdc-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: #0f1113;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.hdc-tab-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+}
+
+.hdc-tab-name {
+  font-size: 11px;
+  color: #9c968d;
+  margin-left: 2px;
+}
+
+.hdc-code {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hdc-line {
+  display: block;
+  color: #ddd9d3;
+  line-height: 1.65;
+}
+
+.hdc-kw  { color: #cf9aff; }
+.hdc-fn  { color: #d2a679; }
+.hdc-num { color: #79c0ff; }
+
+.hdc-panel {
+  width: 180px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 12px;
+  gap: 10px;
+}
+
+.hdc-run-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--sans);
+}
+
+.hdc-play { font-size: 9px; }
+
+/* Run button pulse at 12% of the animation */
+@media (prefers-reduced-motion: no-preference) {
+  .hdc-run-btn {
+    animation: hdc-pulse 4s var(--ease) infinite;
+  }
+}
+
+@keyframes hdc-pulse {
+  0%   { transform: scale(1); }
+  10%  { transform: scale(1.04); }
+  16%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+.hdc-results {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hdc-test {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.06);
+  font-size: 11px;
+  color: #9c968d;
+  font-family: var(--sans);
+}
+
+.hdc-check { color: #4caf50; font-size: 10px; }
+.hdc-test-name { flex: 1; }
+
+.hdc-banner {
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: rgba(46,125,50,.18);
+  border: 1px solid rgba(76,175,80,.25);
+  color: #4caf50;
+  font-size: 11px;
+  font-family: var(--sans);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Stagger: test rows appear then banner */
+@media (prefers-reduced-motion: no-preference) {
+  .hdc-test-1 { animation: hdc-row 4s var(--ease) infinite; animation-delay: 0.6s; }
+  .hdc-test-2 { animation: hdc-row 4s var(--ease) infinite; animation-delay: 1.0s; }
+  .hdc-test-3 { animation: hdc-row 4s var(--ease) infinite; animation-delay: 1.4s; }
+  .hdc-banner { animation: hdc-row 4s var(--ease) infinite; animation-delay: 2.0s; }
+}
+
+@keyframes hdc-row {
+  /* invisible → appear → hold → invisible for next loop */
+  0%    { opacity: 0; transform: translateY(4px); }
+  5%    { opacity: 1; transform: translateY(0); }
+  70%   { opacity: 1; }
+  82%   { opacity: 0; }
+  100%  { opacity: 0; }
+}
+
+/* Reduced motion: show success state statically */
+@media (prefers-reduced-motion: reduce) {
+  .hdc-test-1, .hdc-test-2, .hdc-test-3, .hdc-banner { opacity: 1; }
+}
+
+/* ── Demo 2: Drag & Drop ─────────────────────────────────────────── */
+/*
+ * Sequence (5s loop):
+ *  0-10%   : fade in, show shuffled lines statically
+ *  10-22%  : line-B lifts (scale, shadow, accent border = "grabbed")
+ *  22-55%  : line-B drags DOWN, line-C dodges UP simultaneously
+ *  55-62%  : line-B drops (scale back, border turns green)
+ *  62-76%  : hold correct order
+ *  76-84%  : "Correct!" appears
+ *  84-92%  : fade out
+ *  92-100% : invisible (reset for next loop)
+ */
+
+.hub-demo-drag {
+  background: var(--bg-warm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+}
+
+.hdd-prompt {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+}
+
+.hdd-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+}
+
+.hdd-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg);
+  font-size: 12px;
+  color: var(--text);
+  position: relative; /* needed so z-index works during drag */
+}
+
+.hdd-handle {
+  color: var(--dim);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.hdd-code { flex: 1; }
+.hdd-kw   { color: var(--accent); }
+.hdd-num  { color: #7b68ee; }
+
+/* line-A (| [] -> 0): dodges DOWN as let line passes over it */
+/* line-B (let rec sum): grabbed and dragged UP to correct position 1 */
+/* line-C (| x :: rest): stays static at bottom */
+@media (prefers-reduced-motion: no-preference) {
+  .hdd-line-a {
+    animation: hdd-dodge 5s var(--ease) infinite;
+  }
+
+  .hdd-line-b {
+    animation: hdd-drag 5s var(--ease) infinite;
+    z-index: 2;
+  }
+
+  .hdd-line-c {
+    animation: hdd-static 5s var(--ease) infinite;
+  }
+}
+
+/* Static line fades in/out but doesn't move */
+@keyframes hdd-static {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  84%  { opacity: 1; }
+  92%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Grabbed & dragged line (let rec):
+   grab → drag UP to position 1 → drop (green) → hold → fade */
+@keyframes hdd-drag {
+  0%   { opacity: 0;
+         transform: translateY(0) scale(1);
+         box-shadow: none;
+         border-color: var(--border);
+         background: var(--bg); }
+  10%  { opacity: 1;
+         transform: translateY(0) scale(1);
+         box-shadow: none;
+         border-color: var(--border);
+         background: var(--bg); }
+  /* grab: lift */
+  22%  { transform: translateY(0) scale(1.04);
+         box-shadow: 0 6px 18px rgba(0,0,0,.22);
+         border-color: var(--accent);
+         background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
+  /* drag: move UP one row */
+  55%  { transform: translateY(calc(-100% - 5px)) scale(1.03);
+         box-shadow: 0 6px 18px rgba(0,0,0,.2);
+         border-color: var(--accent);
+         background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
+  /* drop: settle at top, turn green */
+  62%  { transform: translateY(calc(-100% - 5px)) scale(1);
+         box-shadow: none;
+         border-color: var(--ok-strong);
+         background: color-mix(in srgb, var(--ok) 7%, var(--bg)); }
+  76%  { transform: translateY(calc(-100% - 5px)) scale(1);
+         border-color: var(--ok-strong);
+         background: color-mix(in srgb, var(--ok) 7%, var(--bg)); }
+  84%  { opacity: 1; }
+  92%  { opacity: 0;
+         transform: translateY(calc(-100% - 5px)) scale(1); }
+  /* stay displaced; loop boundary (100%→0%) snaps back while opacity:0, invisible */
+  100% { opacity: 0; transform: translateY(calc(-100% - 5px)) scale(1); }
+}
+
+/* Dodging line (| [] -> 0): moves DOWN to make room as let passes over it */
+@keyframes hdd-dodge {
+  0%   { opacity: 0; transform: translateY(0); }
+  10%  { opacity: 1; transform: translateY(0); }
+  22%  { transform: translateY(0); }
+  /* slides down as B drags over it */
+  55%  { transform: translateY(calc(100% + 5px)); opacity: 0.75; }
+  /* settles in new (correct) position 2 */
+  62%  { transform: translateY(calc(100% + 5px)); opacity: 1; border-color: var(--ok-strong); }
+  76%  { transform: translateY(calc(100% + 5px)); }
+  84%  { opacity: 1; }
+  92%  { opacity: 0; transform: translateY(calc(100% + 5px)); }
+  /* stay displaced; loop boundary snaps back invisibly */
+  100% { opacity: 0; transform: translateY(calc(100% + 5px)); }
+}
+
+/* Reduced motion: show correct (settled) state statically */
+@media (prefers-reduced-motion: reduce) {
+  .hdd-line-a { opacity: 1; transform: translateY(calc(100% + 5px)); border-color: var(--ok-strong); }
+  .hdd-line-b { opacity: 1; border-color: var(--ok-strong); background: color-mix(in srgb, var(--ok) 7%, var(--bg)); transform: translateY(calc(-100% - 5px)); }
+  .hdd-line-c { opacity: 1; }
+}
+
+.hdd-ok {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ok);
+}
+
+.hdd-ok-icon { font-size: 13px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hdd-ok { animation: hdd-ok-fade 5s var(--ease) infinite; }
+}
+
+@keyframes hdd-ok-fade {
+  0%, 62%  { opacity: 0; transform: translateY(4px); }
+  72%      { opacity: 1; transform: translateY(0); }
+  84%      { opacity: 1; }
+  92%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hdd-ok { opacity: 1; }
+}
+
+/* ── Demo 3: Predict Output ──────────────────────────────────────── */
+/*
+ * 4s loop. Question + code block = stable base, no animation on container.
+ * Answer text types in at 12%, feedback fades in at 26%, both reset at 88%.
+ * No blank frame; input row is always visible.
+ */
+
+.hub-demo-output {
+  background: var(--bg-warm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+}
+
+.hdp-question {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.hdp-code {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--bg-code);
+  border-radius: var(--r1);
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: #ddd9d3;
+}
+
+.hdp-kw  { color: #cf9aff; }
+.hdp-num { color: #79c0ff; }
+.hdp-str { color: #a5d6a7; }
+
+.hdp-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg);
+}
+
+.hdp-prompt { color: var(--dim); flex-shrink: 0; }
+
+.hdp-typing {
+  font-size: 13px;
+  color: var(--text);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.hdp-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 1px;
+  vertical-align: middle;
+}
+
+.hdp-feedback {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: var(--r1);
+  background: color-mix(in srgb, var(--ok) 8%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--ok) 25%, transparent);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ok);
+}
+
+.hdp-check { font-size: 12px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hdp-typing   { animation: hdp-type  4s steps(1, end) infinite; }
+  .hdp-cursor   { animation: hdp-blink 4s var(--ease) infinite; }
+  .hdp-feedback { animation: hdp-fb    4s var(--ease) infinite; }
+}
+
+@keyframes hdp-type {
+  0%, 12% { width: 0; }
+  20%     { width: 8px; }
+  86%     { width: 8px; }
+  94%     { width: 0; }
+  100%    { width: 0; }
+}
+
+@keyframes hdp-blink {
+  /* cursor blinks twice while typing, then hides when answer shown */
+  0%   { opacity: 1; }
+  8%   { opacity: 0; }
+  13%  { opacity: 1; }
+  17%  { opacity: 0; }
+  22%  { opacity: 0; }   /* hides after text appears */
+  86%  { opacity: 0; }
+  90%  { opacity: 1; }   /* reappears as answer clears */
+  96%  { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes hdp-fb {
+  0%, 26%  { opacity: 0; transform: translateY(4px); }
+  36%      { opacity: 1; transform: translateY(0); }
+  86%      { opacity: 1; }
+  93%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hdp-feedback { opacity: 1; transform: none; }
+  .hdp-typing   { width: 8px; }
+  .hdp-cursor   { opacity: 1; }
+}
+
+/* ── Demo 4: Predict Type ────────────────────────────────────────── */
+/*
+ * 4s loop. REPL block = stable base (always visible).
+ * Answer text appears at 10%, REPL result slides in at 18%,
+ * ok chip at 44%. All reset at 88%. No blank frame.
+ */
+
+.hub-demo-type {
+  background: var(--bg-warm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+}
+
+.hpt-repl {
+  background: var(--bg-code);
+  border-radius: var(--r1);
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #ddd9d3;
+}
+
+.hpt-input { }
+.hpt-prompt { color: var(--dim); }
+.hpt-kw    { color: #cf9aff; }
+
+.hpt-result {
+  margin-top: 2px;
+  color: #ddd9d3;
+}
+.hpt-dash  { color: var(--dim); }
+.hpt-label { color: var(--dim); }
+.hpt-type  { color: #79c0ff; font-weight: 600; }
+
+.hpt-answer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--bg);
+  font-size: 12px;
+}
+.hpt-answer-prompt { color: var(--dim); flex-shrink: 0; }
+.hpt-answer-text   { color: var(--text); }
+
+.hpt-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 13px;
+  background: var(--accent);
+  border-radius: 1px;
+  vertical-align: middle;
+}
+
+.hpt-ok {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: var(--r1);
+  background: color-mix(in srgb, var(--ok) 8%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--ok) 25%, transparent);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ok);
+}
+.hpt-ok-icon { font-size: 12px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hpt-result     { animation: hpt-result       4s var(--ease) infinite; }
+  .hpt-answer-row { animation: hpt-answer        4s var(--ease) infinite; }
+  .hpt-cursor     { animation: hpt-cursor-blink  4s var(--ease) infinite; }
+  .hpt-ok         { animation: hpt-ok-fade       4s var(--ease) infinite; }
+}
+
+/* REPL result: slides up from below, stays, resets at loop boundary */
+@keyframes hpt-result {
+  0%, 14%  { opacity: 0; transform: translateY(6px); }
+  24%      { opacity: 1; transform: translateY(0); }
+  88%      { opacity: 1; transform: translateY(0); }
+  94%      { opacity: 0; }
+  100%     { opacity: 0; transform: translateY(6px); }
+}
+
+/* Answer text appears early, resets late */
+@keyframes hpt-answer {
+  0%, 10%  { opacity: 0; }
+  20%      { opacity: 1; }
+  88%      { opacity: 1; }
+  94%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+/* Cursor blinks while typing, hides when answer shows */
+@keyframes hpt-cursor-blink {
+  0%       { opacity: 1; }
+  6%       { opacity: 0; }
+  10%      { opacity: 1; }
+  14%      { opacity: 0; }
+  20%      { opacity: 0; }  /* hides once answer text visible */
+  88%      { opacity: 0; }
+  92%      { opacity: 1; }  /* reappears briefly as answer resets */
+  97%      { opacity: 0; }
+  100%     { opacity: 1; }
+}
+
+/* Ok chip appears after both answer + result */
+@keyframes hpt-ok-fade {
+  0%, 44%  { opacity: 0; transform: translateY(4px); }
+  54%      { opacity: 1; transform: translateY(0); }
+  88%      { opacity: 1; }
+  94%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hpt-result     { opacity: 1; transform: none; }
+  .hpt-answer-row { opacity: 1; }
+  .hpt-cursor     { opacity: 1; }
+  .hpt-ok         { opacity: 1; transform: none; }
+}
+
+/* ── Demo 5: Fix the Error ───────────────────────────────────────── */
+/*
+ * 4s loop. A↔B crossfade; bad code visible at 0% AND 100% so loop boundary is seamless.
+ * No blank frame ever. Error chip mirrors bad code; ok chip mirrors good code.
+ *
+ *  0-40%  : bad code + error chip (A)
+ *  40-50% : crossfade A → B
+ *  50-88% : good code + ok chip (B)
+ *  88-98% : crossfade B → A
+ *  98-100%: bad code fully back (A)
+ */
+
+.hub-demo-fix {
+  background: var(--bg-warm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+}
+
+.hfe-code-wrap {
+  position: relative;
+  min-height: 60px; /* 2 lines × 20.4px + 16px padding */
+}
+
+.hfe-code {
+  position: absolute;
+  top: 0; left: 0;
+  padding: 8px 10px;
+  border-radius: var(--r1);
+  background: var(--bg-code);
+  font-size: 12px;
+  line-height: 1.7;
+  color: #ddd9d3;
+  white-space: pre;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.hfe-kw  { color: #cf9aff; }
+.hfe-fn  { color: #79c0ff; }
+.hfe-num { color: #79c0ff; }
+
+.hfe-code-bad  { border-bottom: 2px solid #ef5350; z-index: 1; }
+.hfe-code-good { border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent); z-index: 2; }
+
+/* Both chips share one row and crossfade in place (no reserved empty row) */
+.hfe-status {
+  position: relative;
+  min-height: 30px;
+}
+
+.hfe-error,
+.hfe-ok {
+  position: absolute;
+  inset: 0;
+}
+
+.hfe-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--r1);
+  background: color-mix(in srgb, #ef5350 8%, var(--bg));
+  border: 1px solid color-mix(in srgb, #ef5350 25%, transparent);
+  font-size: 11.5px;
+  color: #ef5350;
+}
+.hfe-err-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #ef5350;
+  flex-shrink: 0;
+}
+.hfe-error code { font-family: inherit; font-weight: 600; }
+
+.hfe-ok {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: var(--r1);
+  background: color-mix(in srgb, var(--ok) 8%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--ok) 25%, transparent);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ok);
+}
+.hfe-ok-icon { font-size: 12px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hfe-code-bad  { animation: hfe-bad  4s var(--ease) infinite; }
+  .hfe-code-good { animation: hfe-good 4s var(--ease) infinite; }
+  .hfe-error     { animation: hfe-err  4s var(--ease) infinite; }
+  .hfe-ok        { animation: hfe-ok   4s var(--ease) infinite; }
+}
+
+/* bad code visible at both endpoints → seamless loop.
+   Outgoing slides up + fades; incoming (z-index 2, opaque) rises over it → clean swap, no ghost. */
+@keyframes hfe-bad {
+  0%   { opacity: 1; transform: translateY(0); }
+  38%  { opacity: 1; transform: translateY(0); }
+  47%  { opacity: 0; transform: translateY(-10px); }
+  88%  { opacity: 0; transform: translateY(-10px); }
+  97%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hfe-good {
+  0%   { opacity: 0; transform: translateY(10px); }
+  40%  { opacity: 0; transform: translateY(10px); }
+  49%  { opacity: 1; transform: translateY(0); }
+  86%  { opacity: 1; transform: translateY(0); }
+  95%  { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+
+/* error chip mirrors bad code */
+@keyframes hfe-err {
+  0%   { opacity: 1; transform: translateY(0); }
+  40%  { opacity: 1; transform: translateY(0); }
+  48%  { opacity: 0; transform: translateY(-4px); }
+  90%  { opacity: 0; transform: translateY(-4px); }
+  98%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ok chip appears after good code is visible */
+@keyframes hfe-ok {
+  0%   { opacity: 0; transform: translateY(4px); }
+  46%  { opacity: 0; transform: translateY(4px); }
+  56%  { opacity: 1; transform: translateY(0); }
+  86%  { opacity: 1; transform: translateY(0); }
+  94%  { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 0; transform: translateY(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hfe-code-bad  { opacity: 0; }
+  .hfe-code-good { opacity: 1; }
+  .hfe-error     { opacity: 0; }
+  .hfe-ok        { opacity: 1; transform: none; }
+}
+
+/* ── Demo 6: Complete the Function ──────────────────────────────── */
+/*
+ * 4s loop. A↔B crossfade; stub visible at 0% AND 100% → seamless loop.
+ * min-height on wrap sized to fit the taller (done) block.
+ * Test rows appear with the done state; reset mirrors stub return.
+ *
+ *  0-40%  : stub (A)
+ *  40-50% : crossfade A → B
+ *  50-88% : done code + tests (B)
+ *  88-98% : crossfade B → A
+ */
+
+.hub-demo-complete {
+  background: var(--bg-warm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+}
+
+.hcp-code-wrap {
+  position: relative;
+  min-height: 100px; /* 5 lines × 20.4px + 16px padding (done block is tallest) */
+}
+
+.hcp-code {
+  position: absolute;
+  top: 0; left: 0;
+  padding: 8px 10px;
+  border-radius: var(--r1);
+  background: var(--bg-code);
+  font-size: 12px;
+  line-height: 1.7;
+  color: #ddd9d3;
+  white-space: pre;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.hcp-kw  { color: #cf9aff; }
+.hcp-fn  { color: #79c0ff; }
+
+.hcp-code-stub { z-index: 1; }
+.hcp-code-done { z-index: 2; }
+
+.hcp-todo {
+  background: color-mix(in srgb, #f9a825 25%, transparent);
+  color: #f9a825;
+  border-radius: 3px;
+  padding: 0 3px;
+}
+
+.hcp-tests {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hcp-test {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--ok);
+}
+
+.hcp-check { font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.hcp-test-name { color: var(--text); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hcp-code-stub { animation: hcp-stub 4s var(--ease) infinite; }
+  .hcp-code-done { animation: hcp-done 4s var(--ease) infinite; }
+  .hcp-test-1    { animation: hcp-t1   4s var(--ease) infinite; }
+  .hcp-test-2    { animation: hcp-t2   4s var(--ease) infinite; }
+}
+
+/* stub visible at start + end → seamless loop; slide swap, incoming on top (z-index 2) */
+@keyframes hcp-stub {
+  0%   { opacity: 1; transform: translateY(0); }
+  38%  { opacity: 1; transform: translateY(0); }
+  47%  { opacity: 0; transform: translateY(-10px); }
+  88%  { opacity: 0; transform: translateY(-10px); }
+  97%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hcp-done {
+  0%   { opacity: 0; transform: translateY(10px); }
+  40%  { opacity: 0; transform: translateY(10px); }
+  49%  { opacity: 1; transform: translateY(0); }
+  86%  { opacity: 1; transform: translateY(0); }
+  95%  { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+
+/* tests appear shortly after done code */
+@keyframes hcp-t1 {
+  0%, 52%  { opacity: 0; transform: translateX(-4px); }
+  62%      { opacity: 1; transform: translateX(0); }
+  88%      { opacity: 1; }
+  96%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+@keyframes hcp-t2 {
+  0%, 60%  { opacity: 0; transform: translateX(-4px); }
+  70%      { opacity: 1; transform: translateX(0); }
+  88%      { opacity: 1; }
+  96%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hcp-code-stub { opacity: 0; }
+  .hcp-code-done { opacity: 1; }
+  .hcp-test-1    { opacity: 1; transform: none; }
+  .hcp-test-2    { opacity: 1; transform: none; }
+}
+
+/* ── Demo 7: Refactor ────────────────────────────────────────────── */
+/*
+ * 4s loop. A↔B crossfade using .hrf-stage (both position:absolute).
+ * No scaleY, just opacity crossfade, no layout shift.
+ * before visible at 0% AND 100% → seamless loop, no blank.
+ *
+ *  0-40%  : imperative (before / A)
+ *  40-50% : crossfade A → B
+ *  50-88% : functional (after / B) + ok chip
+ *  88-98% : crossfade B → A
+ */
+
+.hub-demo-refactor {
+  background: var(--bg-warm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+}
+
+/* Sized container holds both absolute versions without layout shift */
+.hrf-stage {
+  position: relative;
+  min-height: 82px; /* 3 lines × 20.4px + 16px padding = 77px, +5px buffer */
+}
+
+.hrf-before,
+.hrf-after {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 8px 10px;
+  border-radius: var(--r1);
+  background: var(--bg-code);
+  font-size: 12px;
+  line-height: 1.7;
+  color: #ddd9d3;
+  overflow: hidden;
+}
+
+.hrf-before { z-index: 1; }
+
+.hrf-after {
+  border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent);
+  z-index: 2;
+}
+
+.hrf-after-label {
+  display: block;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.hrf-kw  { color: #cf9aff; }
+.hrf-num { color: #79c0ff; }
+.hrf-imp { display: block; }
+
+.hrf-ok {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ok);
+}
+.hrf-ok-icon { font-size: 12px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hrf-before { animation: hrf-before  4s var(--ease) infinite; }
+  .hrf-after  { animation: hrf-after-a 4s var(--ease) infinite; }
+  .hrf-ok     { animation: hrf-ok-fade 4s var(--ease) infinite; }
+}
+
+/* before visible at both ends → seamless loop; slide swap, incoming on top (z-index 2) */
+@keyframes hrf-before {
+  0%   { opacity: 1; transform: translateY(0); }
+  38%  { opacity: 1; transform: translateY(0); }
+  47%  { opacity: 0; transform: translateY(-10px); }
+  88%  { opacity: 0; transform: translateY(-10px); }
+  97%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hrf-after-a {
+  0%   { opacity: 0; transform: translateY(10px); }
+  40%  { opacity: 0; transform: translateY(10px); }
+  49%  { opacity: 1; transform: translateY(0); }
+  86%  { opacity: 1; transform: translateY(0); }
+  95%  { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+
+@keyframes hrf-ok-fade {
+  0%, 56%  { opacity: 0; transform: translateY(4px); }
+  66%      { opacity: 1; transform: translateY(0); }
+  88%      { opacity: 1; }
+  96%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hrf-before { opacity: 0; }
+  .hrf-after  { opacity: 1; }
+  .hrf-ok     { opacity: 1; transform: none; }
+}
+
+/* ── Challenges index list (ChallengesIndex.tsx reuses hub card styles) ── */
+
+.hub-challenges-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--r3);
+  overflow: hidden;
+  box-shadow: var(--sh1);
+}
+
 .hub-challenge-card {
   display: flex;
   align-items: stretch;
   gap: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
+  border-bottom: 1px solid var(--border);
   background: var(--bg);
   text-decoration: none;
   color: var(--text);
-  overflow: hidden;
-  transition: border-color var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast);
+  transition: background var(--t-fast);
 }
+
+.hub-challenge-card:last-child {
+  border-bottom: none;
+}
+
 .hub-challenge-card:hover {
-  border-color: var(--accent);
-  box-shadow: var(--sh2);
-  transform: translateY(-1px);
+  background: var(--accent-bg);
   color: var(--text);
   text-decoration: none;
 }
+
+.hub-challenge-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .hub-challenge-num {
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 56px;
-  background: var(--accent-bg);
+  background: var(--bg-warm);
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--accent);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   flex-shrink: 0;
   border-right: 1px solid var(--border);
+  transition: background var(--t-fast);
 }
+
+.hub-challenge-card:hover .hub-challenge-num {
+  background: color-mix(in srgb, var(--accent-bg) 80%, var(--bg-warm));
+}
+
 .hub-challenge-body {
   flex: 1;
-  padding: 16px 20px;
+  padding: var(--s4) var(--s5);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
+
 .hub-challenge-top {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .hub-challenge-title {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
+
 .hub-challenge-desc {
   margin: 0;
   font-family: var(--sans);
@@ -89,12 +1211,14 @@
   color: var(--muted);
   line-height: 1.55;
 }
+
 .hub-challenge-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 4px;
   margin-top: 2px;
 }
+
 .hub-tag {
   font-family: var(--mono);
   font-size: 10px;
@@ -103,220 +1227,78 @@
   border-radius: 999px;
   background: var(--accent-bg);
   color: var(--accent);
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
 }
+
 .hub-challenge-arrow {
   display: flex;
   align-items: center;
-  padding: 0 18px;
-  font-size: 18px;
-  color: var(--dim);
+  padding: 0 var(--s4);
   flex-shrink: 0;
+  color: var(--dim);
   transition: color var(--t-fast), transform var(--t-fast);
 }
+
 .hub-challenge-card:hover .hub-challenge-arrow {
   color: var(--accent);
   transform: translateX(2px);
 }
 
-/* ---- Mini progress bar ---- */
-.hub-mini-progress {
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-  flex-shrink: 0;
-}
-.hub-mini-progress-track {
-  width: 80px;
-  height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.hub-mini-progress-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 2px;
-  transition: width 0.4s var(--ease);
-}
-.hub-mini-progress-text {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--dim);
-  white-space: nowrap;
+/* ── Card entrance stagger ───────────────────────────────────────── */
+
+@media (prefers-reduced-motion: no-preference) {
+  .hub-type-card {
+    animation: fade-up 0.35s var(--ease) both;
+    animation-delay: calc(var(--card-i, 0) * 90ms);
+  }
+
+  .hub-challenge-card {
+    animation: fade-up 0.3s var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
 }
 
-/* ---- Concept rows ---- */
-.hub-concepts {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.hub-concept-row {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s4);
-  padding: 10px 14px;
-  border-radius: var(--r2);
-  transition: background var(--t-fast);
-}
-.hub-concept-row:hover {
-  background: var(--accent-bg);
-}
-.hub-concept-done {
-  opacity: 0.7;
-}
-.hub-concept-label {
-  min-width: 160px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: baseline;
-  gap: var(--s2);
-}
-.hub-concept-name {
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-}
-.hub-concept-count {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--dim);
-}
+/* ── Responsive ──────────────────────────────────────────────────── */
 
-/* ---- Exercise pills ---- */
-.hub-concept-exercises {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.hub-ex-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px 4px 6px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--bg);
-  text-decoration: none;
-  color: var(--text);
-  font-family: var(--sans);
-  font-size: 12px;
-  white-space: nowrap;
-  transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast);
-}
-.hub-ex-pill:hover {
-  border-color: var(--accent);
-  background: var(--accent-bg);
-  color: var(--text);
-  text-decoration: none;
-  transform: translateY(-1px);
-}
-.hub-ex-done {
-  border-color: #3a8a3d;
-}
-.hub-ex-done:hover {
-  border-color: #4caf50;
-}
-.hub-ex-dot {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  font-size: 9px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.hub-ex-dot-easy { color: #2e7d32; }
-.hub-ex-dot-medium { color: var(--accent); }
-.hub-ex-dot-hard { color: #7b1fa2; }
-.hub-ex-done .hub-ex-dot {
-  background: #3a8a3d;
-  color: #fff;
-  font-size: 8px;
-  font-weight: 700;
-}
-.hub-ex-name {
-  line-height: 1;
-}
-
-/* ---- Footer link ---- */
-.hub-mini-footer {
-  margin-top: var(--s5);
-  text-align: center;
-}
-.hub-mini-all-link {
-  font-family: var(--sans);
-  font-size: 13px;
-  color: var(--accent);
-  text-decoration: none;
-}
-.hub-mini-all-link:hover {
-  text-decoration: underline;
-}
-
-/* ---- Responsive ---- */
 @media (max-width: 720px) {
-  .hub-concept-row {
+  .hub-type-head {
+    flex-wrap: wrap;
+    padding: var(--s4);
+  }
+
+  .hub-type-body {
     flex-direction: column;
-    gap: var(--s2);
-    padding: 10px 10px;
+    padding: var(--s4);
+    gap: var(--s4);
   }
-  .hub-concept-label {
-    min-width: 0;
+
+  .hub-demo {
+    width: 100%;
   }
+
+  .hub-type-cta {
+    align-items: stretch;
+  }
+
+  .hub-cta-btn {
+    justify-content: center;
+  }
+
   .hub-challenge-num {
     min-width: 44px;
-    font-size: 12px;
   }
+
   .hub-challenge-body {
-    padding: 12px 14px;
-  }
-  .hub-challenge-arrow {
-    padding: 0 12px;
+    padding: var(--s3) var(--s4);
   }
 }
 
-/* ---- Dark mode ---- */
-[data-theme='dark'] .hub-ex-done {
-  background: rgba(46, 125, 50, 0.08);
-}
-[data-theme='dark'] .hub-ex-done .hub-ex-dot {
-  background: #4caf50;
+/* ── Dark mode tweaks ────────────────────────────────────────────── */
+
+[data-theme='dark'] .hub-type-head {
+  background: var(--bg-warm);
 }
 
-/* ---- Staggered entrance ---- */
-@media (prefers-reduced-motion: no-preference) {
-  .hub-challenge-card {
-    animation: fade-up 0.35s var(--ease) both;
-  }
-  .hub-challenge-card:nth-child(1) { animation-delay: 0ms; }
-  .hub-challenge-card:nth-child(2) { animation-delay: 60ms; }
-  .hub-challenge-card:nth-child(3) { animation-delay: 120ms; }
-  .hub-challenge-card:nth-child(4) { animation-delay: 180ms; }
-  .hub-challenge-card:nth-child(5) { animation-delay: 240ms; }
-  .hub-challenge-card:nth-child(6) { animation-delay: 300ms; }
-
-  .hub-concept-row {
-    animation: fade-up 0.25s var(--ease) both;
-  }
-  .hub-concept-row:nth-child(1) { animation-delay: 0ms; }
-  .hub-concept-row:nth-child(2) { animation-delay: 30ms; }
-  .hub-concept-row:nth-child(3) { animation-delay: 60ms; }
-  .hub-concept-row:nth-child(4) { animation-delay: 90ms; }
-  .hub-concept-row:nth-child(5) { animation-delay: 120ms; }
-  .hub-concept-row:nth-child(6) { animation-delay: 150ms; }
-  .hub-concept-row:nth-child(7) { animation-delay: 180ms; }
-  .hub-concept-row:nth-child(8) { animation-delay: 210ms; }
-  .hub-concept-row:nth-child(9) { animation-delay: 240ms; }
-  .hub-concept-row:nth-child(10) { animation-delay: 270ms; }
-  .hub-concept-row:nth-child(11) { animation-delay: 300ms; }
-  .hub-concept-row:nth-child(12) { animation-delay: 330ms; }
-  .hub-concept-row:nth-child(13) { animation-delay: 360ms; }
-  .hub-concept-row:nth-child(14) { animation-delay: 390ms; }
-  .hub-concept-row:nth-child(15) { animation-delay: 420ms; }
-  .hub-concept-row:nth-child(16) { animation-delay: 450ms; }
-  .hub-concept-row:nth-child(17) { animation-delay: 480ms; }
+[data-theme='dark'] .hdd-num {
+  color: #b48eff;
 }

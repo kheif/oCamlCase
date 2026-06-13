@@ -68,7 +68,7 @@ export function getTopbarLinks(mode: LearnMode): TopbarLink[] {
     { label: 'Cheat Sheet', path: pathFor('Cheat Sheet') },
     { label: 'Concepts', path: conceptSequence(mode)[0], matchPrefix: '/concepts/' },
     { label: 'Labs', path: '/concepts/static-semantics', matchPrefix: '/interpreter/' },
-    { label: 'Exercises', path: '/exercises', matchPrefix: '/exercises/' },
+    { label: 'Exercises', path: '/exercises', matchPrefix: '/exercises' },
     { label: 'Playground', path: '/playground' },
   ];
 }

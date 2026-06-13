@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-const KEY = 'mini-progress';
+const KEY = 'practice-progress';
 
 function load(): Set<string> {
   try {
@@ -18,7 +18,7 @@ function save(ids: Set<string>) {
   } catch { /* localStorage unavailable (private mode / quota) */ }
 }
 
-export function useMiniProgress() {
+export function usePracticeProgress() {
   const [completed, setCompleted] = useState<Set<string>>(() => load());
 
   const markComplete = useCallback((id: string) => {

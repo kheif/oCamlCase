@@ -4,7 +4,10 @@ import ContentPage from './components/ContentPage';
 import Playground from './features/playground/Playground';
 import MiniExerciseIndex from './features/mini-exercises/MiniExerciseIndex';
 import ExercisesHub from './features/exercises/ExercisesHub';
+import ChallengesIndex from './features/exercises/ChallengesIndex';
 import MiniExercisePage from './features/mini-exercises/MiniExercisePage';
+import PracticePage from './features/practice/PracticePage';
+import PracticeKindIndex from './features/practice/PracticeKindIndex';
 import Toycaml from './features/toycaml/Toycaml';
 import TreeLab from './features/treelab/TreeLab';
 import Lexing from './features/interpreter/Lexing';
@@ -22,12 +25,16 @@ export default function App() {
       <Routes>
         <Route path="/playground" element={<Playground />} />
         <Route path="/playground.html" element={<Navigate to="/playground" replace />} />
-        {/* Full-screen mini exercise (no sidebar) */}
+        {/* Full-screen exercises (no sidebar) */}
         <Route path="/exercises/mini/:id" element={<MiniExercisePage />} />
+        <Route path="/exercises/practice/:id" element={<PracticePage />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/exercises" element={<ExercisesHub />} />
+          <Route path="/exercises/challenges" element={<ChallengesIndex />} />
           <Route path="/exercises/mini" element={<MiniExerciseIndex />} />
+          <Route path="/exercises/practice" element={<Navigate to="/exercises" replace />} />
+          <Route path="/exercises/practice/kind/:kind" element={<PracticeKindIndex />} />
           <Route path="/concepts/static-semantics" element={<Toycaml />} />
           <Route path="/concepts/tree-lab" element={<TreeLab />} />
           <Route path="/interpreter/lexing" element={<Lexing />} />

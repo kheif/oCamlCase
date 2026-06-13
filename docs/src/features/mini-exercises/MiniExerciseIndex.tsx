@@ -64,7 +64,7 @@ function loadViewMode(): ViewMode {
   try {
     const v = localStorage.getItem('mini-view-mode');
     if (v === 'concept' || v === 'difficulty') return v;
-  } catch {}
+  } catch { /* localStorage unavailable (private mode) */ }
   return 'concept';
 }
 
@@ -90,7 +90,7 @@ export default function MiniExerciseIndex() {
 
   function handleViewMode(mode: ViewMode) {
     setViewMode(mode);
-    try { localStorage.setItem('mini-view-mode', mode); } catch {}
+    try { localStorage.setItem('mini-view-mode', mode); } catch { /* localStorage unavailable (private mode) */ }
   }
 
   return (

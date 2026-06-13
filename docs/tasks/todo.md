@@ -166,11 +166,35 @@ Source: root TODO.md (pedagogical ordering problem). Plan: `~/.claude/plans/you-
   "Concept 2 of 27" vs "Phase 2 · Step 4 of 4", last page → interpreter handoff
 - NOTE (user): no em-dashes anywhere, ever
 
+## Production-Skill Practice Exercises (2026-06-13) - Slice 1+2 DONE
+
+Source: root TODO.md item 5 (Turkish). Critique: drag-drop = recognition, not production skill.
+
+New feature: `src/features/practice/` - 5 exercise types that require writing/reasoning about code.
+
+- [x] `src/hooks/useOcamlToplevel.ts` - reusable js_of_ocaml runtime hook (load once, run code, return {raw, hasError})
+- [x] `src/hooks/usePracticeProgress.ts` - localStorage progress set (mirrors useMiniProgress)
+- [x] `src/features/practice/data/types.ts` - PracticeExercise discriminated union (5 kinds)
+- [x] `src/features/practice/data/closure-predict.ts` - predict-output: lexical scope + closure capture (from TODO 5.1)
+- [x] `src/features/practice/data/poly-type-predict.ts` - predict-type: `let f x y = x` type inference (from TODO 5.2)
+- [x] `src/features/practice/data/safe-head-fix.ts` - fix-error: partial match -> option type (from TODO 5.3)
+- [x] `src/features/practice/data/map-complete.ts` - complete: implement `map` with hidden tests (from TODO 5.4)
+- [x] `src/features/practice/data/sum-refactor.ts` - refactor: ref/iter loop -> List.fold_left (from TODO 5.5)
+- [x] `src/features/practice/data/index.ts` - aggregator + byId map
+- [x] `src/features/practice/PracticePage.tsx` - per-exercise full-screen page (kind-switched)
+- [x] `src/features/practice/PracticeIndex.tsx` - index grouped by kind
+- [x] `src/features/practice/Practice.css` - scoped styles
+- [x] `src/App.tsx` - routes /exercises/practice and /exercises/practice/:id
+- [x] `src/features/exercises/ExercisesHub.tsx` - Practice section with progress bar
+- [x] verify: typecheck + build clean; 2 pre-existing no-empty in MiniExerciseIndex untouched
+
+Pending: manual verify in npm run dev (OCaml runtime loads in-app, tests pass/fail correctly)
+
 ## Later slices
 
 - [ ] Capstone pipeline REPL + PipelineRail (chars→tokens→AST→type→value, M6+M8)
 - [ ] Overview page; migrate TreeLab/Toycaml to shared useStepper
-- [ ] Modules/signatures concept page (deferred from content expansion)
+- [x] Modules/signatures concept page -- DONE (added in dual-mode restructure as modules.html + functors.html)
 - [ ] Celebration rollout (after pilot review): index card completion, 100% progress moment
 - [ ] Pre-rendering for SEO (JSON-LD currently client-injected)
 - [ ] Verify 7 new mini-exercise outputs in the browser Playground

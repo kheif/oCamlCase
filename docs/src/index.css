@@ -24,6 +24,9 @@
   --accent: #d4621a;
   --accent-bg: #fef4ed;
   --link: #c0571a;
+  --ok: #2e7d32;
+  --ok-strong: #3a8a3d;
+  --hard: #7b1fa2;
 
   /* Syntax highlighting */
   --syn-kw: #f0883e;
@@ -81,6 +84,9 @@
   --accent: #e0772f;
   --accent-bg: #2a211a;
   --link: #e88a45;
+  --ok: #4caf50;
+  --ok-strong: #4caf50;
+  --hard: #bf7ff5;
 }
 
 /* Demo boxes: light-locked so inline CSS-radio demo styles stay legible in dark mode */

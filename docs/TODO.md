@@ -1,144 +1,25 @@
-5\. Egzersiz sistemi: iyi başlangıç ama öğrenmeyi kilitlemek için yetmez
+# TODO
 
+Task inbox. Add tasks here (or tell me in chat). I read this at the start of work and
+whenever you say you wrote something here. Done items get removed -- this is a live
+inbox, not a history log. Durable decisions that come out of a task move to `DECISIONS.md`.
 
+## Now
 
-Ana sayfa 6 coding challenge ve 33 drag-and-drop mini exercise söylüyor. Bu iyi, ama şu risk var:
+_(empty)_
 
+## Later
 
+Carried over from the old `tasks/todo.md` backlog (still open):
 
-Drag-and-drop egzersizler recognition üretir; ama production becerisi üretmeyebilir.
+- [ ] Capstone pipeline REPL + PipelineRail (chars -> tokens -> AST -> type -> value, M6+M8)
+- [ ] Overview page; migrate TreeLab/Toycaml to shared `useStepper`
+- [ ] Celebration rollout (after pilot review): index card completion, 100% progress moment
+- [ ] Pre-rendering for SEO (JSON-LD currently client-injected)
+- [ ] Verify 7 new mini-exercise outputs in the browser Playground
 
+## Notes
 
-
-Yani öğrenci doğru parçayı doğru yere sürükleyebilir ama boş dosyada aynı kodu yazamayabilir.
-
-
-
-Bu yüzden egzersizleri 5 tipe ayırmanı öneririm:
-
-
-
-5.1. Predict egzersizi
-
-
-
-Kod ver:
-
-
-
-let x = 1
-
-let f () = x
-
-let x = 2
-
-f ()
-
-
-
-Sor:
-
-
-
-Sonuç ne?
-
-Neden?
-
-Closure hangi x’i capture etti?
-
-
-
-Bu, lexical scope + closure için mükemmel.
-
-
-
-5.2. Type prediction egzersizi
-
-
-
-Kod ver:
-
-
-
-let f x y = x
-
-
-
-Sor:
-
-
-
-Type ne?
-
-'a -> 'b -> 'a neden?
-
-Neden int -> int -> int değil?
-
-
-
-Bu, type inference için çok güçlü.
-
-
-
-5.3. Fix the compiler error
-
-
-
-Hatalı kod ver, öğrenci düzeltsin.
-
-
-
-let head xs =
-
-&#x20; match xs with
-
-&#x20; | x :: \_ -> x
-
-
-
-Sor:
-
-
-
-Neden warning var?
-
-Bunu option ile nasıl güvenli yaparsın?
-
-5.4. Complete the function
-
-
-
-Klasik coding challenge:
-
-
-
-let rec map f xs =
-
-&#x20; ...
-
-
-
-Ama hidden test olmalı. Sadece “cevabı göster” değil, gerçek test feedback’i lazım.
-
-
-
-5.5. Refactor egzersizi
-
-
-
-Imperative kod ver:
-
-
-
-let total = ref 0
-
-...
-
-
-
-Bunu fold ile yazdır.
-
-
-
-Bu özellikle Java/C/Python geçmişi olan biri için çok iyi olur.
-
+- Format is free; a `- [ ]` checkbox or a plain line both work.
+- The old "5 exercise types" spec that lived here is shipped; its rationale is in
+  `DECISIONS.md` (Behavior).

@@ -36,18 +36,43 @@ const _readyCbs: Array<() => void> = [];
 const _errorCbs: Array<() => void> = [];
 
 const OUTPUT_EL_ID = 'output'; // the id the toplevel bundle hardcodes
+const CONTAINER_EL_ID = 'toplevel-container';
 const SCRIPT_SRC = '/playground/toplevels/toplevel-5.1.1.js';
 
+const OFFSCREEN =
+  'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;';
+
+/**
+ * The toplevel's init (run on window.onload) wires stdout to `#output`, but it
+ * ALSO reads `#userinput` and a working `#test-canvas` during setup and throws
+ * `Not_found` if they are missing -- in which case it silently falls back to
+ * writing to the JS console and `#output` stays empty (tests then see no
+ * output). The standalone /playground page provides this whole hidden subtree
+ * (see src/features/playground/legacy/playground-body.html); when practice
+ * exercises mount that page is not present, so we recreate the same structure.
+ */
 function ensureOutputEl(): HTMLElement {
-  let el = document.getElementById(OUTPUT_EL_ID);
-  if (!el) {
-    el = document.createElement('div');
-    el.id = OUTPUT_EL_ID;
-    el.style.cssText =
-      'position:absolute;left:-9999px;top:-9999px;visibility:hidden;pointer-events:none;';
-    document.body.appendChild(el);
+  let output = document.getElementById(OUTPUT_EL_ID);
+  if (output) return output;
+
+  const container = document.createElement('div');
+  container.id = CONTAINER_EL_ID;
+  container.style.cssText = OFFSCREEN;
+  container.innerHTML =
+    '<pre id="output"></pre>' +
+    '<div><div id="sharp" class="sharp"></div>' +
+    '<textarea id="userinput" autocorrect="off" autocapitalize="none">Loading ...</textarea></div>';
+  document.body.appendChild(container);
+
+  if (!document.getElementById('test-canvas')) {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'test-canvas';
+    canvas.style.cssText = OFFSCREEN + 'display:block;';
+    document.body.appendChild(canvas);
   }
-  return el;
+
+  output = document.getElementById(OUTPUT_EL_ID)!;
+  return output;
 }
 
 function drainCallbacks(list: Array<() => void>) {
@@ -156,21 +181,32 @@ export function useOcamlToplevel() {
    * Reset the OCaml environment and execute `code`.
    * Returns the output text and whether an Error was detected.
    */
-  const run = useCallback((code: string): RunResult => {
+  const run = useCallback((code: string, opts?: { reset?: boolean }): RunResult => {
     if (!window.executecallback) {
       return { raw: 'OCaml runtime not ready.', hasError: true };
     }
-    // Reset environment so each run starts clean.
-    window.toplevelcallback?.reset();
+    try {
+      // Reset environment so each run starts clean. Callers running follow-up
+      // code against definitions from a previous run (e.g. test expressions
+      // that call a function defined in the compile step) pass reset:false so
+      // the toplevel keeps the definitions in scope.
+      if (opts?.reset !== false) window.toplevelcallback?.reset();
 
-    const outputEl = ensureOutputEl();
-    outputEl.innerHTML = '';
+      const outputEl = ensureOutputEl();
+      outputEl.innerHTML = '';
 
-    window.executecallback.execute('toplevel', code);
+      window.executecallback.execute('toplevel', code);
 
-    const raw = scrapeOutput();
-    const hasError = /\berror\b/i.test(raw);
-    return { raw, hasError };
+      const raw = scrapeOutput();
+      const hasError = /\berror\b/i.test(raw);
+      return { raw, hasError };
+    } catch (err) {
+      // A synchronous throw from the toplevel must not propagate -- callers
+      // treat this as a normal failed run rather than crashing (and hanging
+      // their "running" UI state).
+      const message = err instanceof Error ? err.message : String(err);
+      return { raw: `OCaml runtime error: ${message}`, hasError: true };
+    }
   }, []);
 
   /**

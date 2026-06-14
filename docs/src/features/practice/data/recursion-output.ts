@@ -8,7 +8,7 @@ export const data: PredictOutputExercise = {
   conceptLink: { label: 'Recursion', href: '/concepts/tail-recursion' },
   prompt:
     'Trace through `count 3` step by step. ' +
-    'What does this print? (Include the trailing space.)',
+    'What does this print?',
   code: `let rec count n =
   if n = 0 then ()
   else begin

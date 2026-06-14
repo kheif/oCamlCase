@@ -37,4 +37,5 @@ export const data: RefactorExercise = {
     },
   ],
   solution: `let double_all xs = List.map (fun x -> x * 2) xs`,
+  signature: 'val double_all : int list -> int list',
 };

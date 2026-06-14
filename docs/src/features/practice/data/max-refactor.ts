@@ -38,4 +38,5 @@ export const data: RefactorExercise = {
   ],
   solution: `let list_max xs =
   List.fold_left (fun m x -> if x > m then x else m) (List.hd xs) (List.tl xs)`,
+  signature: 'val list_max : int list -> int',
 };

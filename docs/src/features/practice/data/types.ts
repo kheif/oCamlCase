@@ -86,6 +86,12 @@ export type RefactorExercise = {
   starterCode: string;
   tests: TestCase[];
   solution?: string;
+  /**
+   * Target type signature, shown in the `.mli` tab as a fallback before the
+   * student runs code (after a run the live signature is derived from the
+   * toplevel). Plain OCaml signature line(s), e.g. `val sum : int list -> int`.
+   */
+  signature?: string;
 };
 
 export type PracticeExercise =

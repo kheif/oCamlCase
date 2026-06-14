@@ -37,4 +37,5 @@ export const data: RefactorExercise = {
     },
   ],
   solution: `let sum xs = List.fold_left ( + ) 0 xs`,
+  signature: 'val sum : int list -> int',
 };

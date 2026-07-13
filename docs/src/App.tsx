@@ -1,27 +1,33 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import ContentPage from './components/ContentPage';
-import Playground from './features/playground/Playground';
-import MiniExerciseIndex from './features/mini-exercises/MiniExerciseIndex';
-import ExercisesHub from './features/exercises/ExercisesHub';
-import ChallengesIndex from './features/exercises/ChallengesIndex';
-import MiniExercisePage from './features/mini-exercises/MiniExercisePage';
-import PracticePage from './features/practice/PracticePage';
-import PracticeKindIndex from './features/practice/PracticeKindIndex';
-import Toycaml from './features/toycaml/Toycaml';
-import TreeLab from './features/treelab/TreeLab';
-import Lexing from './features/interpreter/Lexing';
-import Parsing from './features/interpreter/Parsing';
-import Dynamics from './features/interpreter/Dynamics';
-import Recursion from './features/interpreter/Recursion';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './features/home/Home';
 import { contentRoutes } from './content/registry';
 import { LearnModeProvider } from './learn/LearnMode';
+
+// Heavy interactive features load on demand so content pages stay light.
+const Playground = lazy(() => import('./features/playground/Playground'));
+const MiniExerciseIndex = lazy(() => import('./features/mini-exercises/MiniExerciseIndex'));
+const ExercisesHub = lazy(() => import('./features/exercises/ExercisesHub'));
+const ChallengesIndex = lazy(() => import('./features/exercises/ChallengesIndex'));
+const MiniExercisePage = lazy(() => import('./features/mini-exercises/MiniExercisePage'));
+const PracticePage = lazy(() => import('./features/practice/PracticePage'));
+const PracticeKindIndex = lazy(() => import('./features/practice/PracticeKindIndex'));
+const Toycaml = lazy(() => import('./features/toycaml/Toycaml'));
+const TreeLab = lazy(() => import('./features/treelab/TreeLab'));
+const Lexing = lazy(() => import('./features/interpreter/Lexing'));
+const Parsing = lazy(() => import('./features/interpreter/Parsing'));
+const Dynamics = lazy(() => import('./features/interpreter/Dynamics'));
+const Recursion = lazy(() => import('./features/interpreter/Recursion'));
 
 export default function App() {
   return (
     <LearnModeProvider>
       <BrowserRouter>
+      <ScrollToTop />
+      <Suspense fallback={null}>
       <Routes>
         <Route path="/playground" element={<Playground />} />
         <Route path="/playground.html" element={<Navigate to="/playground" replace />} />
@@ -78,6 +84,7 @@ export default function App() {
           <Route path="/index.html" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
+      </Suspense>
       </BrowserRouter>
     </LearnModeProvider>
   );

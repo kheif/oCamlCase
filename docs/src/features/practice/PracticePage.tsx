@@ -22,9 +22,14 @@ import type {
   TestCase,
 } from './data/types';
 import ConfettiBurst from '../mini-exercises/ConfettiBurst';
+import PageMeta from '../../components/PageMeta';
 import KindIcon from './KindIcon';
 import CmEditor, { type CmEditorHandle, type TypeSig } from './CmEditor';
 import './Practice.css';
+
+// The run shortcut is Cmd-Enter on Mac, Ctrl-Enter elsewhere (CmEditor binds both).
+const IS_MAC = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+const RUN_KBD = IS_MAC ? '⌘↵' : 'Ctrl ↵';
 
 // ── Syntax-highlighted read-only code block ───────────────────────────────
 
@@ -62,9 +67,11 @@ function normalizeOutput(s: string): string {
 function PredictOutputView({
   exercise,
   onComplete,
+  next,
 }: {
   exercise: PredictOutputExercise;
   onComplete: () => void;
+  next: PracticeExercise | null;
 }) {
   const [answer, setAnswer] = useState('');
   const [checked, setChecked] = useState(false);
@@ -93,6 +100,13 @@ function PredictOutputView({
       {/* LEFT panel content */}
       <div className="pr-left">
         <ExerciseHeader exercise={exercise} />
+
+        {/* On narrow screens the right panel stacks below the fold, so show the
+            code here, above the answer box (the right panel is hidden instead). */}
+        <div className="pr-section pr-mobile-code">
+          <div className="pr-section-label">Code</div>
+          <CodeBlock code={exercise.code} />
+        </div>
 
         <div className="pr-section">
           <div className="pr-section-label">Your prediction</div>
@@ -140,6 +154,7 @@ function PredictOutputView({
             {(correct || checked) && (
               <div className="pr-feedback-explanation">{exercise.explanation}</div>
             )}
+            {correct && <NextUpLink exercise={exercise} next={next} />}
           </div>
         )}
 
@@ -204,9 +219,11 @@ function nthVarName(i: number): string {
 function PredictTypeView({
   exercise,
   onComplete,
+  next,
 }: {
   exercise: PredictTypeExercise;
   onComplete: () => void;
+  next: PracticeExercise | null;
 }) {
   const [answer, setAnswer] = useState('');
   const [checked, setChecked] = useState(false);
@@ -230,6 +247,11 @@ function PredictTypeView({
     <>
       <div className="pr-left">
         <ExerciseHeader exercise={exercise} />
+
+        <div className="pr-section pr-mobile-code">
+          <div className="pr-section-label">Expression</div>
+          <CodeBlock code={exercise.code} />
+        </div>
 
         <div className="pr-section">
           <div className="pr-section-label">Your answer</div>
@@ -274,6 +296,7 @@ function PredictTypeView({
             {(correct || checked) && (
               <div className="pr-feedback-explanation">{exercise.explanation}</div>
             )}
+            {correct && <NextUpLink exercise={exercise} next={next} />}
           </div>
         )}
 
@@ -316,10 +339,12 @@ function CodeExerciseView({
   exercise,
   onComplete,
   theme,
+  next,
 }: {
   exercise: FixErrorExercise | CompleteExercise | RefactorExercise;
   onComplete: () => void;
   theme: 'light' | 'dark';
+  next: PracticeExercise | null;
 }) {
   const { status, run, load } = useOcamlToplevel();
   const [code, setCode] = useState(exercise.starterCode);
@@ -578,10 +603,13 @@ function CodeExerciseView({
           )}
 
           {allPass && (
-            <div className="pr-success">
-              <span className="pr-success-icon">✓</span>
-              All tests pass!
-            </div>
+            <>
+              <div className="pr-success">
+                <span className="pr-success-icon">✓</span>
+                All tests pass!
+              </div>
+              <NextUpLink exercise={exercise} next={next} />
+            </>
           )}
         </div>
 
@@ -692,7 +720,7 @@ function CodeExerciseView({
             ) : (
               <>
                 Run Tests
-                <kbd className="pr-kbd">⌘↵</kbd>
+                <kbd className="pr-kbd">{RUN_KBD}</kbd>
               </>
             )}
           </button>
@@ -742,6 +770,27 @@ function ExerciseHeader({ exercise }: { exercise: PracticeExercise }) {
       <h1 className="pr-title">{exercise.title}</h1>
       <p className="pr-prompt">{exercise.prompt}</p>
     </div>
+  );
+}
+
+/** Forward CTA shown once an exercise is solved: next in the kind, or back to the list. */
+function NextUpLink({
+  exercise,
+  next,
+}: {
+  exercise: PracticeExercise;
+  next: PracticeExercise | null;
+}) {
+  const href = next
+    ? `/exercises/practice/${next.id}`
+    : `/exercises/practice/kind/${exercise.kind}`;
+  return (
+    <Link to={href} className="pr-next-link">
+      <span>{next ? `Next: ${next.title}` : `All done -- back to ${KIND_LABEL[exercise.kind]}`}</span>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M3 7h8M7.5 3.5L11 7l-3.5 3.5" />
+      </svg>
+    </Link>
   );
 }
 
@@ -801,18 +850,22 @@ function PracticeInner({
   function renderPanels() {
     switch (exercise.kind) {
       case 'predict-output':
-        return <PredictOutputView key={exercise.id} exercise={exercise} onComplete={onComplete} />;
+        return <PredictOutputView key={exercise.id} exercise={exercise} onComplete={onComplete} next={next} />;
       case 'predict-type':
-        return <PredictTypeView key={exercise.id} exercise={exercise} onComplete={onComplete} />;
+        return <PredictTypeView key={exercise.id} exercise={exercise} onComplete={onComplete} next={next} />;
       case 'fix-error':
       case 'complete':
       case 'refactor':
-        return <CodeExerciseView key={exercise.id} exercise={exercise} onComplete={onComplete} theme={theme} />;
+        return <CodeExerciseView key={exercise.id} exercise={exercise} onComplete={onComplete} theme={theme} next={next} />;
     }
   }
 
   return (
     <div className="pr-page" data-theme={theme}>
+      <PageMeta
+        title={`${exercise.title} | oCamlCase`}
+        description={exercise.prompt}
+      />
       <div className="pr-topbar">
         <Link to="/" className="pr-brand">
           <img src="/flaticon.png" alt="" />

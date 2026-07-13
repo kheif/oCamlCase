@@ -27,7 +27,9 @@ export default function Sidebar({ open, onClose }: Props) {
                 </span>
               ) : (
                 <Link
-                  key={link.path + link.label}
+                  // num disambiguates intentional repeats (e.g. Static Semantics is
+                  // both a standalone lab and step 3 of the interpreter sequence)
+                  key={`${link.num}${link.path}${link.label}`}
                   to={link.path}
                   data-flip-key={group.label === 'Interactive Labs' ? undefined : link.path}
                   className={`nav-link${isActive(pathname, link.path) ? ' active' : ''}`}

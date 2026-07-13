@@ -6,20 +6,9 @@ inbox, not a history log. Durable decisions that come out of a task move to `DEC
 
 ## Now
 
-Practice-fix audit plan (2026-07-13). Verified in dev: toplevel runs, pass/fail + answer
-checking correct, light/dark theme correct. Remaining, in priority order:
-
-- [ ] Ship it: merge `fix/practice-exercises-theme` into `main`, push (deploy workflow
-      runs tests then publishes). Live site still has the broken practice pages.
-- [ ] Scroll-to-top on route change (react-router keeps old scroll; pages open mid-scroll)
-- [ ] Add `PageMeta` to `PracticePage` + `PracticeKindIndex` (only pages without titles/SEO)
-- [ ] Platform-aware kbd hint: show `Ctrl ↵` on Windows/Linux, `⌘↵` on Mac (hardcoded ⌘ now)
-- [ ] "Next exercise" CTA in the success state (all-pass / correct feedback) -- current
-      dead-end forces hunting the small top-right arrows
-- [ ] Mobile: predict-output/predict-type panel order -- code should stack ABOVE the
-      answer input (code currently below the fold)
-- [ ] Route-level code splitting with `React.lazy` (single 840 kB JS chunk today)
-- [ ] Mobile topbar: theme toggle clipped off right edge
+_(empty -- 2026-07-13 audit plan fully shipped: practice fix merged, scroll reset,
+practice PageMeta, platform kbd, next-exercise CTA, mobile code-first order, route
+code splitting, mobile topbar fix)_
 
 ## Later
 

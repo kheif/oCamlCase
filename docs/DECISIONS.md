@@ -36,6 +36,16 @@ renders, how many of X exist). Append a short, dated `what + why` entry. Keep it
 - **Quiet warm-paper aesthetic is intentional.** Demos match the existing demo-box look
   exactly; do not restyle chrome unless asked. _2026-06-11_
 
+## UX / UI (practice, mobile)
+
+- **Predict exercises on mobile show the code INSIDE the left panel** (a `.pr-mobile-code`
+  duplicate block, right panel hidden at <=700px). The two-panel layout stacks left-first,
+  which put the answer box above the code -- unanswerable without scrolling. Chosen over
+  reordering panels because the header/prompt must stay on top. _2026-07-13_
+- **Solved state always renders a forward CTA** (`NextUpLink`: next exercise in the kind,
+  or back to the kind index on the last one). The topbar arrows alone were a dead end.
+  _2026-07-13_
+
 ## Behavior
 
 - **Predict-output answers are line-normalized + multiline.** `<textarea>` input;

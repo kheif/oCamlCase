@@ -41,4 +41,5 @@ export const data: RefactorExercise = {
     },
   ],
   solution: `let product xs = List.fold_left ( * ) 1 xs`,
+  signature: 'val product : int list -> int',
 };

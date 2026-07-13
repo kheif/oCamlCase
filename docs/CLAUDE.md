@@ -70,4 +70,26 @@ Rules:
 - For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- The graph is auto-refreshed by a `Stop` hook (`.claude/settings.json`) when source files change; a manual `graphify update .` is the fallback.
+
+---
+
+# Knowledge & Task System
+
+Three files, three jobs. Keep them distinct -- do not let history pile up anywhere.
+
+- **`TODO.md`** = task inbox. Read it at the start of work and whenever the user says they
+  wrote something there. Remove items when done. It is a live inbox, not a log.
+- **`DECISIONS.md`** = durable knowledge: design, UX/UI, behavior, architecture decisions
+  and lessons from corrections. After any such decision (or a non-obvious thing learned),
+  append a short dated `what + why` entry under the right section. This replaces
+  commit-by-commit logs -- never recreate those. Before starting work in an area you do
+  not already know, skim `DECISIONS.md` for relevant gotchas.
+- **Plans** (`~/.claude/plans/*.md`) are ephemeral scratch. Delete a plan once its work
+  ships/commits. Never let them accumulate.
+- **Auto-memory** (`~/.claude/.../memory/`) holds only personal / cross-project preferences
+  (e.g. no-em-dash, working style). Project knowledge goes in `DECISIONS.md`, not memory.
+
+Token discipline (these files load every session, keep them lean): prefer
+`graphify query/path/explain` over grep; read targeted file ranges; delegate broad search
+to subagents; DECISIONS.md is read on demand, not loaded by default.

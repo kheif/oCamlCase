@@ -1,9 +1,9 @@
 import {
   useCallback,
+  useEffect,
   useRef,
   useState,
   type KeyboardEvent,
-  type UIEvent,
 } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { KIND_LABEL } from './data/labels';
@@ -23,6 +23,7 @@ import type {
 } from './data/types';
 import ConfettiBurst from '../mini-exercises/ConfettiBurst';
 import KindIcon from './KindIcon';
+import CmEditor, { type CmEditorHandle, type TypeSig } from './CmEditor';
 import './Practice.css';
 
 // ── Syntax-highlighted read-only code block ───────────────────────────────
@@ -43,87 +44,6 @@ function CodeBlock({ code }: { code: string }) {
   );
 }
 
-// ── Editable code editor (highlighted backdrop trick) ─────────────────────
-
-function CodeEditor({
-  value,
-  onChange,
-  disabled,
-  filename,
-  onRun,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  disabled?: boolean;
-  filename: string;
-  onRun?: () => void;
-}) {
-  const preRef = useRef<HTMLPreElement>(null);
-
-  function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
-    // Ctrl+Enter / Cmd+Enter → run
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && onRun) {
-      e.preventDefault();
-      onRun();
-      return;
-    }
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const el = e.currentTarget;
-      const start = el.selectionStart;
-      const end = el.selectionEnd;
-      const next = value.slice(0, start) + '  ' + value.slice(end);
-      onChange(next);
-      requestAnimationFrame(() => {
-        el.selectionStart = el.selectionEnd = start + 2;
-      });
-    }
-  }
-
-  function handleScroll(e: UIEvent<HTMLTextAreaElement>) {
-    if (preRef.current) {
-      preRef.current.scrollTop = e.currentTarget.scrollTop;
-      preRef.current.scrollLeft = e.currentTarget.scrollLeft;
-    }
-  }
-
-  const lines = value.split('\n');
-
-  return (
-    <div className="pr-editor-wrap">
-      <div className="pr-editor-tab">
-        <span className="pr-editor-tab-dot" />
-        <span className="pr-editor-tab-dot" />
-        <span className="pr-editor-tab-dot" />
-        <span className="pr-editor-tab-name">{filename}</span>
-      </div>
-      <div className="pr-editor-inner">
-        <div className="pr-editor-sizer" aria-hidden="true">{value + '\n'}</div>
-        <pre ref={preRef} className="pr-editor-highlight" aria-hidden="true">
-          {lines.map((line, i) => (
-            <span key={i} className="pr-hl-line">
-              {highlightOcaml(line)}
-              {i < lines.length - 1 && '\n'}
-            </span>
-          ))}
-          {'\n'}
-        </pre>
-        <textarea
-          className="pr-editor-textarea"
-          value={value}
-          onChange={(e) => onChange(e.currentTarget.value)}
-          onKeyDown={handleKeyDown}
-          onScroll={handleScroll}
-          disabled={disabled}
-          spellCheck={false}
-          autoCapitalize="none"
-          autoCorrect="off"
-        />
-      </div>
-    </div>
-  );
-}
-
 // ── Spinner ───────────────────────────────────────────────────────────────
 
 function Spinner() {
@@ -131,6 +51,13 @@ function Spinner() {
 }
 
 // ── Predict-output exercise ───────────────────────────────────────────────
+
+/** Compare stdout leniently: trim each line, drop trailing blank lines. */
+function normalizeOutput(s: string): string {
+  const lines = s.replace(/\r\n/g, '\n').split('\n').map((l) => l.trim());
+  while (lines.length > 0 && lines[lines.length - 1] === '') lines.pop();
+  return lines.join('\n');
+}
 
 function PredictOutputView({
   exercise,
@@ -145,14 +72,18 @@ function PredictOutputView({
 
   function check() {
     if (!answer.trim()) return;
-    const ok = answer.trim() === exercise.expected.trim();
+    const ok = normalizeOutput(answer) === normalizeOutput(exercise.expected);
     setCorrect(ok);
     setChecked(true);
     if (ok) onComplete();
   }
 
-  function handleKey(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') check();
+  function handleKey(e: KeyboardEvent<HTMLTextAreaElement>) {
+    // Enter submits; Shift+Enter inserts a newline (output may span lines).
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      check();
+    }
   }
 
   const isDone = checked && correct;
@@ -167,14 +98,17 @@ function PredictOutputView({
           <div className="pr-section-label">Your prediction</div>
           <div className="pr-predict-input-row">
             <div className="pr-terminal-prompt">$</div>
-            <input
-              type="text"
-              className={`pr-predict-input ${checked ? (correct ? 'is-correct' : 'is-wrong') : ''}`}
+            <textarea
+              className={`pr-predict-input pr-predict-textarea ${checked ? (correct ? 'is-correct' : 'is-wrong') : ''}`}
               placeholder="What does this print?"
               value={answer}
               onChange={(e) => setAnswer(e.currentTarget.value)}
               onKeyDown={handleKey}
               disabled={isDone}
+              rows={3}
+              spellCheck={false}
+              autoCapitalize="none"
+              autoCorrect="off"
               autoFocus
             />
           </div>
@@ -224,7 +158,47 @@ function PredictOutputView({
 // ── Predict-type exercise ─────────────────────────────────────────────────
 
 function normalizeType(t: string): string {
-  return t.trim().replace(/\s+/g, ' ').replace(/\( /g, '(').replace(/ \)/g, ')');
+  let s = t.trim().replace(/\s+/g, ' ').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')');
+  s = stripOuterParens(s);
+  return canonicalizeVars(s);
+}
+
+/** Remove redundant balanced outer parens; leave `(a -> b) -> c` intact. */
+function stripOuterParens(s: string): string {
+  let str = s.trim();
+  while (str.length >= 2 && str[0] === '(' && str[str.length - 1] === ')') {
+    let depth = 0;
+    let wrapsWhole = true;
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === '(') depth++;
+      else if (str[i] === ')') {
+        depth--;
+        // Outer parens close before the end => they don't wrap the whole type.
+        if (depth === 0 && i < str.length - 1) { wrapsWhole = false; break; }
+      }
+    }
+    if (!wrapsWhole || depth !== 0) break;
+    str = str.slice(1, -1).trim();
+  }
+  return str;
+}
+
+/** Rename type vars canonically by first appearance: first distinct -> 'a, etc. */
+function canonicalizeVars(s: string): string {
+  const map = new Map<string, string>();
+  let n = 0;
+  return s.replace(/'[A-Za-z_][A-Za-z0-9_]*/g, (orig) => {
+    let canon = map.get(orig);
+    if (canon === undefined) { canon = "'" + nthVarName(n++); map.set(orig, canon); }
+    return canon;
+  });
+}
+
+/** 0->a ... 25->z, 26->a1, ... (matches OCaml's variable-naming scheme). */
+function nthVarName(i: number): string {
+  const letter = String.fromCharCode(97 + (i % 26));
+  const suffix = Math.floor(i / 26);
+  return suffix === 0 ? letter : `${letter}${suffix}`;
 }
 
 function PredictTypeView({
@@ -323,27 +297,100 @@ type TestResult = {
   expected: string;
 };
 
+/** Parse `val name : type = ...` echo lines from toplevel output. */
+function parseSignatures(raw: string): TypeSig[] {
+  const out: TypeSig[] = [];
+  raw.split('\n').forEach((line) => {
+    const m = line.match(/^val\s+(\S+)\s*:\s*(.+?)\s*=\s*.*$/);
+    if (m) out.push({ name: m[1], type: m[2].trim() });
+  });
+  return out;
+}
+
+/** First non-empty trimmed stdout line (the convention tests print one line). */
+function firstLine(raw: string): string {
+  return raw.split('\n').map((l) => l.trim()).filter(Boolean)[0] ?? '';
+}
+
 function CodeExerciseView({
   exercise,
   onComplete,
+  theme,
 }: {
   exercise: FixErrorExercise | CompleteExercise | RefactorExercise;
   onComplete: () => void;
+  theme: 'light' | 'dark';
 }) {
   const { status, run, load } = useOcamlToplevel();
   const [code, setCode] = useState(exercise.starterCode);
   const [results, setResults] = useState<TestResult[]>([]);
-  const [rawOutput, setRawOutput] = useState('');
   const [running, setRunning] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
   const [failCount, setFailCount] = useState(0);
   const runBtnRef = useRef<HTMLButtonElement>(null);
+  const cmRef = useRef<CmEditorHandle>(null);
+
+  // ── Failure-reason panel ────────────────────────────────────────────────
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  const [errorCollapsed, setErrorCollapsed] = useState(false);
+
+  // ── .ml / .mli tabs (refactor only) ─────────────────────────────────────
+  const isRefactor = exercise.kind === 'refactor';
+  const [activeTab, setActiveTab] = useState<'ml' | 'mli'>('ml');
+  const [signatures, setSignatures] = useState<TypeSig[]>([]);
+
+  // ── User-authored tests ─────────────────────────────────────────────────
+  const [userTests, setUserTests] = useState<TestCase[]>([]);
+  const [showAddTest, setShowAddTest] = useState(false);
+  const [draftName, setDraftName] = useState('');
+  const [draftExpr, setDraftExpr] = useState('');
+  const [draftExpected, setDraftExpected] = useState('');
 
   const [celebrating, setCelebrating] = useState(false);
   const [confettiOrigin, setConfettiOrigin] = useState<{ x: number; y: number } | null>(null);
 
+  const allTests = [...exercise.tests, ...userTests];
+  const userStartIdx = exercise.tests.length;
   const allPass = results.length > 0 && results.every((r) => r.state === 'pass');
   const passCount = results.filter((r) => r.state === 'pass').length;
+
+  // Rows to show: live results once a run happened, else a pending preview.
+  const rows: TestResult[] =
+    results.length > 0
+      ? results
+      : allTests.map((t) => ({ name: t.name, state: 'pending', expected: t.expected }));
+
+  // Stored signature fallback for the .mli tab before the first run.
+  const mliText =
+    signatures.length > 0
+      ? signatures.map((s) => `val ${s.name} : ${s.type}`).join('\n')
+      : isRefactor && exercise.signature
+        ? exercise.signature
+        : '';
+
+  function invalidateResults() {
+    // User changed the test set -- stale pass/fail no longer applies.
+    setResults([]);
+  }
+
+  function addTest() {
+    if (!draftExpr.trim()) return;
+    const name = draftName.trim() || `custom test ${userTests.length + 1}`;
+    setUserTests((prev) => [
+      ...prev,
+      { name, testCode: draftExpr, expected: draftExpected.trim() },
+    ]);
+    setDraftName('');
+    setDraftExpr('');
+    setDraftExpected('');
+    setShowAddTest(false);
+    invalidateResults();
+  }
+
+  function removeUserTest(userIdx: number) {
+    setUserTests((prev) => prev.filter((_, i) => i !== userIdx));
+    invalidateResults();
+  }
 
   const runTests = useCallback(() => {
     if (status !== 'ready') {
@@ -351,54 +398,88 @@ function CodeExerciseView({
       return;
     }
     setRunning(true);
-    setRawOutput('');
 
-    const testResults: TestResult[] = exercise.tests.map((t) => ({
-      name: t.name,
-      state: 'pending',
-      expected: t.expected,
-    }));
-    setResults(testResults);
+    const tests = [...exercise.tests, ...userTests];
+    setResults(tests.map((t) => ({ name: t.name, state: 'pending', expected: t.expected })));
 
-    const compileResult = run(code);
-    if (compileResult.hasError) {
-      setRawOutput(compileResult.raw);
-      setResults(testResults.map((r) => ({ ...r, state: 'fail' as const, got: 'compile error' })));
-      setRunning(false);
-      setFailCount((n) => n + 1);
-      return;
-    }
-
-    const filled: TestResult[] = [];
-    let allGood = true;
-    let accOutput = '';
-
-    for (let i = 0; i < exercise.tests.length; i++) {
-      const t: TestCase = exercise.tests[i];
-      const res = run(code + '\n' + t.testCode);
-      const line = res.raw.split('\n').map((l) => l.trim()).filter(Boolean)[0] ?? '';
-      const pass = line === t.expected;
-      if (!pass) allGood = false;
-      accOutput += res.raw + '\n';
-      filled.push({ name: t.name, state: pass ? 'pass' : 'fail', got: line, expected: t.expected });
-    }
-
-    setResults(filled);
-    setRawOutput(accOutput.trim());
-    setRunning(false);
-
-    if (allGood) {
-      onComplete();
-      const el = runBtnRef.current;
-      if (el) {
-        const rect = el.getBoundingClientRect();
-        setConfettiOrigin({ x: rect.left + rect.width / 2, y: rect.top });
-        setCelebrating(true);
+    try {
+      const compileResult = run(code);
+      if (compileResult.hasError) {
+        setResults(
+          tests.map((t) => ({
+            name: t.name,
+            state: 'fail' as const,
+            got: 'compile error',
+            expected: t.expected,
+          })),
+        );
+        setSignatures([]);
+        cmRef.current?.clearTypeHints();
+        setErrorDetail(compileResult.raw.trim() || 'Compilation failed.');
+        setErrorCollapsed(false);
+        setFailCount((n) => n + 1);
+        return;
       }
-    } else {
-      setFailCount((n) => n + 1);
+
+      // Code compiled -- derive + render inferred type signatures.
+      const sigs = parseSignatures(compileResult.raw);
+      setSignatures(sigs);
+      cmRef.current?.setTypeHints(sigs);
+
+      const filled: TestResult[] = [];
+      let allGood = true;
+      let firstFailRaw = '';
+
+      for (const t of tests) {
+        // Run the test expression alone against the already-compiled code.
+        // reset:false keeps the just-compiled definitions in scope, and avoids
+        // re-echoing their `val ... = <fun>` signatures into the output (which
+        // would make firstLine pick up the signature instead of the printed
+        // result).
+        const res = run(t.testCode, { reset: false });
+        const line = firstLine(res.raw);
+        const pass = line === t.expected;
+        if (!pass) {
+          allGood = false;
+          if (!firstFailRaw) firstFailRaw = res.raw;
+        }
+        filled.push({ name: t.name, state: pass ? 'pass' : 'fail', got: line, expected: t.expected });
+      }
+
+      setResults(filled);
+
+      if (allGood) {
+        setErrorDetail(null);
+        onComplete();
+        const el = runBtnRef.current;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          setConfettiOrigin({ x: rect.left + rect.width / 2, y: rect.top });
+          setCelebrating(true);
+        }
+      } else {
+        const failed = filled.find((r) => r.state === 'fail');
+        const summary = failed
+          ? `Test "${failed.name}" failed.\nExpected: ${failed.expected}\nGot: ${failed.got || '(nothing)'}\n\n${firstFailRaw.trim()}`
+          : firstFailRaw.trim();
+        setErrorDetail(summary.trim() || 'A test failed.');
+        setErrorCollapsed(false);
+        setFailCount((n) => n + 1);
+      }
+    } finally {
+      // Always reset -- a synchronous throw must never leave the button stuck.
+      setRunning(false);
     }
-  }, [status, run, load, code, exercise, onComplete]);
+  }, [status, run, load, code, exercise, userTests, onComplete]);
+
+  // CodeMirror renders blank if it was display:none (the .mli tab); re-measure
+  // whenever the editor tab becomes visible again.
+  useEffect(() => {
+    if (activeTab === 'ml') {
+      const id = requestAnimationFrame(() => cmRef.current?.refresh());
+      return () => cancelAnimationFrame(id);
+    }
+  }, [activeTab]);
 
   const isLoading = status === 'loading' || running;
   const canShowSolution = exercise.solution != null && failCount >= 2 && !showSolution;
@@ -409,20 +490,21 @@ function CodeExerciseView({
       <div className="pr-left">
         <ExerciseHeader exercise={exercise} />
 
-        {results.length > 0 && (
-          <div className="pr-section">
-            <div className="pr-section-label">
-              Tests
-              {results.length > 0 && (
-                <span className={`pr-test-score ${allPass ? 'all-pass' : ''}`}>
-                  {passCount} / {results.length}
-                </span>
-              )}
-            </div>
-            <div className="pr-tests">
-              {results.map((r, i) => (
+        <div className="pr-section">
+          <div className="pr-section-label">
+            Tests
+            {results.length > 0 && (
+              <span className={`pr-test-score ${allPass ? 'all-pass' : ''}`}>
+                {passCount} / {results.length}
+              </span>
+            )}
+          </div>
+          <div className="pr-tests">
+            {rows.map((r, i) => {
+              const isUser = i >= userStartIdx;
+              return (
                 <div
-                  key={r.name}
+                  key={`${r.name}-${i}`}
                   className={`pr-test ${r.state === 'pass' ? 'is-pass' : r.state === 'fail' ? 'is-fail' : ''}`}
                   style={{ '--i': i } as React.CSSProperties}
                 >
@@ -430,43 +512,170 @@ function CodeExerciseView({
                     {r.state === 'pass' ? '✓' : r.state === 'fail' ? '✗' : '·'}
                   </span>
                   <span className="pr-test-name">{r.name}</span>
+                  {isUser && <span className="pr-test-tag">yours</span>}
                   {r.state === 'fail' && r.got !== undefined && (
                     <span className="pr-test-detail">
                       got <code>{r.got || 'nothing'}</code>
                     </span>
                   )}
+                  {isUser && (
+                    <button
+                      className="pr-test-remove"
+                      onClick={() => removeUserTest(i - userStartIdx)}
+                      aria-label={`Remove test ${r.name}`}
+                      title="Remove"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
-              ))}
-            </div>
-
-            {allPass && (
-              <div className="pr-success">
-                <span className="pr-success-icon">✓</span>
-                All tests pass!
-              </div>
-            )}
+              );
+            })}
           </div>
-        )}
 
-        {rawOutput && !allPass && (
-          <details className="pr-output-details">
-            <summary className="pr-output-summary">OCaml output</summary>
-            <div className="pr-output">{rawOutput}</div>
-          </details>
-        )}
+          {showAddTest ? (
+            <div className="pr-add-test">
+              <input
+                className="pr-add-test-input"
+                placeholder="Test name (optional)"
+                value={draftName}
+                onChange={(e) => setDraftName(e.currentTarget.value)}
+              />
+              <input
+                className="pr-add-test-input pr-add-test-code"
+                placeholder={'let () = Printf.printf "%d\\n" (f 7)'}
+                value={draftExpr}
+                onChange={(e) => setDraftExpr(e.currentTarget.value)}
+                spellCheck={false}
+                autoCapitalize="none"
+                autoCorrect="off"
+              />
+              <input
+                className="pr-add-test-input"
+                placeholder="Expected output (e.g. 42)"
+                value={draftExpected}
+                onChange={(e) => setDraftExpected(e.currentTarget.value)}
+              />
+              <p className="pr-add-test-hint">
+                The expression must print exactly one line; it is compared to the expected output.
+              </p>
+              <div className="pr-add-test-actions">
+                <button className="pr-add-test-confirm" onClick={addTest} disabled={!draftExpr.trim()}>
+                  Add test
+                </button>
+                <button
+                  className="pr-add-test-cancel"
+                  onClick={() => setShowAddTest(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button className="pr-add-test-btn" onClick={() => setShowAddTest(true)}>
+              <span className="pr-add-test-plus">+</span> Add your own test
+            </button>
+          )}
+
+          {allPass && (
+            <div className="pr-success">
+              <span className="pr-success-icon">✓</span>
+              All tests pass!
+            </div>
+          )}
+        </div>
 
         <ExerciseFooter exercise={exercise} />
       </div>
 
-      {/* RIGHT: editor + sticky run bar */}
+      {/* RIGHT: tabbed editor + sticky run bar */}
       <div className="pr-right pr-right-editor">
-        <CodeEditor
-          value={code}
-          onChange={setCode}
-          disabled={isLoading}
-          filename="exercise.ml"
-          onRun={runTests}
-        />
+        <div className="pr-editor-tabs" role="tablist">
+          <button
+            role="tab"
+            aria-selected={activeTab === 'ml'}
+            className={`pr-tab ${activeTab === 'ml' ? 'is-active' : ''}`}
+            onClick={() => setActiveTab('ml')}
+          >
+            exercise.ml
+          </button>
+          {isRefactor && (
+            <button
+              role="tab"
+              aria-selected={activeTab === 'mli'}
+              className={`pr-tab ${activeTab === 'mli' ? 'is-active' : ''}`}
+              onClick={() => setActiveTab('mli')}
+              title="Expected type signature"
+            >
+              exercise.mli
+            </button>
+          )}
+        </div>
+
+        <div className="pr-editor-stage">
+          <div
+            className="pr-editor-pane"
+            style={{ display: activeTab === 'ml' ? 'flex' : 'none' }}
+          >
+            <CmEditor
+              ref={cmRef}
+              value={code}
+              onChange={setCode}
+              disabled={isLoading}
+              theme={theme}
+              onRun={runTests}
+            />
+          </div>
+
+          {isRefactor && activeTab === 'mli' && (
+            <div className="pr-mli-pane">
+              <div className="pr-mli-note">
+                {signatures.length > 0
+                  ? 'Inferred signature from your last run.'
+                  : 'Target signature. Run your code to see the inferred type.'}
+              </div>
+              <div className="pr-code-block">
+                <pre>
+                  {(mliText || '(* no signature *)').split('\n').map((line, i) => (
+                    <div key={i} className="pr-code-line">
+                      <span className="pr-code-gutter">{i + 1}</span>
+                      <span className="pr-code-text">{highlightOcaml(line)}</span>
+                    </div>
+                  ))}
+                </pre>
+              </div>
+            </div>
+          )}
+
+          {errorDetail && (
+            <div className={`pr-why ${errorCollapsed ? 'is-collapsed' : ''}`} role="alert">
+              <div className="pr-why-head">
+                <span className="pr-why-icon">✗</span>
+                <span className="pr-why-title">Why it failed</span>
+                <button
+                  className="pr-why-toggle"
+                  onClick={() => setErrorCollapsed((c) => !c)}
+                  aria-label={errorCollapsed ? 'Expand' : 'Collapse'}
+                  aria-expanded={!errorCollapsed}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M3 4.5L6 7.5l3-3" />
+                  </svg>
+                </button>
+                <button
+                  className="pr-why-close"
+                  onClick={() => setErrorDetail(null)}
+                  aria-label="Dismiss"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="pr-why-body">
+                <pre>{errorDetail}</pre>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="pr-run-bar">
           <button
@@ -539,12 +748,23 @@ function ExerciseHeader({ exercise }: { exercise: PracticeExercise }) {
 function ExerciseFooter({ exercise }: { exercise: PracticeExercise }) {
   if (!exercise.conceptLink) return null;
   return (
-    <div className="pr-concept-link">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-        <path d="M6 1L6 11M1 6L11 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      </svg>
-      <Link to={exercise.conceptLink.href}>{exercise.conceptLink.label}</Link>
-    </div>
+    <Link to={exercise.conceptLink.href} className="pr-concept-link">
+      <span className="pr-concept-icon" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M8 3.5C8 3.5 6.5 2.5 3.5 2.5C2.95 2.5 2.5 2.95 2.5 3.5V12C2.5 12 4 11.5 6 12C7.2 12.3 8 13 8 13V3.5Z" />
+          <path d="M8 3.5C8 3.5 9.5 2.5 12.5 2.5C13.05 2.5 13.5 2.95 13.5 3.5V12C13.5 12 12 11.5 10 12C8.8 12.3 8 13 8 13V3.5Z" />
+        </svg>
+      </span>
+      <span className="pr-concept-text">
+        <span className="pr-concept-eyebrow">Related concept</span>
+        <span className="pr-concept-label">{exercise.conceptLink.label}</span>
+      </span>
+      <span className="pr-concept-arrow" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 7h8M7.5 3.5L11 7l-3.5 3.5" />
+        </svg>
+      </span>
+    </Link>
   );
 }
 
@@ -587,7 +807,7 @@ function PracticeInner({
       case 'fix-error':
       case 'complete':
       case 'refactor':
-        return <CodeExerciseView key={exercise.id} exercise={exercise} onComplete={onComplete} />;
+        return <CodeExerciseView key={exercise.id} exercise={exercise} onComplete={onComplete} theme={theme} />;
     }
   }
 

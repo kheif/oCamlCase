@@ -8,12 +8,12 @@ export default function Layout() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Reset transient route-driven UI (mobile sidebar, scroll position) on
-    // every navigation; closing here also covers full reloads back into the
-    // SPA, which a Sidebar/Topbar onClick handler alone wouldn't catch.
+    // Close the mobile sidebar on every navigation; doing it here also covers
+    // full reloads back into the SPA, which a Sidebar/Topbar onClick handler
+    // alone wouldn't catch. Scroll reset lives in <ScrollToTop /> so it also
+    // applies to full-screen routes outside this layout.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSidebarOpen(false);
-    window.scrollTo(0, 0);
   }, [pathname]);
 
   return (

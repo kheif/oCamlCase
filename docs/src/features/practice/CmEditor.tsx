@@ -196,7 +196,6 @@ const CmEditor = forwardRef<CmEditorHandle, CmEditorProps>(function CmEditor(
       settingRef.current = false;
       clearTypeHints();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   // ── Sync theme + disabled ────────────────────────────────────────────────────

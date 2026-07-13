@@ -1,4 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
+import PageMeta from '../../components/PageMeta';
 import { usePracticeProgress } from '../../hooks/usePracticeProgress';
 import { practiceExercises } from './data';
 import type { PracticeExercise } from './data/types';
@@ -37,6 +38,10 @@ export default function PracticeKindIndex() {
 
   return (
     <div className="article">
+      <PageMeta
+        title={`${KIND_LABEL[kind]} | oCamlCase`}
+        description={KIND_DESC[kind]}
+      />
       <div className="page-header">
         <div className="page-label">
           <Link to="/exercises" style={{ color: 'inherit', textDecoration: 'none' }}>Exercises</Link>

@@ -610,6 +610,27 @@
 }
 .pr-success-icon { font-size: 15px; }
 
+/* Forward CTA once solved: next exercise in the kind, or back to the list */
+.pr-next-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 11px 14px;
+  background: var(--pr-accent);
+  border-radius: 7px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: none;
+  transition: filter 0.1s, transform 0.1s;
+  animation: pr-pop 0.25s var(--ease, ease) both;
+}
+.pr-next-link:hover { filter: brightness(1.08); text-decoration: none; color: #fff; }
+.pr-next-link:active { transform: scale(0.99); }
+.pr-next-link svg { flex-shrink: 0; }
+
 /* ── OCaml output (collapsible) ───────────────────────────────────────────── */
 
 .pr-output-details {
@@ -1279,12 +1300,24 @@ a.pr-idx-resume:hover .pr-idx-chevron {
 
 /* ── Responsive: stack panels on narrow screens ───────────────────────────── */
 
+/* Mobile-only inline code block for predict exercises (desktop shows the
+   right-hand panel instead). */
+.pr-mobile-code { display: none; }
+
 @media (max-width: 700px) {
   .pr-main { flex-direction: column; overflow-y: auto; }
   .pr-left  { width: 100%; max-width: 100%; border-right: none; border-bottom: 1px solid var(--pr-border); padding: 20px 16px 24px; }
   .pr-right { min-height: 340px; }
+  /* Predict exercises: code must sit above the answer box, not below the fold */
+  .pr-mobile-code { display: block; }
+  .pr-right-code { display: none; }
+  /* Topbar: it has overflow:hidden and every child is flex-shrink:0, so on
+     narrow screens drop the breadcrumb trail to keep nav + theme visible. */
   .pr-current-title { display: none; }
   .pr-dots { display: none; }
+  .pr-breadcrumb { display: none; }
+  .pr-sep { display: none; }
+  .pr-counter { font-size: 11px; }
 }
 
 /* ── Reduced motion ───────────────────────────────────────────────────────── */

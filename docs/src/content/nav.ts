@@ -11,6 +11,7 @@ const interactiveLabsGroup: NavGroup = {
     { num: '·', label: 'Tree Lab', path: '/concepts/tree-lab' },
     { num: '·', label: 'Playground', path: '/playground' },
     { num: '', label: 'Building an Interpreter', path: '', subHeader: true },
+    { num: '·', label: 'Overview', path: '/interpreter' },
     { num: '1.', label: 'Lexing', path: '/interpreter/lexing' },
     { num: '2.', label: 'Parsing', path: '/interpreter/parsing' },
     { num: '3.', label: 'Static Semantics', path: '/concepts/static-semantics' },
@@ -67,7 +68,7 @@ export function getTopbarLinks(mode: LearnMode): TopbarLink[] {
   return [
     { label: 'Cheat Sheet', path: pathFor('Cheat Sheet') },
     { label: 'Concepts', path: conceptSequence(mode)[0], matchPrefix: '/concepts/' },
-    { label: 'Labs', path: '/concepts/static-semantics', matchPrefix: '/interpreter/' },
+    { label: 'Labs', path: '/interpreter', matchPrefix: '/interpreter' },
     { label: 'Exercises', path: '/exercises', matchPrefix: '/exercises' },
     { label: 'Playground', path: '/playground' },
   ];

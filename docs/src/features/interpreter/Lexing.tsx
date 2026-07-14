@@ -162,8 +162,8 @@ export default function Lexing() {
       <CodeBlock fname="lex_var / lex_num" code={LEX_VAR_NUM} />
 
       <div className="lx-next">
-        Next: <Link to="/concepts/static-semantics">Static Semantics →</Link> (parsing slice coming
-        soon: tokens become an abstract syntax tree).
+        Next: <Link to="/interpreter/parsing">Parsing →</Link> where the token sequence becomes an
+        abstract syntax tree.
       </div>
     </div>
   );

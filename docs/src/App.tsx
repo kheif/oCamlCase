@@ -17,6 +17,7 @@ const PracticePage = lazy(() => import('./features/practice/PracticePage'));
 const PracticeKindIndex = lazy(() => import('./features/practice/PracticeKindIndex'));
 const Toycaml = lazy(() => import('./features/toycaml/Toycaml'));
 const TreeLab = lazy(() => import('./features/treelab/TreeLab'));
+const InterpreterOverview = lazy(() => import('./features/interpreter/Overview'));
 const Lexing = lazy(() => import('./features/interpreter/Lexing'));
 const Parsing = lazy(() => import('./features/interpreter/Parsing'));
 const Dynamics = lazy(() => import('./features/interpreter/Dynamics'));
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/exercises/practice/kind/:kind" element={<PracticeKindIndex />} />
           <Route path="/concepts/static-semantics" element={<Toycaml />} />
           <Route path="/concepts/tree-lab" element={<TreeLab />} />
+          <Route path="/interpreter" element={<InterpreterOverview />} />
           <Route path="/interpreter/lexing" element={<Lexing />} />
           <Route path="/interpreter/parsing" element={<Parsing />} />
           <Route path="/interpreter/dynamics" element={<Dynamics />} />

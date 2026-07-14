@@ -16,6 +16,12 @@ renders, how many of X exist). Append a short, dated `what + why` entry. Keep it
   App hardcodes BrowserRouter and features assume a browser; head-only gets the actual SEO
   win (deep links were HTTP 404 via the 404.html fallback). Route metadata is imported from
   the app's own modules -- never hand-list titles. _2026-07-14_
+  - **Gotcha: prerendering a route makes GitHub Pages serve it at a trailing slash.**
+    Once dist/<route>/index.html exists, `/route` 301-redirects to `/route/`. Any RELATIVE
+    asset path in code running on that route then resolves against `/route/` and 404s. Bit
+    the playground: `loadOCaml` used `playground/toplevels/...` -> became
+    `/playground/playground/toplevels/...` -> "Failed to load OCaml". Use absolute
+    (`/playground/...`) asset paths on any prerendered route. _2026-07-14_
 - **Capstone composes existing engines; it has no interpreter of its own.**
   `interpreter/pipeline.ts` = lex.ts + toycaml parseExp/elaborate/evalDerivation, so the
   REPL can't disagree with the per-stage widgets. lex.ts gained RFUN (slice-5 spirit);

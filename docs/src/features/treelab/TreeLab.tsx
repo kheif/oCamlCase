@@ -7,12 +7,12 @@
 //   Balance      - animated depthb fold, shows check/Unbalanced
 //
 // Architecture mirrors Toycaml.tsx: pure engine (.ts files) + React UI.
-// Stepper pattern (seenSteps reset, autoplay setTimeout, activeNode) is
-// reused verbatim from Toycaml.tsx:357-403.
+// Stepping uses the shared useStepper hook (src/hooks/useStepper.ts).
 
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
+import { useStepper } from '../../hooks/useStepper';
 import { highlightOcaml } from '../../lib/highlightOcaml';
 import {
   addChild,
@@ -135,44 +135,6 @@ if (import.meta.env.DEV) {
 type Mode = 'tour' | 'linearize' | 'project' | 'balance';
 type LinSub = 'pre' | 'post';
 type ProjSub = 'prep' | 'pop';
-
-// ---- Stepper hook (reusable pattern from Toycaml) --------------------------
-
-function useStepper(totalSteps: number) {
-  const [stepIdx, setStepIdx] = useState(totalSteps);
-  const [playing, setPlaying] = useState(false);
-
-  // Adjust-on-identity-change: when the step array changes (new tree or new
-  // mode), reset to fully-revealed - the result should never feel "stuck".
-  const [seen, setSeen] = useState(totalSteps);
-  if (totalSteps !== seen) {
-    setSeen(totalSteps);
-    setStepIdx(totalSteps);
-    if (playing) setPlaying(false);
-  }
-
-  useEffect(() => {
-    if (!playing || stepIdx >= totalSteps) return;
-    const id = setTimeout(() => setStepIdx((s) => Math.min(totalSteps, s + 1)), 700);
-    return () => clearTimeout(id);
-  }, [playing, stepIdx, totalSteps]);
-
-  // Clamp so downstream useMemos never receive an out-of-bounds index during
-  // the stale render frame before React re-renders with the updated state.
-  const clamped = Math.min(stepIdx, totalSteps);
-  const atEnd = clamped >= totalSteps;
-
-  function togglePlay() {
-    if (atEnd) { setStepIdx(0); setPlaying(true); }
-    else setPlaying((p) => !p);
-  }
-  function prev() { setPlaying(false); setStepIdx((s) => Math.max(0, s - 1)); }
-  function next() { setPlaying(false); setStepIdx((s) => Math.min(totalSteps, s + 1)); }
-  function replay() { setStepIdx(0); setPlaying(false); }
-  function showAll() { setStepIdx(totalSteps); setPlaying(false); }
-
-  return { stepIdx: clamped, playing, atEnd, togglePlay, prev, next, replay, showAll };
-}
 
 // ---- main component ---------------------------------------------------------
 

@@ -1,0 +1,11 @@
+/* Owned by ConfettiBurst so the canvas is styled wherever the component is
+   used (practice pages, index pages) -- with route-level code splitting the
+   MiniExercisePage stylesheet is not necessarily loaded. */
+.me-confetti {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+}

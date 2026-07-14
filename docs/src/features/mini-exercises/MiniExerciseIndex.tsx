@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
+import ConfettiBurst from './ConfettiBurst';
 import { miniExercises } from './data';
 import { useMiniProgress } from '../../hooks/useMiniProgress';
+import { useCelebrateOnce } from '../../hooks/useCelebrateOnce';
 import './MiniExerciseIndex.css';
 
 const CATEGORY_ORDER = [
@@ -74,6 +76,11 @@ export default function MiniExerciseIndex() {
   const total = miniExercises.length;
   const doneCount = miniExercises.filter((m) => completed.has(m.id)).length;
   const pct = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+  const { celebrating, origin, anchorRef, stop } = useCelebrateOnce(
+    'mini-celebrated',
+    doneCount,
+    total,
+  );
 
   const groups =
     viewMode === 'concept'
@@ -108,7 +115,7 @@ export default function MiniExerciseIndex() {
         </p>
       </div>
 
-      <div className="mini-progress-bar-wrap">
+      <div className="mini-progress-bar-wrap" ref={anchorRef}>
         <div className="mini-progress-meta">
           <span className="mini-progress-label">Progress</span>
           <span className="mini-progress-count">
@@ -168,6 +175,8 @@ export default function MiniExerciseIndex() {
           </div>
         );
       })}
+
+      {celebrating && origin && <ConfettiBurst origin={origin} onDone={stop} />}
     </div>
   );
 }

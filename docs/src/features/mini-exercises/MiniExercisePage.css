@@ -747,14 +747,7 @@
 .me-check {
   flex: none;
 }
-.me-confetti {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 999;
-}
+/* .me-confetti moved to ConfettiBurst.css (owned by the component) */
 .me-status-bad {
   color: var(--me-error-text);
   background: var(--me-error-bg);

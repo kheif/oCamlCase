@@ -16,9 +16,7 @@ Carried over from the old `tasks/todo.md` backlog (still open):
 
 - [ ] Capstone pipeline REPL + PipelineRail (chars -> tokens -> AST -> type -> value, M6+M8)
 - [ ] Overview page; migrate TreeLab/Toycaml to shared `useStepper`
-- [ ] Celebration rollout (after pilot review): index card completion, 100% progress moment
 - [ ] Pre-rendering for SEO (JSON-LD currently client-injected)
-- [ ] Verify 7 new mini-exercise outputs in the browser Playground
 
 ## Notes
 

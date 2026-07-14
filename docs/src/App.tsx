@@ -22,6 +22,7 @@ const Lexing = lazy(() => import('./features/interpreter/Lexing'));
 const Parsing = lazy(() => import('./features/interpreter/Parsing'));
 const Dynamics = lazy(() => import('./features/interpreter/Dynamics'));
 const Recursion = lazy(() => import('./features/interpreter/Recursion'));
+const Capstone = lazy(() => import('./features/interpreter/Capstone'));
 
 export default function App() {
   return (
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/interpreter/parsing" element={<Parsing />} />
           <Route path="/interpreter/dynamics" element={<Dynamics />} />
           <Route path="/interpreter/recursion" element={<Recursion />} />
+          <Route path="/interpreter/capstone" element={<Capstone />} />
           {contentRoutes
             .filter((r) => r.path !== '/')
             .map((r) => (

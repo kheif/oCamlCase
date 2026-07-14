@@ -92,6 +92,12 @@ const featurePages: Page[] = [
     description:
       'Adding recursive functions (rfun) to ToyCaml: the Srabs typing rule, the Drabs/Drapp evaluation rules with self-referential closures, and how recursion makes non-termination possible.',
   },
+  {
+    path: '/interpreter/capstone',
+    title: 'Capstone: the Whole Pipeline | oCamlCase',
+    description:
+      'Every stage of the ToyCaml interpreter in one REPL: type an expression and watch it travel from characters through tokens and the syntax tree to a type and finally a value.',
+  },
 ];
 
 const pages: Page[] = [

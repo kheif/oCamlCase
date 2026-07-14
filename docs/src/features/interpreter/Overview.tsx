@@ -59,6 +59,15 @@ const STAGES: Stage[] = [
     blurb:
       'Recursive abstractions buy real expressive power; the price is that a well-typed program may now run forever.',
   },
+  {
+    num: '6',
+    title: 'Capstone: the Pipeline',
+    href: '/interpreter/capstone',
+    from: 'source',
+    to: 'value',
+    blurb:
+      'All five stages wired end to end in one REPL. Type an expression and watch how far it travels, and where it stops.',
+  },
 ];
 
 const RAIL = ['characters', 'tokens', 'syntax tree', 'type', 'value'];

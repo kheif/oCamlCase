@@ -37,6 +37,7 @@ export type Token =
   | { t: 'THEN' }
   | { t: 'ELSE' }
   | { t: 'FUN' }
+  | { t: 'RFUN' } // slice 5 extension (recursive abstractions), not in the slides' lexer
   | { t: 'BOOL' }
   | { t: 'INT' }
   | { t: 'CON'; con: Con }
@@ -84,6 +85,8 @@ export function tokenText(tok: Token): string {
       return 'else';
     case 'FUN':
       return 'fun';
+    case 'RFUN':
+      return 'rfun';
     case 'BOOL':
       return 'bool';
     case 'INT':
@@ -126,6 +129,7 @@ const KEYWORDS: Record<string, Token> = {
   then: { t: 'THEN' },
   else: { t: 'ELSE' },
   fun: { t: 'FUN' },
+  rfun: { t: 'RFUN' },
   false: { t: 'CON', con: { kind: 'BCon', value: false } },
   true: { t: 'CON', con: { kind: 'BCon', value: true } },
 };

@@ -17,6 +17,7 @@ const interactiveLabsGroup: NavGroup = {
     { num: '3.', label: 'Static Semantics', path: '/concepts/static-semantics' },
     { num: '4.', label: 'Dynamic Semantics', path: '/interpreter/dynamics' },
     { num: '5.', label: 'Recursion & Divergence', path: '/interpreter/recursion' },
+    { num: '6.', label: 'Capstone: the Pipeline', path: '/interpreter/capstone' },
   ],
 };
 

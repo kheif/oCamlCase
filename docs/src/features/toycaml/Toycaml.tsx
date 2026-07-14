@@ -1,6 +1,7 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
+import { useStepper } from '../../hooks/useStepper';
 import { highlightOcaml } from '../../lib/highlightOcaml';
 import { free, showExp, showExpAst, showTy, type Exp, type Ty } from './ast';
 import {
@@ -344,8 +345,6 @@ export default function Toycaml() {
   const [presetIdx, setPresetIdx] = useState(0);
   const [envRows, setEnvRows] = useState<EnvRow[]>(() => clonePreset(PRESETS[0]).env);
   const [exprText, setExprText] = useState(() => clonePreset(PRESETS[0]).expr);
-  const [stepIdx, setStepIdx] = useState(0);
-  const [playing, setPlaying] = useState(false);
   const [activeTab, setActiveTab] = useState<'check' | 'run'>('check');
   const [runValues, setRunValues] = useState<Record<string, string>>({});
 
@@ -385,35 +384,17 @@ export default function Toycaml() {
 
   const steps = useMemo(() => (derivation ? flattenPostOrder(derivation) : []), [derivation]);
 
-  // Re-derivations (new preset, edited env/expression) start fully revealed -
-  // the result should never feel "stuck" - but the stepper can replay the build.
-  // Resetting on a new `steps` identity *during render* (React's documented
-  // "adjusting state when a prop changes" pattern) avoids the cascading-render
-  // effect the linter flags for `setState` inside `useEffect`.
+  // Shared stepper (src/hooks/useStepper.ts) at the original 900ms cadence.
+  const stepper = useStepper(steps.length, 900);
+  const { stepIdx, playing, atEnd, togglePlay } = stepper;
+
+  // The hook resets to fully-revealed when the step COUNT changes; also reset
+  // when a re-derivation produces a different `steps` array of the same length
+  // (edited env/expression), using the render-time "adjust state" pattern.
   const [seenSteps, setSeenSteps] = useState(steps);
   if (steps !== seenSteps) {
     setSeenSteps(steps);
-    setStepIdx(steps.length);
-    if (playing) setPlaying(false);
-  }
-
-  // ---- B1: autoplay - schedules its own next tick; the pending setState lives
-  // inside the timer callback (async), not the effect body, so this is the
-  // "subscribe to an external clock" shape the set-state-in-effect lint allows. ----
-  useEffect(() => {
-    if (!playing || stepIdx >= steps.length) return undefined;
-    const id = setTimeout(() => setStepIdx((s) => Math.min(steps.length, s + 1)), 900);
-    return () => clearTimeout(id);
-  }, [playing, stepIdx, steps.length]);
-
-  const atEnd = stepIdx >= steps.length;
-  function togglePlay() {
-    if (atEnd) {
-      setStepIdx(0);
-      setPlaying(true);
-    } else {
-      setPlaying((p) => !p);
-    }
+    stepper.showAll();
   }
 
   // ---- B2: the node the cursor is currently on - drives cross-panel highlight
@@ -859,12 +840,12 @@ export default function Toycaml() {
                 {effectiveTab === 'check' && (
                   <>
                     <div className="tc-stepper">
-                      <button type="button" onClick={() => setStepIdx(0)} disabled={stepIdx === 0}>
+                      <button type="button" onClick={stepper.replay} disabled={stepIdx === 0}>
                         ⟲ Replay
                       </button>
                       <button
                         type="button"
-                        onClick={() => setStepIdx((s) => Math.max(0, s - 1))}
+                        onClick={stepper.prev}
                         disabled={stepIdx === 0}
                       >
                         ← Prev
@@ -881,7 +862,7 @@ export default function Toycaml() {
                       </span>
                       <button
                         type="button"
-                        onClick={() => setStepIdx((s) => Math.min(steps.length, s + 1))}
+                        onClick={stepper.next}
                         disabled={stepIdx === steps.length}
                       >
                         Next →
@@ -889,7 +870,7 @@ export default function Toycaml() {
                       <button
                         type="button"
                         className="tc-step-skip"
-                        onClick={() => setStepIdx(steps.length)}
+                        onClick={stepper.showAll}
                         disabled={stepIdx === steps.length}
                       >
                         Show full derivation

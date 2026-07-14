@@ -12,13 +12,9 @@ code splitting, mobile topbar fix)_
 
 ## Later
 
-Carried over from the old `tasks/todo.md` backlog (still open):
-
-- [ ] Capstone pipeline REPL + PipelineRail (chars -> tokens -> AST -> type -> value, M6+M8)
-- [ ] Overview page; migrate TreeLab/Toycaml to shared `useStepper`
-- [ ] Celebration rollout (after pilot review): index card completion, 100% progress moment
-- [ ] Pre-rendering for SEO (JSON-LD currently client-injected)
-- [ ] Verify 7 new mini-exercise outputs in the browser Playground
+_(empty -- the old backlog shipped 2026-07-14: capstone pipeline REPL, interpreter
+overview page, useStepper migration, SEO prerender + generated sitemap, celebration
+rollout, mini-exercise output verification)_
 
 ## Notes
 

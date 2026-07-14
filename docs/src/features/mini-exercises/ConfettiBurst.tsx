@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import './ConfettiBurst.css';
 
 type Props = {
   origin: { x: number; y: number };

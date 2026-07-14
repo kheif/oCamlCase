@@ -302,8 +302,8 @@ export default function Dynamics() {
       </p>
 
       <div className="lx-next">
-        Next: Recursion &amp; Divergence, adding <code>rfun</code>, where termination is no longer
-        guaranteed. (coming soon)
+        Next: <Link to="/interpreter/recursion">Recursion &amp; Divergence →</Link> adding{' '}
+        <code>rfun</code>, where termination is no longer guaranteed.
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
+import ConfettiBurst from '../mini-exercises/ConfettiBurst';
+import { useCelebrateOnce } from '../../hooks/useCelebrateOnce';
 import { usePracticeProgress } from '../../hooks/usePracticeProgress';
 import { practiceExercises } from './data';
 import type { PracticeExercise } from './data/types';
@@ -24,17 +26,22 @@ function ChevronRight() {
 export default function PracticeKindIndex() {
   const { kind: rawKind } = useParams<{ kind: string }>();
   const kind = rawKind as PracticeExercise['kind'];
-  // Hooks must run before any early return (rules-of-hooks)
+  // Hooks must run before any early return (rules-of-hooks); for an unknown
+  // kind the filter is empty and the redirect below never renders the rest.
   const { completed } = usePracticeProgress();
-
-  if (!SECTION_ORDER.includes(kind)) {
-    return <Navigate to="/exercises" replace />;
-  }
-
   const exercises = practiceExercises.filter((e) => e.kind === kind);
   const doneCount = exercises.filter((e) => completed.has(e.id)).length;
   const total     = exercises.length;
   const pct       = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+  const { celebrating, origin, anchorRef, stop } = useCelebrateOnce(
+    `pr-celebrated-${kind}`,
+    doneCount,
+    total,
+  );
+
+  if (!SECTION_ORDER.includes(kind)) {
+    return <Navigate to="/exercises" replace />;
+  }
 
   return (
     <div className="article">
@@ -52,7 +59,7 @@ export default function PracticeKindIndex() {
       </div>
 
       {/* progress overview */}
-      <div className="pr-idx-overview">
+      <div className="pr-idx-overview" ref={anchorRef}>
         <div className="pr-idx-overview-progress">
           <div className="pr-idx-overview-headline">
             <span className="pr-idx-overview-count">{doneCount} of {total}</span>
@@ -137,6 +144,8 @@ export default function PracticeKindIndex() {
           })}
         </div>
       </div>
+
+      {celebrating && origin && <ConfettiBurst origin={origin} onDone={stop} />}
     </div>
   );
 }

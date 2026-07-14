@@ -10,6 +10,18 @@ renders, how many of X exist). Append a short, dated `what + why` entry. Keep it
 
 ## Architecture
 
+- **SEO prerender is meta-level, not renderToString.** `scripts/prerender.ts` (vite-node,
+  runs in `npm run build`) writes dist/<route>/index.html per route with real head tags +
+  JSON-LD, and generates sitemap.xml from the same route list. Full body SSR was rejected:
+  App hardcodes BrowserRouter and features assume a browser; head-only gets the actual SEO
+  win (deep links were HTTP 404 via the 404.html fallback). Route metadata is imported from
+  the app's own modules -- never hand-list titles. _2026-07-14_
+- **Capstone composes existing engines; it has no interpreter of its own.**
+  `interpreter/pipeline.ts` = lex.ts + toycaml parseExp/elaborate/evalDerivation, so the
+  REPL can't disagree with the per-stage widgets. lex.ts gained RFUN (slice-5 spirit);
+  the toycaml parser still uses its internal tokenizer -- fine, they agree on the surface
+  syntax. _2026-07-14_
+
 - **OCaml toplevel needs a hidden DOM subtree, not just `#output`.** The
   `toplevel-5.1.1.js` bundle's `onload` init wires stdout to `#output` only if
   `#toplevel-container`, `#output`, `#userinput`, and a working `#test-canvas` all exist;

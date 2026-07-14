@@ -1485,7 +1485,10 @@ function loadOCaml(cb) {
   btn.disabled = true;
   window.version = '5.1.1';
   const s = document.createElement('script');
-  s.src = 'playground/toplevels/toplevel-5.1.1.js';
+  // Absolute path: the site prerenders /playground/index.html, so GitHub Pages
+  // serves the route at /playground/ (trailing slash). A relative src would then
+  // resolve against /playground/ and 404 on /playground/playground/toplevels/...
+  s.src = '/playground/toplevels/toplevel-5.1.1.js';
   s.onload = () => {
     let initError = null;
     // The toplevel JS sets window.onload to its init function.
